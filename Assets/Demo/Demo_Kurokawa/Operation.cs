@@ -62,6 +62,11 @@ public class Operation : MonoBehaviour
         }
     }
 
+    public bool GetIsLongTouch()
+	{
+        return isLongTouch;
+	}
+
     void Update()
     {
         //タップされた時（左クリック）
@@ -74,41 +79,47 @@ public class Operation : MonoBehaviour
             touchStartPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
         }
 
-        //毎フレームタッチの移動量を取得するモードならば
-        if (isWorkEveryFrame)
+        if (rotateObject != null)
         {
-            //タッチしているとき、一番初めのタップ一から現在のタップ位置でフリック方向を決定する
-            if (isTouching)
+
+
+            //毎フレームタッチの移動量を取得するモードならば
+            if (isWorkEveryFrame)
             {
-                //前フレームのタッチ位置と現在のフレームのタッチ位置が一緒だったらオブジェクトを回転させない
-                if (touchEndPos.magnitude != new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z).magnitude)
-				{
+                //タッチしているとき、一番初めのタップ一から現在のタップ位置でフリック方向を決定する
+                if (isTouching)
+                {
+                    //前フレームのタッチ位置と現在のフレームのタッチ位置が一緒だったらオブジェクトを回転させない
+                    // if (touchEndPos.magnitude != new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z).magnitude)
+                    //{
                     //最終地点（現在のタップ位置）を更新してフリック方向を決定する
                     DecideDirection();
                     //回転対象のオブジェクトにフリック方向を与える
                     rotateObject.GetComponent<ObjectRotation>().Rotate(direction);
+                    // }
                 }
             }
-        }
-        //タップ開始位置からタップを離したところまでをフリック操作とみなすモードならば
-        else
-        {
-            //タップが離された時
-            if (Input.GetMouseButtonUp(0))
+            //タップ開始位置からタップを離したところまでをフリック操作とみなすモードならば
+            else
             {
-                //タッチしていない
-                isTouching = false;
-                //長押ししていない
-                isLongTouch = false;
-                //一定時間以上長押ししていない
-                isDecideDirWhenLongTouch = false;
-                //タッチしている時間をリセット
-                touchTime = 0.0f;
-                //どの方向にフリックしたか判断する
-                DecideDirection();
-                //オブジェクトをフリックした方向に回転させる
-                rotateObject.GetComponent<ObjectRotation>().Rotate(direction);
+                //タップが離された時
+                if (Input.GetMouseButtonUp(0))
+                {
+                    //タッチしていない
+                    isTouching = false;
+                    //長押ししていない
+                    isLongTouch = false;
+                    //一定時間以上長押ししていない
+                    isDecideDirWhenLongTouch = false;
+                    //タッチしている時間をリセット
+                    touchTime = 0.0f;
+                    //どの方向にフリックしたか判断する
+                    DecideDirection();
+                    //オブジェクトをフリックした方向に回転させる
+                    rotateObject.GetComponent<ObjectRotation>().Rotate(direction);
+                }
             }
+
         }
 
         //タップが離された時各フラグ、変数をリセット
@@ -147,7 +158,7 @@ public class Operation : MonoBehaviour
             if(isLongTouch)
 			{
                 //長押し中のデバック表記
-                Debug.Log("counting! " + touchTime);
+                //Debug.Log("counting! " + touchTime);
             }
         }
     }
