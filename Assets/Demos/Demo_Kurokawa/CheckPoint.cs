@@ -17,11 +17,12 @@ public class CheckPoint : MonoBehaviourPunCallbacks
         
     }
 
-    void OnTriggerEneter(Collider col)
+    void OnTriggerEnter(Collider col)
 	{
         if(col.gameObject.tag == "OwnPlayer")
 		{
-            col.gameObject.GetComponent<ProgressChecker>().SetThroughPointName(col.gameObject.name);
+            col.gameObject.GetComponent<ProgressChecker>().SetThroughPointName(this.gameObject.name);
+            Debug.Log(this.gameObject.name);
 		}
 	}
 }

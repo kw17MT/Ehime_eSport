@@ -18,6 +18,9 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private bool isShownResult = false;
     private bool m_shouldCountDown = true;
 
+    private bool m_isInstantiateAI = false;
+    private int m_playerReadyNum = 0;
+
     private void Start()
     {
         // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
@@ -28,6 +31,23 @@ public class InGameScript : MonoBehaviourPunCallbacks
         // 自身のアバター（ネットワークオブジェクト）を生成する
         var position = new Vector3(currentPlayerNumber, 0.0f, 0.0f);
         PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+
+        //ホストのみ実行する部分
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            if (!m_isInstantiateAI)
+            {
+                for (int i = 0; i < 4 - PhotonNetwork.PlayerList.Length; i++)
+                {
+                    //プレイヤーを横に並べていく
+                    var AIPos = new Vector3(i + 1, 0.0f, 0.0f);
+                    //PrefabからAIをルームオブジェクトとして生成
+                    PhotonNetwork.InstantiateRoomObject("AI", AIPos, Quaternion.identity);
+                }
+                //AIを生成した。
+                m_isInstantiateAI = true;
+            }
+        }
 
         m_memberListText = GameObject.Find("MemberList");
         m_countDownText = GameObject.Find("CountDown");
@@ -51,7 +71,10 @@ public class InGameScript : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions(), TypedLobby.Default);
     }
 
-
+    public void AddReadyPlayerNum()
+	{
+        m_playerReadyNum++;
+    }
 
     public void AddGoaledPlayerNumAndRecordTime(float time)
     {
@@ -94,7 +117,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            if (m_shouldCountDown)
+            Debug.Log(m_playerReadyNum + "      /      "+ PhotonNetwork.PlayerList.Length);
+            if (m_shouldCountDown && m_playerReadyNum == PhotonNetwork.PlayerList.Length)
             {
                 //マッチング待機時間をゲーム時間で減らしていく
                 m_countDownNum -= Time.deltaTime;
@@ -103,7 +127,6 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 {
                     m_shouldCountDown = false;
                     //game開始フラグを立てるように通信を送る
-                    //GameObject.Find("OwnPlayer").GetComponent<AvatarController>().SetMovable();
                     photonView.RPC(nameof(SetPlayerMovable), RpcTarget.All);
 
                 }

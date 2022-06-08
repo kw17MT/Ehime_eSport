@@ -34,14 +34,15 @@ public class AvatarController : MonoBehaviourPunCallbacks
         if (SceneManager.GetActiveScene().name == "DemoInGame")
 		{
             m_rb.useGravity = true;
+            photonView.RPC(nameof(TellReadyOK), RpcTarget.MasterClient);
         }
 
         m_paramManager = GameObject.Find("ParamManager");
 
         //1秒間に何回通信するか
-        PhotonNetwork.SendRate = 3;
+        //PhotonNetwork.SendRate = 3;
         //1秒間に何回同期を行うか
-        PhotonNetwork.SerializationRate = 3;
+        //PhotonNetwork.SerializationRate = 3;
     }
 
     public void SetMovable()
@@ -61,6 +62,12 @@ public class AvatarController : MonoBehaviourPunCallbacks
         GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNumAndRecordTime(time);
     }
 
+    [PunRPC]
+    private void TellReadyOK()
+	{
+        GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddReadyPlayerNum();
+    }
+
     private void Update()
 	{
         if (SceneManager.GetActiveScene().name == "DemoInGame" && m_canMove)
@@ -72,7 +79,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_moveDir = this.transform.forward * (Input.GetAxis("Vertical") * 100.0f);
                 //m_rb.AddForce(m_moveDir);
                 //回転
-                m_rot = new Vector3(0.0f, Input.GetAxis("Horizontal") / 2.0f, 0.0f);
+                m_rot = new Vector3(0.0f, Input.GetAxis("Horizontal") / 1.0f, 0.0f);
 
                 //テストでボタンを押したらバナナが出るようにする。
                 if (Input.GetKeyDown(KeyCode.K))
