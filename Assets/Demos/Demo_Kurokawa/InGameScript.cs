@@ -3,6 +3,7 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 // MonoBehaviourPunCallbacksを継承して、PUNのコールバックを受け取れるようにする
 public class InGameScript : MonoBehaviourPunCallbacks
@@ -18,16 +19,38 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private bool isShownResult = false;
     private bool m_shouldCountDown = true;
 
+    Dictionary<string, float> m_scoreBoard = new Dictionary<string, float>();
+
+    private bool m_isInstantiateAI = false;
+    private int m_playerReadyNum = 0;
+
     private void Start()
     {
         // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
         PhotonNetwork.ConnectUsingSettings();
 
-        int currentPlayerNumber = PhotonNetwork.CountOfPlayersInRooms;
+        int id = GameObject.Find("ParamManager").GetComponent<ParamManage>().GetPlayerID();
 
         // 自身のアバター（ネットワークオブジェクト）を生成する
-        var position = new Vector3(currentPlayerNumber, 0.0f, 0.0f);
+        var position = new Vector3(id, 0.0f, 0.0f);
         PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+
+        //ホストのみ実行する部分
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            if (!m_isInstantiateAI)
+            {
+                for (int i = 0; i < 4 - PhotonNetwork.PlayerList.Length; i++)
+                {
+                    //プレイヤーを横に並べていく
+                    var AIPos = new Vector3(i + 1, 0.0f, 0.0f);
+                    //PrefabからAIをルームオブジェクトとして生成
+                    PhotonNetwork.InstantiateRoomObject("AI", AIPos, Quaternion.identity);
+                }
+                //AIを生成した。
+                m_isInstantiateAI = true;
+            }
+        }
 
         m_memberListText = GameObject.Find("MemberList");
         m_countDownText = GameObject.Find("CountDown");
@@ -43,22 +66,20 @@ public class InGameScript : MonoBehaviourPunCallbacks
         m_prevCountDownNum = (int)m_countDownNum;
     }
 
-
-    // マスターサーバーへの接続が成功した時に呼ばれるコールバック
-    public override void OnConnectedToMaster()
-    {
-        // "Room"という名前のルームに参加する（ルームが存在しなければ作成して参加する）
-        PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions(), TypedLobby.Default);
+    public void AddReadyPlayerNum()
+	{
+        m_playerReadyNum++;
     }
 
-
-
-    public void AddGoaledPlayerNumAndRecordTime(float time)
+    public void AddGoaledPlayerNameAndRecordTime(string playerName, float time)
     {
-        this.m_playerGoaledTime[m_goaledPlayerNum] = time;
+        //this.m_playerGoaledTime[m_goaledPlayerNum] = time;
+        //this.m_goaledPlayerNum++;
+        //Debug.Log("RECORED");
+        //Debug.Log("Result " + m_goaledPlayerNum + " / " + PhotonNetwork.PlayerList.Length);
+
+        m_scoreBoard.Add(playerName, time);
         this.m_goaledPlayerNum++;
-        Debug.Log("RECORED");
-        Debug.Log("Result " + m_goaledPlayerNum + " / " + PhotonNetwork.PlayerList.Length);
     }
 
     [PunRPC]
@@ -75,12 +96,14 @@ public class InGameScript : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void ShowResult(int goaledPlayerNum, float[] scoreBoard)
+    private void ShowResult(Dictionary<string, float> scoreBoard)
     {
-        for (int i = 0; i < goaledPlayerNum; i++)
-        {
-            m_resultText.GetComponent<Text>().text += "1st : " + scoreBoard[i] + "\n";
+        foreach(var score in scoreBoard)
+		{
+            m_resultText.GetComponent<Text>().text += "1st : " + score.Key + " : " + score.Value;
         }
+
+        //ここから下にＡＩのことを書いていく
     }
 
     void Update()
@@ -94,7 +117,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            if (m_shouldCountDown)
+            Debug.Log(m_playerReadyNum + "      /      "+ PhotonNetwork.PlayerList.Length);
+            if (m_shouldCountDown && m_playerReadyNum == PhotonNetwork.PlayerList.Length)
             {
                 //マッチング待機時間をゲーム時間で減らしていく
                 m_countDownNum -= Time.deltaTime;
@@ -103,7 +127,6 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 {
                     m_shouldCountDown = false;
                     //game開始フラグを立てるように通信を送る
-                    //GameObject.Find("OwnPlayer").GetComponent<AvatarController>().SetMovable();
                     photonView.RPC(nameof(SetPlayerMovable), RpcTarget.All);
 
                 }
@@ -121,17 +144,12 @@ public class InGameScript : MonoBehaviourPunCallbacks
             //ゴールしたプレイヤーの数がルーム内のプレイヤーの数と一致したら
             if (m_goaledPlayerNum == PhotonNetwork.PlayerList.Length && !isShownResult)
             {
-
-                photonView.RPC(nameof(ShowResult), RpcTarget.All, m_goaledPlayerNum, m_playerGoaledTime);
-
+                //完走タイムを表示するように全員に通知
+                photonView.RPC(nameof(ShowResult), RpcTarget.All, m_scoreBoard);
+                //完走通知を行った
                 isShownResult = true;
             }
-
-            //Debug.Log(PhotonNetwork.PlayerList.Length);
         }
-
-
-        //Debug.Log("Result " + m_goaledPlayerNum + " / " + PhotonNetwork.PlayerList.Length);
 
         //Escが押された時
         if (Input.GetKey(KeyCode.Escape))

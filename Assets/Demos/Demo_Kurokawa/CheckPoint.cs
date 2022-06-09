@@ -5,23 +5,14 @@ using Photon.Pun;
 
 public class CheckPoint : MonoBehaviourPunCallbacks
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    void OnTriggerEneter(Collider col)
+	//チェックポイントをくぐったら
+    void OnTriggerEnter(Collider col)
 	{
+		//OwnPlayerとタグ付けされていたら
         if(col.gameObject.tag == "OwnPlayer")
 		{
-            col.gameObject.GetComponent<ProgressChecker>().SetThroughPointName(col.gameObject.name);
+			//チェックした場所の名前を保存
+            col.gameObject.GetComponent<ProgressChecker>().SetThroughPointName(this.gameObject.name);
 		}
 	}
 }
