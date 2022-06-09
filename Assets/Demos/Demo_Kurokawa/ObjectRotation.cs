@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//使用感確認のテストオブジェクト用
 public class ObjectRotation : MonoBehaviour
 {
     Rigidbody rb = null;
@@ -11,14 +12,9 @@ public class ObjectRotation : MonoBehaviour
         rb = this.GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void Rotate(string dir)
     {
+        //どちらにフリックされたかでオブジェクトをその方向に回す
         switch (dir)
         {
             case "right":
@@ -27,6 +23,7 @@ public class ObjectRotation : MonoBehaviour
             case "left":
                 rb.angularVelocity = new Vector3(0.0f, 1.0f, 0.0f);
                 break;
+            //タッチで止める
             case "touch":
                 rb.angularVelocity = new Vector3(0.0f, 0.0f, 0.0f);
                 break;

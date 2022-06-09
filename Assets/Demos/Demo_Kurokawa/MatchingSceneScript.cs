@@ -3,16 +3,21 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
+using System.Collections.Generic;
 
 // MonoBehaviourPunCallbacksを継承して、PUNのコールバックを受け取れるようにする
+//マッチング中の挙動のクラス
 public class MatchingSceneScript : MonoBehaviourPunCallbacks
 {
     private GameObject m_memberListText = null;                     //メンバーリストを表示するテキストインスタンス
     private GameObject m_waitTimeText = null;                       //残り待機時間を表示するテキストインスタンス
     private GameObject m_operation = null;                          //操作管理のインスタンス
+    private GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
+
     private int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
-    private float m_matchingWaitTime = 50.0f;                        //残り待機時間
-    private bool m_isInstantiateAI = false;                         //AIインスタスを生成したか
+    private float m_matchingWaitTime = 500.0f;                       //残り待機時間
+    private bool m_isInstantiateAI = false;                         //AIインスタンスを生成したか
 
     private void Start()
     {
@@ -22,10 +27,33 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
         //名前でメンバーを表示するインスタンスを取得
         m_memberListText = GameObject.Find("MemberList");
+        m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
         //マッチング待機時間を表示するインスタンスを取得
         m_waitTimeText = GameObject.Find("WaitTime");
+        //シーン間で保持するパラメータインスタンス
+        m_paramManager = GameObject.Find("ParamManager");
         //シーンの遷移はホストクライアントに依存する
         PhotonNetwork.AutomaticallySyncScene = true;
+    }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+	{
+        m_memberListText.GetComponent<Text>().text = ".+ *SpecialRoomMember * +.\n";
+        //ルームのメンバーリストを更新する。
+        foreach (var pl in PhotonNetwork.PlayerList)
+        {
+            m_memberListText.GetComponent<Text>().text += pl.NickName + "\n";
+        }
+    }
+
+    public override void OnPlayerLeftRoom(Player player)
+	{
+        m_memberListText.GetComponent<Text>().text = ".+ *SpecialRoomMember * +.\n";
+        //ルームのメンバーリストを更新する。
+        foreach (var pl in PhotonNetwork.PlayerList)
+        {
+            m_memberListText.GetComponent<Text>().text += pl.NickName + "\n";
+        }
     }
 
     //作成するルームの設定インスタンス
@@ -36,7 +64,9 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         //部屋に参加できるか
         IsOpen = true,
         //この部屋がロビーにリストされるか
-        IsVisible = true, 
+        IsVisible = true,
+        //ユーザーIDの発布を行う。
+        PublishUserId = true,
     };
 
     // マスターサーバーへの接続が成功した時に呼ばれるコールバック
@@ -57,11 +87,56 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         //現在接続しているプレイヤー数を取得する。
-        int currentPlayerNumber = PhotonNetwork.PlayerList.Length - 1;
+        float currentPlayerNumber = (PhotonNetwork.PlayerList.Length - 1);
         //プレイヤーを横に並べていく
-        var position = new Vector3(currentPlayerNumber, 0.0f, 0.0f);
+        var position = new Vector3(currentPlayerNumber * 1.5f, 0.0f, 0.0f);
         //Prefabからプレイヤーが操作するモデルを生成
-        PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+        var player =  PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+
+        //今までこのルームに何人が入ってきたかでアクターナンバーが増えていく（書き込み不可）
+        int id = PhotonNetwork.LocalPlayer.ActorNumber;
+        //プレイヤーに5以上のIDが割り振られたことはどこかのタイミングで一人以上抜けている
+        if (id >= 5)
+		{
+			//ルームにいる他のプレイヤーを取得
+			Player[] otherPlayers = PhotonNetwork.PlayerListOthers;
+			//他のプレイヤーに割り当てられている、使えない名前とIDを保存していく配列を定義
+			var cantUseId = new List<string>();
+
+			foreach (var pl in otherPlayers)
+			{
+				//既に使っているIDを保存していく
+				cantUseId.Add(pl.NickName);
+			}
+
+            //Player1という名前のユーザーがいなければ、ID1を使用する。
+			if (!cantUseId.Contains("Player1"))
+			{
+				id = 1;
+			}
+			else if (!cantUseId.Contains("Player2"))
+			{
+				id = 2;
+			}
+			else if (!cantUseId.Contains("Player3"))
+			{
+				id = 3;
+			}
+			else if (!cantUseId.Contains("Player4"))
+			{
+				id = 4;
+			}
+		}
+        //プレイヤーのIDを記録する
+		m_paramManager.GetComponent<ParamManage>().SetPlayerID(id);
+
+
+        m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
+        //ルームのメンバーリストを更新する。
+        foreach (var pl in PhotonNetwork.PlayerList)
+        {
+            m_memberListText.GetComponent<Text>().text += pl.NickName + "\n";
+        }
     }
 
     //関数の通信の際に必要な表記
@@ -126,11 +201,11 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
 
     void Update()
     {
-        //ルームのメンバーリストを更新する。
         m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
-        foreach (var player in PhotonNetwork.PlayerList)
+        //ルームのメンバーリストを更新する。
+        foreach (var pl in PhotonNetwork.PlayerList)
         {
-            m_memberListText.GetComponent<Text>().text += player.NickName + "\n";
+            m_memberListText.GetComponent<Text>().text += pl.NickName + "\n";
         }
 
         //ホストのみ実行する部分
