@@ -46,6 +46,10 @@ MonoBehaviour:
   - DestroyHittedOrangePeel
   - SetCountDownTime
   - SetPlayerMovable
+  - AddGoaledPlayerNumAndRecordTime
+  - TellRecordTime
+  - ShowResult
+  - TellReadyOK
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

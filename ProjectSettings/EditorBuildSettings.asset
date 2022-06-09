@@ -9,12 +9,39 @@ EditorBuildSettings:
     path: 
     guid: d1c3109bdb54ad54c8a2b2838528e640
   - enabled: 1
-    path: Assets/Demo/Demo_Kurokawa/DemoScene.unity
+    path: Assets/Demos/Demo_Kurokawa/DemoScene.unity
     guid: 8027057e4d988e149a0f1d57ab03a055
   - enabled: 1
-    path: Assets/Demo/Demo_Kurokawa/DemoMatchingScene.unity
+    path: Assets/Demos/Demo_Kurokawa/DemoMatchingScene.unity
     guid: 17d28aa01a6e904409736ad5deb98102
   - enabled: 1
-    path: Assets/Demo/Demo_Kurokawa/DemoInGame.unity
+    path: Assets/Demos/Demo_Kurokawa/DemoInGame.unity
     guid: 822214aa80dc9a54692ea64f47aad08e
+  - enabled: 1
+    path: Assets/Scenes/01_TitleScene/01_TitleScene.unity
+    guid: 03457d6ebcd9f8e4f8b5c6561fb86076
+  - enabled: 1
+    path: Assets/Scenes/02_ModeSelectScene/02_ModeSelectScene.unity
+    guid: 0d94c9ecddaf546458f3d2a4c0da9ffd
+  - enabled: 1
+    path: Assets/Scenes/03_SettingScene/03_SettingScene.unity
+    guid: 3631cd71522ffd64790ee20dac102f4c
+  - enabled: 1
+    path: Assets/Scenes/04_CharaSelectScene/04_CharaSelectScene.unity
+    guid: f5f3253848f58e54e92479fc599610bd
+  - enabled: 1
+    path: Assets/Scenes/05_StageSelectScene/05_StageSelectScene.unity
+    guid: 4bf05514820297b48a3cb2fd004ad4c1
+  - enabled: 1
+    path: Assets/Scenes/06_CpuPowerSettingScene/06_CpuPowerSettingScene.unity
+    guid: 3bb0940aedd9ae544b7f08effff9c5e3
+  - enabled: 1
+    path: Assets/Scenes/07_MatchingScene/07_MatchingScene.unity
+    guid: 8a5bea98b43563e48badaa63bf610513
+  - enabled: 1
+    path: Assets/Scenes/08_GameScene/08_GameScene.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/09_ResultScene/09_ResultScene.unity
+    guid: 611abe24bdff6704c9528cc8b825459d
   m_configObjects: {}
