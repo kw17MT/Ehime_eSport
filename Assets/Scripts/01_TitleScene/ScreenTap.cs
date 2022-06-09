@@ -10,6 +10,9 @@ public class ScreenTap : MonoBehaviour
     //列車の移動範囲
     [SerializeField] float trainMoveRange;
 
+    //トランジション
+    [SerializeField] TransitionPostEffect m_transitionPostEffect;
+
     void Update()
     {
         //画面がタップされたかを判定
@@ -25,9 +28,11 @@ public class ScreenTap : MonoBehaviour
         //カメラに一定の距離まで近づいたら、
         if (this.transform.position.z < trainMoveRange)
         {
+            //トランジション起動
+            m_transitionPostEffect.OnTransition();
+
             //モード選択シーンに遷移
             SceneManager.LoadScene("02_ModeSelectScene");
-
         }
     }
 
@@ -43,6 +48,9 @@ public class ScreenTap : MonoBehaviour
         //画面がタップされたら、
         if (Input.GetButtonDown("Fire1"))
         {
+            //トランジション起動
+            m_transitionPostEffect.OnTransition();
+
             //列車が前進できる判定にする
             canAdvance = true;
         }

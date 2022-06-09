@@ -1,38 +1,62 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
-/// <summary>
-/// トランジションクラス
-/// </summary>
-public class PostEffect : MonoBehaviour
+public class PostEffect : ScriptableRendererFeature
 {
-    //ポストエフェクトシェーダー入りのマテリアル
-    public Material m_postEffectMat;
+    [SerializeField] private GrayscaleSetting settings = new GrayscaleSetting();
+    GrayScalePass scriptablePass;
 
-    //画面切り替え
-    const float m_kFadeMax = 128.0f;
-    float m_fadeCount = 1.0f;
-    [SerializeField]bool m_fadeFlag;
-
-    //更新関数
-    void Update()
+    public override void Create()
     {
-        //画面切り替え
-        //(仮処理：左ボタンクリックをしたら切り替え)
-        if(Input.GetMouseButtonDown(0))
+        if (settings.material != null)
         {
-            //フェードを切り替える
-            m_fadeFlag = !m_fadeFlag;
+            scriptablePass = new GrayScalePass();
+            scriptablePass.postEffectMaterial = settings.material;
+            scriptablePass.renderPassEvent = settings.renderPassEvent;
         }
-
-        m_fadeCount = Mathf.Clamp(m_fadeCount + (m_fadeFlag ? 1.0f : -1.0f) / m_kFadeMax, 0.0f, 1.0f);
-
-        m_postEffectMat.SetFloat("_FadeCount", m_fadeCount);
     }
 
-    void OnRenderImage(RenderTexture src, RenderTexture dest)
+    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        Graphics.Blit(src, dest, m_postEffectMat);
+        if (scriptablePass != null && scriptablePass.postEffectMaterial != null)
+        {
+            // レンダーキューに登録 (ポストエフェクト実行)
+            renderer.EnqueuePass(scriptablePass);
+        }
+    }
+
+
+    [System.Serializable]
+    public class GrayscaleSetting
+    {
+        // ポストエフェクトに使用するマテリアル
+        public Material material;
+
+        // レンダリングの実行タイミング
+        public RenderPassEvent renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
+    }
+
+    /// <summary>
+    /// Grayscale実行Pass
+    /// </summary>
+    class GrayScalePass : ScriptableRenderPass
+    {
+        private readonly string profilerTag = "GrayScale Pass";
+
+        public Material postEffectMaterial; // グレースケール計算用マテリアル
+
+        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            var cameraColorTarget = renderingData.cameraData.renderer.cameraColorTarget;
+
+            // コマンドバッファ
+            var cmd = CommandBufferPool.Get(profilerTag);
+
+            // マテリアル実行
+            cmd.Blit(cameraColorTarget, cameraColorTarget, postEffectMaterial);
+
+            context.ExecuteCommandBuffer(cmd);
+        }
     }
 }
