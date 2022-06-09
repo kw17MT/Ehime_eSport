@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class FpsDisplayScript : MonoBehaviour
 {
+    [SerializeField]
+    int m_fontSize = 20;
 
     //// Field ////
     int m_frameCount = 0;
     float m_prevTime = 0.0f;
     float m_fps = 0.0f;
+    GUIStyle m_guiStyle = new GUIStyle();
 
     //// Const Field ////
     float m_kFpsUpdateInterval = 0.5f;
@@ -19,7 +22,7 @@ public class FpsDisplayScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -43,7 +46,8 @@ public class FpsDisplayScript : MonoBehaviour
 
     private void OnGUI()
     {
-        GUILayout.Label(m_fps.ToString());
+        m_guiStyle.fontSize = m_fontSize;
+        GUILayout.Label(m_fps.ToString(), m_guiStyle);
 
         return;
     }
