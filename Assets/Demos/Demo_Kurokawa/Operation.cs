@@ -21,6 +21,7 @@ public class Operation : MonoBehaviour
         rotateObject = GameObject.Find("Cube");
     }
 
+    //どの方向にフリックしたか判断する関数
     void DecideDirection()
 	{
         //タッチを離した時の画面上の位置を取得
@@ -62,11 +63,13 @@ public class Operation : MonoBehaviour
         }
     }
 
+    //長押しかどうかを取得するゲッター
     public bool GetIsLongTouch()
 	{
         return isLongTouch;
 	}
 
+    //更新関数
     void Update()
     {
         //タップされた時（左クリック）
@@ -105,14 +108,8 @@ public class Operation : MonoBehaviour
                 //タップが離された時
                 if (Input.GetMouseButtonUp(0))
                 {
-                    //タッチしていない
-                    isTouching = false;
-                    //長押ししていない
-                    isLongTouch = false;
-                    //一定時間以上長押ししていない
-                    isDecideDirWhenLongTouch = false;
-                    //タッチしている時間をリセット
-                    touchTime = 0.0f;
+                    //タッチのフラグや数値を初期化する
+                    TachDataInit();
                     //どの方向にフリックしたか判断する
                     DecideDirection();
                     //オブジェクトをフリックした方向に回転させる
@@ -122,24 +119,18 @@ public class Operation : MonoBehaviour
 
         }
 
-        //タップが離された時各フラグ、変数をリセット
+        //タップが離されたとき、
         if (Input.GetMouseButtonUp(0))
         {
-            //タッチしていない
-            isTouching = false;
-            //長押ししていない
-            isLongTouch = false;
-            //一定時間以上長押ししていない
-            isDecideDirWhenLongTouch = false;
-            //タッチしている時間をリセット
-            touchTime = 0.0f;
+            //タッチのフラグや数値を初期化する
+            TachDataInit();
         }
 
         if (isTouching)
 		{
             //タッチしている時間をゲームタイムで計測
             touchTime += Time.deltaTime;
-            
+
             //ある程度長押ししたらスライドしていないか確かめる
             if (touchTime >= 1.2f && !isDecideDirWhenLongTouch)
             {
@@ -161,5 +152,18 @@ public class Operation : MonoBehaviour
                 //Debug.Log("counting! " + touchTime);
             }
         }
+    }
+
+    //タッチのフラグや数値を初期化する関数
+    void TachDataInit()
+    {
+        //タッチしていない
+        isTouching = false;
+        //長押ししていない
+        isLongTouch = false;
+        //一定時間以上長押ししていない
+        isDecideDirWhenLongTouch = false;
+        //タッチしている時間をリセット
+        touchTime = 0.0f;
     }
 }

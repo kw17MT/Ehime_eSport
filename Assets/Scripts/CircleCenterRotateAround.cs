@@ -6,13 +6,13 @@ using UnityEngine;
 public class CircleCenterRotateAround : MonoBehaviour
 {
     // 中心点
-    [SerializeField]GameObject center;
+    [SerializeField]GameObject m_center = null;
 
     // 回転軸(Y軸)
-    private Vector3 axis = Vector3.up;
+    Vector3 m_axis = Vector3.up;
 
     // 円運動周期
-    public float period;
+    public float period = 0.0f;
 
     //周れるかどうか
     bool aroundMoveOn = false;
@@ -20,14 +20,40 @@ public class CircleCenterRotateAround : MonoBehaviour
     //周る時間カウンター
     int aroundCount = 0;
 
+    //時計回りか反時計回りか
+    int m_reverse = 1;
+
+    //操作システム
+    OperationNew m_operation = null;
+
+    void Start()
+    {
+        //操作システムのゲームオブジェクトを検索しスクリプトを使用する
+        m_operation = GameObject.Find("OperationSystem").GetComponent<OperationNew>();
+    }
+
     void Update()
     {
-        //画面がタップされたら、
-        if (Input.GetButtonDown("Fire1")&&!aroundMoveOn)
+        if (!aroundMoveOn)
         {
-            //周れる状態にする
-            aroundMoveOn = true;
+            //画面が右フリックされたら、
+            if (m_operation.GetNowOperation() == "right")
+            {
+                //周れる状態にする
+                aroundMoveOn = true;
+                //時計回り
+                m_reverse = 1;
+            }
+            //画面が左フリックされたら、
+            if (m_operation.GetNowOperation() == "left")
+            {
+                //周れる状態にする
+                aroundMoveOn = true;
+                //時計回り
+                m_reverse = -1;
+            }
         }
+
 
         //周る処理を実行
         GoAround();
@@ -41,9 +67,9 @@ public class CircleCenterRotateAround : MonoBehaviour
 
         // 中心点centerの周りを、軸axisで、period周期で円運動
         transform.RotateAround(
-            center.transform.position,          //中心点
-            axis,                               //軸
-            360 / period * Time.deltaTime       //周期
+            m_center.transform.position,                     //中心点
+            m_axis,                                          //軸
+            360 / period * Time.deltaTime * m_reverse      //周期
         );
 
         //カウント計測

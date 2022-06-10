@@ -8,17 +8,17 @@ using UnityEngine.UI;
 /// </summary>
 public class VibrationToggle : MonoBehaviour
 {
-    [SerializeField]Image m_backgroundImage;
-    [SerializeField]RectTransform m_handle;
-    [SerializeField]bool m_onAwake;
+    [SerializeField]Image m_backgroundImage = null;
+    [SerializeField]RectTransform m_handle = null;
+    [SerializeField]bool m_onAwake = false;
 
     /// <summary>
     /// ƒgƒOƒ‹‚Ì’l
     /// </summary>
-    [NonSerialized] public bool m_value;
+    [NonSerialized] public bool m_value = false;
 
-    float m_handlePosX;
-    Sequence m_sequence;
+    float m_handlePosX = 0.0f;
+    Sequence m_sequence = null;
 
     static readonly Color m_OFF_BG_COLOR = new Color(0.92f, 0.92f, 0.92f);
     static readonly Color m_ON_BG_COLOR = new Color(0.2f, 0.84f, 0.3f);

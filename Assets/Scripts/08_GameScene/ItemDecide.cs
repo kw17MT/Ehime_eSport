@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class ItemDecide : MonoBehaviour
 {
     //全てのアイテムスプライトの配列
-    [SerializeField] Sprite[] itemSprite;
+    [SerializeField] Sprite[] itemSprite = null;
     //アイテム画像
-    [SerializeField]Image itemImage;
+    [SerializeField]Image itemImage = null;
 
     //ステート
     enum EnItemState
@@ -20,16 +20,16 @@ public class ItemDecide : MonoBehaviour
     EnItemState itemState = EnItemState.enNothingState;
 
     //点滅の回数
-    [SerializeField] int blinkingNumberOfTimes;
+    [SerializeField] int blinkingNumberOfTimes = 0;
     //点滅の表示時間
-    [SerializeField] float blinkingDelayTime;
+    [SerializeField] float blinkingDelayTime = 0.0f;
     //点滅処理が終了したかどうか
     bool isBlinkingFinish = false;
 
     //抽選回数
-    [SerializeField] int lotteryNumberOfTimes;
+    [SerializeField] int lotteryNumberOfTimes = 0;
     //抽選の表示時間
-    [SerializeField] float lotteryDelayTime;
+    [SerializeField] float lotteryDelayTime = 0.0f;
     //抽選処理が終了したかどうか
     bool isLotteryFinish = false;
 

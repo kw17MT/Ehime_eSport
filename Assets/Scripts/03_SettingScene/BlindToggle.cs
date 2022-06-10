@@ -8,27 +8,27 @@ using UnityEngine.UI;
 /// </summary>
 public class BlindToggle : MonoBehaviour
 {
-    [SerializeField] private Image backgroundImage;
-    [SerializeField] private RectTransform handle;
-    [SerializeField] private bool onAwake;
+    [SerializeField]Image m_backgroundImage = null;
+    [SerializeField]RectTransform m_handle = null;
+    [SerializeField]bool m_onAwake = false;
 
     /// <summary>
     /// ÉgÉOÉãÇÃíl
     /// </summary>
-    [NonSerialized] public bool Value;
+    [NonSerialized] public bool m_value = false;
 
-    private float handlePosX;
-    private Sequence sequence;
+    float m_handlePosX = 0.0f;
+    Sequence m_sequence = null;
 
-    private static readonly Color OFF_BG_COLOR = new Color(0.92f, 0.92f, 0.92f);
-    private static readonly Color ON_BG_COLOR = new Color(0.2f, 0.84f, 0.3f);
+    static readonly Color OFF_BG_COLOR = new Color(0.92f, 0.92f, 0.92f);
+    static readonly Color ON_BG_COLOR = new Color(0.2f, 0.84f, 0.3f);
 
-    private const float SWITCH_DURATION = 0.36f;
+    const float SWITCH_DURATION = 0.36f;
 
-    private void Start()
+    void Start()
     {
-        handlePosX = Mathf.Abs(handle.anchoredPosition.x);
-        Value = onAwake;
+        m_handlePosX = Mathf.Abs(m_handle.anchoredPosition.x);
+        m_value = m_onAwake;
         UpdateToggle(0);
     }
 
@@ -37,21 +37,21 @@ public class BlindToggle : MonoBehaviour
     /// </summary>
     public void SwitchToggle()
     {
-        Value = !Value;
+        m_value = !m_value;
         UpdateToggle(SWITCH_DURATION);
     }
 
     /// <summary>
     /// èÛë‘ÇîΩâfÇ≥ÇπÇÈ
     /// </summary>
-    private void UpdateToggle(float duration)
+    void UpdateToggle(float duration)
     {
-        var bgColor = Value ? ON_BG_COLOR : OFF_BG_COLOR;
-        var handleDestX = Value ? handlePosX : -handlePosX;
+        var bgColor = m_value ? ON_BG_COLOR : OFF_BG_COLOR;
+        var handleDestX = m_value ? m_handlePosX : -m_handlePosX;
 
-        sequence?.Complete();
-        sequence = DOTween.Sequence();
-        sequence.Append(backgroundImage.DOColor(bgColor, duration))
-            .Join(handle.DOAnchorPosX(handleDestX, duration / 2));
+        m_sequence?.Complete();
+        m_sequence = DOTween.Sequence();
+        m_sequence.Append(m_backgroundImage.DOColor(bgColor, duration))
+            .Join(m_handle.DOAnchorPosX(handleDestX, duration / 2));
     }
 }
