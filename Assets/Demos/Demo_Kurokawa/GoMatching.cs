@@ -5,17 +5,18 @@ using UnityEngine.SceneManagement;
 
 public class GoMatching : MonoBehaviour
 {
-    private GameObject operation = null;
-    // Start is called before the first frame update
+    GameObject operation = null;
+
+    //スタート関数
     void Start()
     {
         operation = GameObject.Find("OperationManager");
     }
 
-    // Update is called once per frame
+    //更新関数
     void Update()
     {
-        if (operation.GetComponent<Operation>().GetIsLongTouch())
+        if (operation.GetComponent<OperationOld>().GetIsLongTouch())
         {
             SceneManager.LoadScene("DemoMatchingScene");
             Debug.Log("To Standby Scene");

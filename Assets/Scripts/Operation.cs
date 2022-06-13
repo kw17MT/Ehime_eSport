@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// ユーザー操作(左右フリックやタッチ)
 /// </summary>
-public class OperationNew : MonoBehaviour
+public class Operation : MonoBehaviour
 {
     Vector3 m_touchStartPos = Vector3.zero;               //タッチを開始した位置
     Vector3 m_touchEndPos = Vector3.zero;                 //タッチを終えた位置、もしくは現在タッチしている位置（モードによって扱いが違う）
@@ -59,10 +59,10 @@ public class OperationNew : MonoBehaviour
                 m_canDataThrow = true;
             }
            else
-            {
-                //フリック方向またはタップの情報を渡せない状態にする
-                m_canDataThrow = false;
-            }
+           {
+               //フリック方向またはタップの情報を渡せない状態にする
+               m_canDataThrow = false;
+           }
         }
 
         //タップが離されたとき、

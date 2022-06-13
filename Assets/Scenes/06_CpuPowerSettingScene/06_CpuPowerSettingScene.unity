@@ -558,6 +558,14 @@ PrefabInstance:
       propertyPath: m_center
       value: 
       objectReference: {fileID: 2069432516}
+    - target: {fileID: 2017269562427295894, guid: 43c6bc23a1dde8642829611cf0e5eb15, type: 3}
+      propertyPath: m_period
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2017269562427295894, guid: 43c6bc23a1dde8642829611cf0e5eb15, type: 3}
+      propertyPath: m_countTime
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 2047881474351182769, guid: 43c6bc23a1dde8642829611cf0e5eb15, type: 3}
       propertyPath: m_RootOrder
       value: 5
@@ -819,6 +827,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6886c2dbed5d5640addf08503afe442, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_strengthName:
+  - "\u3088\u308F\u3044"
+  - "\u3075\u3064\u3046"
+  - "\u3064\u3088\u3044"
   m_strengthLabel: {fileID: 2054783541}
 --- !u!4 &1712961090
 Transform:

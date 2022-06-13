@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ScrollObject : MonoBehaviour
 {
-    [SerializeField] float speed = 0.0f;      //速度
+    [SerializeField] float speed = 0.0f;             //速度
     [SerializeField] float startPosition = 0.0f;     //開始位置
     [SerializeField] float endPosition = 0.0f;       //終了位置
 

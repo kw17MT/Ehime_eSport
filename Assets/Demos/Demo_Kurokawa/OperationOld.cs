@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Operation : MonoBehaviour
+public class OperationOld : MonoBehaviour
 {
     private Vector3 touchStartPos = Vector3.zero;               //タッチを開始した位置
     private Vector3 touchEndPos = Vector3.zero;                 //タッチを終えた位置、もしくは現在タッチしている位置（モードによって扱いが違う）

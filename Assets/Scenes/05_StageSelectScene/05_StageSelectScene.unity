@@ -716,6 +716,14 @@ PrefabInstance:
       propertyPath: m_center
       value: 
       objectReference: {fileID: 1746243186}
+    - target: {fileID: 2017269562427295894, guid: 43c6bc23a1dde8642829611cf0e5eb15, type: 3}
+      propertyPath: m_period
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2017269562427295894, guid: 43c6bc23a1dde8642829611cf0e5eb15, type: 3}
+      propertyPath: m_countTime
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 2047881474351182769, guid: 43c6bc23a1dde8642829611cf0e5eb15, type: 3}
       propertyPath: m_RootOrder
       value: 5

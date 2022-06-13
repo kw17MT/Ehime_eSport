@@ -822,7 +822,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce783179f6e2b1e4ca9b1f98edf3163d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_modeName:
+  - "\u30AA\u30F3\u30E9\u30A4\u30F3\u305F\u3044\u305B\u3093"
+  - "CPU\u305F\u3044\u305B\u3093"
+  - "\u30BF\u30A4\u30E0\u30A2\u30BF\u30C3\u30AF"
+  - "\u305B\u3063\u3066\u3044"
   m_modeLabel: {fileID: 953504262}
+  m_modeExplanationSentence:
+  - "\u30AA\u30F3\u30E9\u30A4\u30F3\u305F\u3044\u305B\u3093\u30E2\u30FC\u30C9\u3002"
+  - "CPU\u305F\u3044\u305B\u3093\u30E2\u30FC\u30C9\u3002"
+  - "\u30BF\u30A4\u30E0\u30A2\u30BF\u30C3\u30AF\u30E2\u30FC\u30C9\u3002"
+  - "\u305B\u3063\u3066\u3044\u30E2\u30FC\u30C9\u3002"
   m_modeExplanationLabel: {fileID: 918023782}
 --- !u!4 &1884125658
 Transform:
@@ -1074,6 +1084,14 @@ PrefabInstance:
       propertyPath: m_center
       value: 
       objectReference: {fileID: 1468374616}
+    - target: {fileID: 2017269562427295894, guid: 43c6bc23a1dde8642829611cf0e5eb15, type: 3}
+      propertyPath: m_period
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2017269562427295894, guid: 43c6bc23a1dde8642829611cf0e5eb15, type: 3}
+      propertyPath: m_countTime
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 2047881474351182769, guid: 43c6bc23a1dde8642829611cf0e5eb15, type: 3}
       propertyPath: m_RootOrder
       value: 7

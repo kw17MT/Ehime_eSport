@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class CpuPowerSettingChange : MonoBehaviour
 {
     //CPUの強さ名
-    string[] m_strengthName = { "よわい", "ふつう", "つよい" };
+    [SerializeField] string[] m_strengthName;
     //CPUの強さラベル
     [SerializeField] Text m_strengthLabel = null;
 
@@ -25,28 +25,41 @@ public class CpuPowerSettingChange : MonoBehaviour
     EnCpuPowerType m_nowSelectStrength = EnCpuPowerType.enWeak;
 
     //操作システム
-    OperationNew m_operation = null;
+    Operation m_operation = null;
+
+    //選択移動をしているか
+    bool m_selectMove = false;
+
+    //移動時間カウンター
+    int m_selectMoveCount = 0;
+
+    CircleCenterRotateAround m_circleCenterRotateAround = null;
 
     void Start()
     {
         //操作システムのゲームオブジェクトを検索しスクリプトを使用する
-        m_operation = GameObject.Find("OperationSystem").GetComponent<OperationNew>();
+        m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
+        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しスクリプトを使用する
+        m_circleCenterRotateAround = GameObject.Find("Train").GetComponent<CircleCenterRotateAround>();
     }
 
     //アップデート関数
     void Update()
     {
-        //画面が右フリックされたら、
-        if (m_operation.GetNowOperation() == "right")
+        if (!m_selectMove)
         {
-            //次のCPUの強さに選択を移動
-            GoNextCpuPower();
-        }
-        //画面が左フリックされたら、
-        if (m_operation.GetNowOperation() == "left")
-        {
-            //前のCPUの強さに選択を移動
-            GoBackStage();
+            //画面が右フリックされたら、
+            if (m_operation.GetNowOperation() == "right")
+            {
+                //次のCPUの強さに選択を移動
+                GoNextCpuPower();
+            }
+            //画面が左フリックされたら、
+            if (m_operation.GetNowOperation() == "left")
+            {
+                //前のCPUの強さに選択を移動
+                GoBackStage();
+            }
         }
 
         //画面が長押しされたら、
@@ -56,6 +69,9 @@ public class CpuPowerSettingChange : MonoBehaviour
             GoNextScene();
         }
 
+        //電車の移動に合わせて選択しているデータを合わせるカウンター
+        Count();
+
         //CPUの強さラベルを更新
         m_strengthLabel.text = m_strengthName[(int)m_nowSelectStrength];
     }
@@ -63,6 +79,8 @@ public class CpuPowerSettingChange : MonoBehaviour
     //次のCPUの強さに選択を移動する関数
     void GoNextCpuPower()
     {
+        //選択移動状態にする
+        m_selectMove = true;
         //選択されているCPUの強さを次の強さにする
         m_nowSelectStrength++;
         if (m_nowSelectStrength >= EnCpuPowerType.enMaxCpuPowserNum)
@@ -73,6 +91,8 @@ public class CpuPowerSettingChange : MonoBehaviour
     //前のCPUの強さに選択を移動する関数
     void GoBackStage()
     {
+        //選択移動状態にする
+        m_selectMove = true;
         //選択されているCPUの強さを前のCPUの強さにする
         m_nowSelectStrength--;
         if (m_nowSelectStrength < EnCpuPowerType.enWeak)
@@ -89,5 +109,24 @@ public class CpuPowerSettingChange : MonoBehaviour
 
         //マッチングシーンに遷移
         SceneManager.LoadScene("07_MatchingScene");
+    }
+
+    //電車の移動に合わせて選択しているデータを合わせるカウンター
+    void Count()
+    {
+        //選択移動状態じゃないときは処理をしない。
+        if (!m_selectMove) return;
+
+        //カウント計測
+        m_selectMoveCount++;
+
+        //カウントが指定した数値より大きくなったら、
+        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime())
+        {
+            //選択移動していない状態に戻す
+            m_selectMove = false;
+            //カウントの初期化
+            m_selectMoveCount = 0;
+        }
     }
 }

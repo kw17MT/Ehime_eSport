@@ -10,25 +10,17 @@ using UnityEngine.SceneManagement;
 public class CharaSelectChange : MonoBehaviour
 {
     //キャラクター名
-    string[] m_charaName = { "みきゃん", "子みきゃん", "ダークみきゃん" };
+    [SerializeField] string[] m_charaName = null;
     //キャラクター名ラベル
     [SerializeField] Text m_charaNameLabel = null;
 
     //キャラクターステータス
-    string[] m_charaStatus = { "S\nS\nS\nS", "A\nA\nA\nA", "B\nB\nB\nB" };
+    [SerializeField] string[] m_charaStatus = null;
     //キャラステータスラベル
     [SerializeField] Text m_charaStatusLabel = null;
 
     //キャラクター説明文
-    string[] m_charaExplanationSentence =
-    {
-        //みきゃん
-        "えひめのマスコットキャラクター。みきゃん。かわいい。かわいい。かわいい。かわいい。",
-        //子みきゃん
-        "えひめのマスコットキャラクター。子みきゃん。かわいい。かわいい。かわいい。かわいい。",
-        //ダークみきゃん
-        "えひめのマスコットキャラクター。ダークみきゃん。かわいい。かわいい。かわいい。かわいい。"
-    };
+    [SerializeField] string[] m_charaExplanationSentence = null;
     //キャラクター説明ラベル
     [SerializeField] Text m_charaExplanationLabel = null;
 
@@ -43,28 +35,41 @@ public class CharaSelectChange : MonoBehaviour
     EnCharaType m_nowSelectChara = EnCharaType.enMikyan;
 
     //操作システム
-    OperationNew m_operation = null;
+    Operation m_operation = null;
+
+    //選択移動をしているか
+    bool m_selectMove = false;
+
+    //移動時間カウンター
+    int m_selectMoveCount = 0;
+
+    CircleCenterRotateAround m_circleCenterRotateAround = null;
 
     void Start()
     {
         //操作システムのゲームオブジェクトを検索しスクリプトを使用する
-        m_operation = GameObject.Find("OperationSystem").GetComponent<OperationNew>();
+        m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
+        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しスクリプトを使用する
+        m_circleCenterRotateAround = GameObject.Find("Train").GetComponent<CircleCenterRotateAround>();
     }
 
     //アップデート関数
     void Update()
     {
-        //画面が右フリックされたら、
-        if (m_operation.GetNowOperation() == "right")
+        if (!m_selectMove)
         {
-            //次のキャラクターに選択を移動
-            GoNextChara();
-        }
-        //画面が左フリックされたら、
-        if (m_operation.GetNowOperation() == "left")
-        {
-            //前のキャラクターに選択を移動
-            GoBackChara();
+            //画面が右フリックされたら、
+            if (m_operation.GetNowOperation() == "right")
+            {
+                //次のキャラクターに選択を移動
+                GoNextChara();
+            }
+            //画面が左フリックされたら、
+            if (m_operation.GetNowOperation() == "left")
+            {
+                //前のキャラクターに選択を移動
+                GoBackChara();
+            }
         }
 
         //画面が長押しされたら、
@@ -74,6 +79,9 @@ public class CharaSelectChange : MonoBehaviour
             GoNextScene();
         }
 
+        //電車の移動に合わせて選択しているデータを合わせるカウンター
+        Count();
+
         //キャラ選択シーンのテキストなどのデータを更新
         CharaSelectSceneDataUpdate();
     }
@@ -81,6 +89,8 @@ public class CharaSelectChange : MonoBehaviour
     //次のキャラクターに選択を移動する関数
     void GoNextChara()
     {
+        //選択移動状態にする
+        m_selectMove = true;
         //選択されているキャラクターを次のキャラクターにする
         m_nowSelectChara++;
         if (m_nowSelectChara >= EnCharaType.enMaxCharaNum)
@@ -91,6 +101,8 @@ public class CharaSelectChange : MonoBehaviour
     //前のキャラクターに選択を移動する関数
     void GoBackChara()
     {
+        //選択移動状態にする
+        m_selectMove = true;
         //選択されているモードを前のモードにする
         m_nowSelectChara--;
         if (m_nowSelectChara < EnCharaType.enMikyan)
@@ -105,7 +117,11 @@ public class CharaSelectChange : MonoBehaviour
         //キャラクター名ラベルを更新
         m_charaNameLabel.text = m_charaName[(int)m_nowSelectChara];
         //キャラクターステータスラベルを更新
-        m_charaStatusLabel.text = m_charaStatus[(int)m_nowSelectChara];
+        m_charaStatusLabel.text =
+            m_charaStatus[(int)m_nowSelectChara][0] + "\n" +
+            m_charaStatus[(int)m_nowSelectChara][1] + "\n" +
+            m_charaStatus[(int)m_nowSelectChara][2] + "\n" +
+            m_charaStatus[(int)m_nowSelectChara][3];
         //キャラクター説明ラベルを更新
         m_charaExplanationLabel.text = m_charaExplanationSentence[(int)m_nowSelectChara];
     }
@@ -118,5 +134,24 @@ public class CharaSelectChange : MonoBehaviour
 
         //ステージ選択シーンに遷移
         SceneManager.LoadScene("05_StageSelectScene");
+    }
+
+    //電車の移動に合わせて選択しているデータを合わせるカウンター
+    void Count()
+    {
+        //選択移動状態じゃないときは処理をしない。
+        if (!m_selectMove) return;
+
+        //カウント計測
+        m_selectMoveCount++;
+
+        //カウントが指定した数値より大きくなったら、
+        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime())
+        {
+            //選択移動していない状態に戻す
+            m_selectMove = false;
+            //カウントの初期化
+            m_selectMoveCount = 0;
+        }
     }
 }

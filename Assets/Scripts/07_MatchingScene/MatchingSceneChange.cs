@@ -9,12 +9,12 @@ using UnityEngine.SceneManagement;
 public class MatchingSceneChange : MonoBehaviour
 {
     //操作システム
-    OperationNew m_operation = null;
+    Operation m_operation = null;
 
     void Start()
     {
         //操作システムのゲームオブジェクトを検索しスクリプトを使用する
-        m_operation = GameObject.Find("OperationSystem").GetComponent<OperationNew>();
+        m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
     }
 
     //アップデート関数

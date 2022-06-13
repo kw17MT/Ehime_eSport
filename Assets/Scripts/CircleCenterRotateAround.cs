@@ -12,35 +12,38 @@ public class CircleCenterRotateAround : MonoBehaviour
     Vector3 m_axis = Vector3.up;
 
     // 円運動周期
-    public float period = 0.0f;
+    public float m_period = 0.0f;
 
     //周れるかどうか
-    bool aroundMoveOn = false;
+    bool m_aroundMoveOn = false;
 
     //周る時間カウンター
-    int aroundCount = 0;
+    int m_aroundCount = 0;
 
     //時計回りか反時計回りか
     int m_reverse = 1;
 
     //操作システム
-    OperationNew m_operation = null;
+    Operation m_operation = null;
+
+    //タイマーの稼働時間
+    [SerializeField]int m_countTime = 0;
 
     void Start()
     {
         //操作システムのゲームオブジェクトを検索しスクリプトを使用する
-        m_operation = GameObject.Find("OperationSystem").GetComponent<OperationNew>();
+        m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
     }
 
     void Update()
     {
-        if (!aroundMoveOn)
+        if (!m_aroundMoveOn)
         {
             //画面が右フリックされたら、
             if (m_operation.GetNowOperation() == "right")
             {
                 //周れる状態にする
-                aroundMoveOn = true;
+                m_aroundMoveOn = true;
                 //時計回り
                 m_reverse = 1;
             }
@@ -48,7 +51,7 @@ public class CircleCenterRotateAround : MonoBehaviour
             if (m_operation.GetNowOperation() == "left")
             {
                 //周れる状態にする
-                aroundMoveOn = true;
+                m_aroundMoveOn = true;
                 //時計回り
                 m_reverse = -1;
             }
@@ -63,24 +66,31 @@ public class CircleCenterRotateAround : MonoBehaviour
     void GoAround()
     {
         //周ない状態のときは処理をしない。
-        if (!aroundMoveOn) return;
+        if (!m_aroundMoveOn) return;
 
         // 中心点centerの周りを、軸axisで、period周期で円運動
         transform.RotateAround(
             m_center.transform.position,                     //中心点
             m_axis,                                          //軸
-            360 / period * Time.deltaTime * m_reverse      //周期
+            360 / m_period * Time.deltaTime * m_reverse      //周期
         );
 
         //カウント計測
-        aroundCount++;
+        m_aroundCount++;
+
         //カウントが指定した数値より大きくなったら、
-        if (aroundCount > 100)
+        if (m_aroundCount > m_countTime)
         {
             //周れない状態に戻す
-            aroundMoveOn = false;
+            m_aroundMoveOn = false;
             //カウントの初期化
-            aroundCount = 0;
+            m_aroundCount = 0;
         }
+    }
+
+    //タイマーの稼働時間を取得するゲッター
+    public int GetCountTime()
+    {
+        return m_countTime;
     }
 }
