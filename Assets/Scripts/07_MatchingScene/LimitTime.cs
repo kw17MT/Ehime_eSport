@@ -6,16 +6,16 @@ using UnityEngine.UI;
 public class LimitTime : MonoBehaviour
 {
     //§ŒÀŠÔƒ‰ƒxƒ‹
-    [SerializeField] Text limitTimeLabel;
+    [SerializeField] Text limitTimeLabel = null;
 
     //§ŒÀŠÔ‚Ì”wŒi‰æ‘œ
-    [SerializeField] Image limitTimeBackImage1;
-    [SerializeField] Image limitTimeBackImage2;
+    [SerializeField] Image limitTimeBackImage1 = null;
+    [SerializeField] Image limitTimeBackImage2 = null;
 
     //§ŒÀŠÔ’l(•Ï‰»‚³‚¹‚Ä‚¢‚­)
-    [SerializeField] float limitTimeValue;
+    [SerializeField] float limitTimeValue = 0.0f;
     //Å‘å§ŒÀŠÔ’l
-    float maxLimitTimeValue;
+    float maxLimitTimeValue = 0.0f;
 
 
     void Start()

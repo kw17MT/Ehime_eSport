@@ -4,8 +4,8 @@ using UnityEngine.Rendering.Universal;
 
 public class PostEffect : ScriptableRendererFeature
 {
-    [SerializeField] private GrayscaleSetting settings = new GrayscaleSetting();
-    GrayScalePass scriptablePass;
+    [SerializeField]GrayscaleSetting settings = new GrayscaleSetting();
+    GrayScalePass scriptablePass = null;
 
     public override void Create()
     {

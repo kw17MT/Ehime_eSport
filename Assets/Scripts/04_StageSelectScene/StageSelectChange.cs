@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// ステージ選択画面クラス
@@ -9,29 +10,21 @@ using UnityEngine.UI;
 public class StageSelectChange : MonoBehaviour
 {
     //ステージ名
-    string[] m_stageName = { "ステージ1", "ステージ2", "ステージ3" };
+    [SerializeField] string[] m_stageName = null;
     //ステージ名ラベル
-    [SerializeField] Text m_stageNameLabel;
+    [SerializeField] Text m_stageNameLabel = null;
 
     //難易度スプライト
-    [SerializeField] Sprite[] m_difficlutySprite;
+    [SerializeField] Sprite[] m_difficlutySprite = null;
     //難易度イメージ
-    [SerializeField] Image m_difficlutyImage;
+    [SerializeField] Image m_difficlutyImage = null;
     //ステージごとの難易度(0,簡単。1,普通。2,難しい)
-    int[] m_stageDifficluty = { 0, 1, 2 };
+    [SerializeField]int[] m_stageDifficluty = { 0, 1, 2 };
 
     //ステージ説明文
-    string[] m_stageExplanationSentence =
-    {
-        //ステージ1
-        "ここはステージ1。えへへでえへへなえへへである。えへへでえへへ。えへへへへへへへ。",
-        //ステージ2
-        "ここはステージ2。えへへでえへへなえへへである。えへへでえへへ。えへへへへへへへ。",
-        //ステージ3
-        "ここはステージ3えへへでえへへなえへへである。えへへでえへへ。えへへへへへへへ。"
-    };
+    [SerializeField] string[] m_stageExplanationSentence = null;
     //ステージ説明文ラベル
-    [SerializeField] Text m_stageExplanationLabel;
+    [SerializeField] Text m_stageExplanationLabel = null;
 
     enum EnStageType
     {
@@ -43,14 +36,42 @@ public class StageSelectChange : MonoBehaviour
     //現在選択されているステージ
     EnStageType m_nowSelectStage = EnStageType.enStage1;
 
+    //操作システム
+    Operation m_operation = null;
+
+    //選択移動をしているか
+    bool m_selectMove = false;
+
+    //移動時間カウンター
+    int m_selectMoveCount = 0;
+
+    CircleCenterRotateAround m_circleCenterRotateAround = null;
+
+    void Start()
+    {
+        //操作システムのゲームオブジェクトを検索しスクリプトを使用する
+        m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
+        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しスクリプトを使用する
+        m_circleCenterRotateAround = GameObject.Find("Train").GetComponent<CircleCenterRotateAround>();
+    }
+
     //アップデート関数
     void Update()
     {
-        //画面がタップされたら、
-        if (Input.GetButtonDown("Fire1"))
+        if (!m_selectMove)
         {
-            //次のステージに選択を移動
-            GoNextStage();
+            //画面が右フリックされたら、
+            if (m_operation.GetNowOperation() == "right")
+            {
+                //次のステージに選択を移動
+                GoNextStage();
+            }
+            //画面が左フリックされたら、
+            if (m_operation.GetNowOperation() == "left")
+            {
+                //前のステージに選択を移動
+                GoBackStage();
+            }
         }
 
         //選択されているステージによって分岐
@@ -67,6 +88,16 @@ public class StageSelectChange : MonoBehaviour
                 break;
         }
 
+        //画面が長押しされたら、
+        if (m_operation.GetIsLongTouch())
+        {
+            //次のシーンに遷移させる
+            GoNextScene();
+        }
+
+        //電車の移動に合わせて選択しているデータを合わせるカウンター
+        Count();
+
         //ステージ選択シーンのテキストなどのデータを更新
         StageSceneDataUpdate();
     }
@@ -74,11 +105,25 @@ public class StageSelectChange : MonoBehaviour
     //次のステージに選択を移動する関数
     void GoNextStage()
     {
+        //選択移動状態にする
+        m_selectMove = true;
         //選択されているステージを次のステージにする
         m_nowSelectStage++;
         if (m_nowSelectStage >= EnStageType.enMaxStageNum)
         {
             m_nowSelectStage = EnStageType.enStage1;
+        }
+    }
+    //前のステージに選択を移動する関数
+    void GoBackStage()
+    {
+        //選択移動状態にする
+        m_selectMove = true;
+        //選択されているステージを前のステージにする
+        m_nowSelectStage--;
+        if (m_nowSelectStage < EnStageType.enStage1)
+        {
+            m_nowSelectStage = EnStageType.enMaxStageNum - 1;
         }
     }
 
@@ -91,5 +136,34 @@ public class StageSelectChange : MonoBehaviour
         m_stageNameLabel.text = m_stageName[(int)m_nowSelectStage];
         //ステージ説明文を更新
         m_stageExplanationLabel.text = m_stageExplanationSentence[(int)m_nowSelectStage];
+    }
+
+    //次のシーンに遷移させる関数
+    void GoNextScene()
+    {
+        //操作の判定を初期化させる
+        m_operation.TachDataInit();
+
+        //CPU強さ設定選択シーンに遷移
+        SceneManager.LoadScene("06_CpuPowerSettingScene");
+    }
+
+    //電車の移動に合わせて選択しているデータを合わせるカウンター
+    void Count()
+    {
+        //選択移動状態じゃないときは処理をしない。
+        if (!m_selectMove) return;
+
+        //カウント計測
+        m_selectMoveCount++;
+
+        //カウントが指定した数値より大きくなったら、
+        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime())
+        {
+            //選択移動していない状態に戻す
+            m_selectMove = false;
+            //カウントの初期化
+            m_selectMoveCount = 0;
+        }
     }
 }
