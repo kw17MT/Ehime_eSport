@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class TransitionPostEffect : MonoBehaviour
 {
-    [SerializeField] private Material postEffectMaterial; //トランジションのマテリアル
-    [SerializeField] private float transitionTime = 2f; //トランジションの時間
+    [SerializeField] private Material postEffectMaterial = null; //トランジションのマテリアル
+    [SerializeField] private float transitionTime = 2.0f; //トランジションの時間
     readonly int _progressId = Shader.PropertyToID("_Progress"); //シェーダープロパティのReference名
     bool m_isTransitionIn = true;   //トランジションがInかOutかフラグ
     bool m_isPlay = false;  //トランジションが再生されているかフラグ

@@ -8,8 +8,8 @@ using UnityEngine.UI;
 /// </summary>
 public class GetSliderValue : MonoBehaviour
 {
-    [SerializeField]Slider m_slider;
-    [SerializeField] Text m_nowSliderValueText;
+    [SerializeField]Slider m_slider = null;
+    [SerializeField] Text m_nowSliderValueText = null;
 
     //スライダーの値が変更されたら実行される関数
     public void ChangeValue()

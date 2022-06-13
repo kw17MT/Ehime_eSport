@@ -9,9 +9,9 @@ using UnityEngine.UI;
 public class NowRankingChange : MonoBehaviour
 {
     //Œ»İ‚Ì‡ˆÊƒ‰ƒxƒ‹
-    [SerializeField] Text m_nowRankingLabel;
+    [SerializeField] Text m_nowRankingLabel = null;
     //‡ˆÊ‚Ìƒ‰ƒ“ƒNƒ‰ƒxƒ‹
-    [SerializeField] Text m_rankLabel;
+    [SerializeField] Text m_rankLabel = null;
     //Œ»İ‚Ì‡ˆÊ
     [SerializeField] int m_ranking = 1;
 

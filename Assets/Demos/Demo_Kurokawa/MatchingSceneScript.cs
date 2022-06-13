@@ -10,16 +10,16 @@ using System.Collections.Generic;
 //マッチング中の挙動のクラス
 public class MatchingSceneScript : MonoBehaviourPunCallbacks
 {
-    private GameObject m_memberListText = null;                     //メンバーリストを表示するテキストインスタンス
-    private GameObject m_waitTimeText = null;                       //残り待機時間を表示するテキストインスタンス
-    private GameObject m_operation = null;                          //操作管理のインスタンス
-    private GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
+    GameObject m_memberListText = null;                     //メンバーリストを表示するテキストインスタンス
+    GameObject m_waitTimeText = null;                       //残り待機時間を表示するテキストインスタンス
+    GameObject m_operation = null;                          //操作管理のインスタンス
+    GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
 
-    private int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
-    private float m_matchingWaitTime = 500.0f;                       //残り待機時間
-    private bool m_isInstantiateAI = false;                         //AIインスタンスを生成したか
+    int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
+    float m_matchingWaitTime = 500.0f;                       //残り待機時間
+    bool m_isInstantiateAI = false;                         //AIインスタンスを生成したか
 
-    private void Start()
+    void Start()
     {
         //操作を監視するため、操作インスタンスを取得
         m_operation = GameObject.Find("OperationManager");
@@ -57,7 +57,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     }
 
     //作成するルームの設定インスタンス
-    private RoomOptions roomOptions = new RoomOptions()
+    RoomOptions roomOptions = new RoomOptions()
     {
         //0だと人数制限なし
         MaxPlayers = 4,
@@ -149,7 +149,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     }
 
     //待機時間が終了した時、一度だけAIを不足プレイヤー分生成する。
-    private void InstantiateAIOnce()
+    void InstantiateAIOnce()
 	{
         //AIを生成していなければ
         if (!m_isInstantiateAI)
@@ -170,7 +170,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     }
 
     //残り待機時間を他のプレイヤーと同期させる
-    private void SynchronizeWaitTime()
+    void SynchronizeWaitTime()
 	{
         //マッチング待機時間をゲーム時間で減らしていく
         m_matchingWaitTime -= Time.deltaTime;
@@ -212,7 +212,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             //ホストクライアントがボタンを長押しすると
-            if(m_operation.GetComponent<Operation>().GetIsLongTouch())
+            if(m_operation.GetComponent<OperationOld>().GetIsLongTouch())
 			{
                 //強制的にインゲームに遷移する
                 SceneManager.LoadScene("DemoInGame");
