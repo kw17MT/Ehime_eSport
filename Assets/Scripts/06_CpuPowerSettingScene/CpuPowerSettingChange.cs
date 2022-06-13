@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class CpuPowerSettingChange : MonoBehaviour
 {
     //CPU‚Ì‹­‚³–¼
-    [SerializeField] string[] m_strengthName;
+    [SerializeField] string[] m_strengthName = null;
     //CPU‚Ì‹­‚³ƒ‰ƒxƒ‹
     [SerializeField] Text m_strengthLabel = null;
 
