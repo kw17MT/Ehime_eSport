@@ -8,6 +8,12 @@ public class OrangePeel : MonoBehaviourPunCallbacks
     //オレンジの皮と重なったら
     void OnTriggerEnter(Collider col)
 	{
+        //当たったものが自分が操作するプレイヤーであったら
+        if(col.gameObject.tag == "OwnPlayer")
+		{
+            //攻撃された判定にする。
+            col.gameObject.GetComponent<AvatarController>().SetIsAttacked();
+		}
         //ぶつかった皮を消す
         photonView.RPC(nameof(DestroyHittedOrangePeel), RpcTarget.All, this.gameObject.name);
     }

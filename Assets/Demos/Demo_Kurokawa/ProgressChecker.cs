@@ -64,8 +64,14 @@ public class ProgressChecker : MonoBehaviour
         //完走したラップ数を増やす
         m_rapCount++;
 
+        //フラグを元に戻す
+        for(int i = 0; i < MAX_CHECKPOINT_NUM; i++)
+		{
+            m_checkPoint[i] = false;
+		}
+
         //ラップ数の更新
-        m_rapCountText.GetComponent<Text>().text = "Rap : " + m_rapCount + " / 3";
+        m_rapCountText.GetComponent<Text>().text = "Rap : " + m_rapCount + " / " + MAX_RAP_NUM;
 
         //ゴールできる
         return true;

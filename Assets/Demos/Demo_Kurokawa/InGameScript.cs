@@ -1,9 +1,11 @@
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+
 
 // MonoBehaviourPunCallbacksを継承して、PUNのコールバックを受け取れるようにする
 public class InGameScript : MonoBehaviourPunCallbacks
@@ -50,6 +52,13 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 //AIを生成した。
                 m_isInstantiateAI = true;
             }
+
+            var hashtable = new ExitGames.Client.Photon.Hashtable();
+            hashtable.Add("Player1Invincible", 0); 
+            hashtable.Add("Player2Invincible", 0); 
+            hashtable.Add("Player3Invincible", 0); 
+            hashtable.Add("Player4Invincible", 0);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
         }
 
         m_memberListText = GameObject.Find("MemberList");
@@ -71,14 +80,12 @@ public class InGameScript : MonoBehaviourPunCallbacks
         m_playerReadyNum++;
     }
 
+    //ゴールしたプレイヤー名とタイムをホストに記録
     public void AddGoaledPlayerNameAndRecordTime(string playerName, float time)
     {
-        //this.m_playerGoaledTime[m_goaledPlayerNum] = time;
-        //this.m_goaledPlayerNum++;
-        //Debug.Log("RECORED");
-        //Debug.Log("Result " + m_goaledPlayerNum + " / " + PhotonNetwork.PlayerList.Length);
-
+        //プレイヤー名をキーに、クリアタイムをバリューに
         m_scoreBoard.Add(playerName, time);
+        //ゴールしたプレイヤーの総数をインクリメント
         this.m_goaledPlayerNum++;
     }
 
@@ -117,7 +124,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            Debug.Log(m_playerReadyNum + "      /      "+ PhotonNetwork.PlayerList.Length);
+            //Debug.Log(m_playerReadyNum + "      /      "+ PhotonNetwork.PlayerList.Length);
             if (m_shouldCountDown && m_playerReadyNum == PhotonNetwork.PlayerList.Length)
             {
                 //マッチング待機時間をゲーム時間で減らしていく
