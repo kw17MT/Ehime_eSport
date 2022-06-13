@@ -93,7 +93,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         //Prefabからプレイヤーが操作するモデルを生成
         var player =  PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
 
-        //今までこのルームに何人が入ってきたかでアクターナンバーが増えていく（書き込み不可）
+        //今までこのルームに何人が入ってきたかでアクターナンバーが増えていく（アクターナンバーに書き込み不可）
         int id = PhotonNetwork.LocalPlayer.ActorNumber;
         //プレイヤーに5以上のIDが割り振られたことはどこかのタイミングで一人以上抜けている
         if (id >= 5)

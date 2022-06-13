@@ -1,4 +1,6 @@
 using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -8,24 +10,36 @@ public class AvatarController : MonoBehaviourPunCallbacks
 {
     Rigidbody m_rb = null;                              //割り当てられたリジッドボディ
     Vector3 m_moveDir = Vector3.zero;                   //移動する方向
+    Vector3 m_moveSpeed = Vector3.zero;                 //移動スピード
     Vector3 m_rot = Vector3.zero;                       //どちらに回転するかの向き
     private GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
     private bool m_canMove = false;                     //移動が制限されていないか
     private float m_runningTime = 0.0f;                 //走行時間
+    private float m_stiffenTime = 0.0f;
+    private float m_starTime = 0.0f;
     private bool m_isGoaled = false;                    //自分はゴールしたか
     private bool m_isToldRecord = false;                //自分の走破レコードをホストクライアントに送ったかどうかのフラグ
     private bool m_isToldReady = false;                 //ルームに参加して準備ができたことを一度だけ通信するためのフラグ
+    private bool m_isUsingStar = false;
+    private bool m_isUsingKiller = false;
+    private bool m_isUsingJet = false;
+    private bool m_isAttacked = false;
 
-    public float MOVE_POWER = 100.0f;                   //リジッドボディにかける移動の倍率
+    public float MOVE_POWER = 50.0f;                   //リジッドボディにかける移動の倍率
+    public float MOVE_POWER_USING_STAR = 110.0f;        //スター使用時のリジッドボディにかける移動の倍率
+    public float MOVE_POWER_USING_JET = 120.0f;        //ジェット使用時のリジッドボディにかける移動の倍率
+    public float MOVE_POWER_USING_KILLER = 130.0f;      //キラー使用時のリジッドボディにかける移動の倍率
     public float ROT_POWER = 1.0f;                      //ハンドリング
+    public float MAX_STAR_REMAIN_TIME = 10.5f;           //スターの継続時間
+    public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
 
     void Start()
-	{
+    {
         //リジッドボディを取得
         m_rb = GetComponent<Rigidbody>();
         //インゲーム中であれば
         if (SceneManager.GetActiveScene().name == "DemoInGame")
-		{
+        {
             //重力をオンにする
             m_rb.useGravity = true;
             //インゲームに移行できたことを通信
@@ -35,14 +49,15 @@ public class AvatarController : MonoBehaviourPunCallbacks
         m_paramManager = GameObject.Find("ParamManager");
         //ネットワークで同期される名前を設定
         PhotonNetwork.NickName = "Player" + m_paramManager.GetComponent<ParamManage>().GetPlayerID();
+        gameObject.tag = "Player";
         //自分が生成されたインスタンスであれば
-        if(photonView.IsMine)
-		{
+        if (photonView.IsMine)
+        {
             //探しやすい名前を付ける。（ヒエラルキーにも適用される）
             gameObject.name = "OwnPlayer";
             //タグをつける
             gameObject.tag = "OwnPlayer";
-		}
+        }
 
         //1秒間に何回通信するか
         PhotonNetwork.SendRate = 3;
@@ -50,35 +65,107 @@ public class AvatarController : MonoBehaviourPunCallbacks
         PhotonNetwork.SerializationRate = 3;
     }
 
+    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+    {
+        //更新されたルームのカスタムプロパティのペアをコンソールに出力する
+        foreach (var prop in propertiesThatChanged)
+        {
+            string name = PhotonNetwork.NickName + "Invincible";
+            string key = prop.Key.ToString();
+            if (name == key)
+			{
+                bool isUsingStar = false;
+                int isUsing = (PhotonNetwork.CurrentRoom.CustomProperties[prop.Key] is int value) ? value : 0;
+                if (isUsing == 1)
+				{
+                    isUsingStar = true;
+				}
+                m_isUsingStar = isUsingStar;
+            }
+            Debug.Log($"{prop.Key}: {prop.Value}");
+        }
+    }
+
     //プレイヤーのインプットを受けいれて移動可能にする
     public void SetMovable()
-	{
+    {
         m_canMove = true;
-	}
+    }
 
     //プレイヤーがゴールしたかを設定する
     public void SetGoaled()
-	{
+    {
         m_isGoaled = true;
+    }
+
+    //自分が攻撃されたことを設定する
+    public void SetIsAttacked()
+    {
+        if(!m_isUsingKiller && !m_isUsingStar)
+		{
+            m_isAttacked = true;
+        }
+    }
+
+    public void SetIsUsingStar()
+	{
+        //ルームプロパティの自分の無敵状態を名前を使って検索、変更を行う
+        var hashtable = new ExitGames.Client.Photon.Hashtable();
+        string name = PhotonNetwork.NickName + "Invincible";
+        hashtable[name] = 1;
+        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+    }
+
+    //スターを使用しているかを取得する
+    public bool GetIsUsingStar()
+	{
+        return m_isUsingStar;
 	}
 
-    //ゲーム上へクリアタイムを送る
+    //ホストへクリアタイムを送る
     [PunRPC]
-    void TellRecordTime(float time)
-	{
-        GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNameAndRecordTime(PhotonNetwork.NickName, time);
+    void TellRecordTime(string name, float time)
+    {
+        GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNameAndRecordTime(name, time);
     }
 
     //自身がレースの参加の用意ができたかホストに送る
     [PunRPC]
     private void TellReadyOK()
-	{
-        if(!m_isToldReady)
-		{
+    {
+        if (!m_isToldReady)
+        {
             GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddReadyPlayerNum();
             m_isToldReady = true;
         }
     }
+
+    private void OnCollisionEnter(Collision col)
+	{
+        //衝突対象が他のプレイヤーならば
+        if(col.gameObject.tag == "Player")
+        {
+            Player pl = col.gameObject.GetComponent<PhotonView>().Owner;
+            string plName = pl.NickName + "Invincible";
+
+            bool isCrash = false;
+            int stat = (PhotonNetwork.CurrentRoom.CustomProperties[plName] is int value) ? value : 0;
+
+            if (stat == 1 && !m_isUsingStar)
+			{
+                isCrash = true;
+			}
+
+            //そのプレイヤーがスターを使用していたら
+            if (isCrash)
+			{
+                //テストで上に吹っ飛ばす
+                //m_rb.AddForce(new Vector3(0.0f, 50.0f, 0.0f));
+                m_isAttacked = true;
+                Debug.Log("Hitted");
+			}
+		}
+	}
 
     private void Update()
 	{
@@ -89,16 +176,28 @@ public class AvatarController : MonoBehaviourPunCallbacks
             if (photonView.IsMine)
             {
                 //前方向に移動
-                m_moveDir = this.transform.forward * (Input.GetAxis("Vertical") * MOVE_POWER);
-                //回転
-                m_rot = new Vector3(0.0f, Input.GetAxis("Horizontal") * ROT_POWER, 0.0f);
-
-                //テストでボタンを押したらバナナが出るようにする。
-                if (Input.GetKeyDown(KeyCode.K))
+                m_moveDir = this.transform.forward * (Input.GetAxis("Vertical"));
+                //移動スピードを計算する。
+                if (m_isUsingKiller)
                 {
-                    Vector3 orangePeelPos = this.transform.position + (this.transform.forward * -2.0f);
-                    photonView.RPC(nameof(InstantiateOrangePeel), RpcTarget.All, orangePeelPos);
+                    m_moveSpeed = m_moveDir * MOVE_POWER_USING_KILLER;
                 }
+                else if (m_isUsingStar)
+				{
+                    m_moveSpeed = m_moveDir * MOVE_POWER_USING_STAR;
+                }
+                else if(m_isUsingJet)
+				{
+                    m_moveSpeed = m_moveDir * MOVE_POWER_USING_JET;
+                    m_isUsingJet = false;
+                }
+				else
+				{
+                    m_moveSpeed = m_moveDir * MOVE_POWER;
+                }
+
+                //入力による回転量
+                m_rot = new Vector3(0.0f, Input.GetAxis("Horizontal") * ROT_POWER, 0.0f);
             }
 
             //ゴールしていなったら
@@ -110,7 +209,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 			else if(!m_isToldRecord)
 			{
                 //クリアタイムをホストだけに送る
-                photonView.RPC(nameof(TellRecordTime), RpcTarget.MasterClient, m_runningTime);
+                photonView.RPC(nameof(TellRecordTime), RpcTarget.MasterClient, PhotonNetwork.NickName, m_runningTime);
 
                 m_isToldRecord = true;
             }
@@ -123,23 +222,45 @@ public class AvatarController : MonoBehaviourPunCallbacks
         }
     }
 
-    //オレンジの皮を自分の後ろに置く
-    [PunRPC]
-    public void InstantiateOrangePeel(Vector3 popPos)
-    {
-        //ゲーム全体で生成したオレンジの皮の数を把握できるように、ローカルのインスタンスでもメモする。
-        m_paramManager.GetComponent<ParamManage>().AddOrangePeelNum();
-        
-        //ローカルでオレンジの皮を指定された座標に生成
-        var orange = PhotonNetwork.Instantiate("OrangePeel", popPos, Quaternion.identity);
-        //こちら側でも名前に総合生成数を付与する。
-        orange.name = "OrangePeel" + m_paramManager.GetComponent<ParamManage>().GetOrangePeelNumOnField();
-    }
-
     //環境に依存されない、一定期間のUpdate関数（移動はここにかくこと）
     private void FixedUpdate()
     {
-        m_rb.AddForce(m_moveDir);
-        transform.Rotate(m_rot);
-    }
+        //自分が攻撃されていなければ
+        if(!m_isAttacked)
+		{
+            //前方へ加速
+            m_rb.AddForce(m_moveSpeed);
+            //回転を適用する
+            transform.Rotate(m_rot);
+        }
+		//攻撃されていたら
+		else
+		{
+            //硬直時間をゲーム時間で増やす
+            m_stiffenTime += Time.deltaTime;
+            //設定した最大硬直時間を超えたら
+            if(m_stiffenTime >= MAX_STIFFIN_TIME)
+			{
+                //計測した硬直時間をリセット
+                m_stiffenTime = 0.0f;
+                //攻撃フラグを直す
+                m_isAttacked = false;
+            }
+		}
+
+		if (m_isUsingStar)
+		{
+			m_starTime += Time.deltaTime;
+			if (m_starTime >= MAX_STAR_REMAIN_TIME)
+			{
+				m_starTime = 0.0f;
+				m_isUsingStar = false;
+
+				var hashtable = new ExitGames.Client.Photon.Hashtable();
+				string name = PhotonNetwork.NickName + "Invincible";
+				hashtable[name] = 0;
+				PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+            }
+		}
+	}
 }

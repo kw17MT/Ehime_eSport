@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: -7280818190112603685}
   - component: {fileID: -8559476411398457238}
   - component: {fileID: -4170844876093469077}
+  - component: {fileID: -7257786847198530558}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -185,8 +186,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db126e5339ad4e4eb18fbb5f3af0cd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MOVE_POWER: 100
+  MOVE_POWER: 50
+  MOVE_POWER_USING_STAR: 110
+  MOVE_POWER_USING_JET: 120
+  MOVE_POWER_USING_KILLER: 130
   ROT_POWER: 1
+  MAX_STAR_REMAIN_TIME: 10.5
+  MAX_STIFFIN_TIME: 2
 --- !u!114 &-4170844876093469077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -203,3 +209,15 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 1
   m_TeleportEnabled: 1
   m_TeleportIfDistanceGreaterThan: 3
+--- !u!114 &-7257786847198530558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7519939043479899258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e141f999d0fb27489ca44783fb2fc1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
