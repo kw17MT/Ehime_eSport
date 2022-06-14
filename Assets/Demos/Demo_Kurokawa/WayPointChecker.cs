@@ -54,6 +54,12 @@ public class WayPointChecker : MonoBehaviour
         return m_currentWayPointPos;
     }
 
+    public int GetNextWayPointNumber()
+	{
+        return m_currentWayPointNum + 1;
+
+    }
+
     // Update is called once per frame
     void Update()
     {
