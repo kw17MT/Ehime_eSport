@@ -19,6 +19,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private float m_stiffenTime = 0.0f;
     private float m_starTime = 0.0f;
     private float m_dashTime = 0.0f;
+    private float m_killerTime = 0.0f;
     private bool m_isGoaled = false;                    //自分はゴールしたか
     private bool m_isToldRecord = false;                //自分の走破レコードをホストクライアントに送ったかどうかのフラグ
     private bool m_isToldReady = false;                 //ルームに参加して準備ができたことを一度だけ通信するためのフラグ
@@ -32,9 +33,10 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MOVE_POWER = 25.0f;                   //リジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_STAR = 35.0f;        //スター使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_JET = 50.0f;        //ジェット使用時のリジッドボディにかける移動の倍率
-    public float MOVE_POWER_USING_KILLER = 40.0f;      //キラー使用時のリジッドボディにかける移動の倍率
+    public float MOVE_POWER_USING_KILLER = 60.0f;      //キラー使用時のリジッドボディにかける移動の倍率
     public float ROT_POWER = 1.0f;                      //ハンドリング
     public float MAX_STAR_REMAIN_TIME = 10.5f;           //スターの継続時間
+    public float MAX_KILLER_REMAIN_TIME = 3.0f;
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
     public float MAX_DASH_TIME = 1.0f;
 
@@ -128,6 +130,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
         m_isUsingJet = true;
 	}
 
+    public void SetIsUsingKiller()
+	{
+        m_isUsingKiller = true;
+	}
+
     //スターを使用しているかを取得する
     public bool GetIsUsingStar()
 	{
@@ -163,7 +170,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
             bool isCrash = false;
             int stat = (PhotonNetwork.CurrentRoom.CustomProperties[plName] is int value) ? value : 0;
 
-            if (stat == 1 && !m_isUsingStar)
+            if (stat == 1 && !m_isUsingStar && !m_isUsingKiller)
 			{
                 isCrash = true;
 			}
@@ -173,6 +180,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
 			{
                 m_isAttacked = true;
                 Debug.Log("Hitted");
+			}
+		}
+		else if(col.gameObject.name == "Snapper")
+		{
+            if(!m_isUsingKiller && !m_isUsingStar)
+			{
+                m_isAttacked = true;
 			}
 		}
 	}
@@ -228,19 +242,50 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_isToldRecord = true;
             }
 
-            //Yキル
-            if (this.transform.position.y <= -2.0f)
-            {
-                this.transform.position = new Vector3(0.0f, 2.0f, 0.0f);
-            }
-        }
+			//Yキル
+			if (this.transform.position.y <= -2.0f)
+			{
+				this.transform.position = new Vector3(0.0f, 2.0f, 0.0f);
+			}
+		}
     }
 
     //環境に依存されない、一定期間のUpdate関数（移動はここにかくこと）
     private void FixedUpdate()
     {
+        if (m_isUsingKiller)
+        {
+			//m_rb.AddForce((m_corseDir * MOVE_POWER_USING_KILLER) - m_rb.velocity);
+
+
+			
+
+			//this.transform.Translate(m_corseDir / 2.0f);
+
+			Vector3 direction = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
+            direction.Normalize();
+            direction.y = 0.0f;
+            this.transform.position += direction * 1.5f;
+
+            Quaternion rot;
+            rot = Quaternion.LookRotation(direction - this.transform.forward);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
+            m_prevTrasnform = this.transform.rotation;
+
+
+
+
+            m_killerTime += Time.deltaTime;
+            if(m_killerTime >= MAX_KILLER_REMAIN_TIME)
+			{
+                m_killerTime = 0.0f;
+                m_isUsingKiller = false;
+            }
+            return;
+        }
+
         //自分が攻撃されていなければ
-        if(!m_isAttacked)
+        if (!m_isAttacked)
 		{
             //前方へ加速
             m_rb.AddForce(m_moveSpeed - m_rb.velocity);
@@ -263,7 +308,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 				{
                     Quaternion rot;
                    
-                    rot = Quaternion.LookRotation(m_corseDir- this.transform.forward);
+                    rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
                     transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
 
                     m_prevTrasnform = this.transform.rotation;
@@ -284,6 +329,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_isAttacked = false;
             }
 		}
+
+
         if(m_isUsingJet)
 		{
             m_dashTime += Time.deltaTime;
@@ -293,9 +340,6 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_dashTime = 0.0f;
 			}
 		}
-
-        
-
 		if (m_isUsingStar)
 		{
 			m_starTime += Time.deltaTime;
