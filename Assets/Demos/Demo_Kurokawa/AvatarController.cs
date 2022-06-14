@@ -12,11 +12,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
     Vector3 m_moveDir = Vector3.zero;                   //移動する方向
     Vector3 m_moveSpeed = Vector3.zero;                 //移動スピード
     Vector3 m_rot = Vector3.zero;                       //どちらに回転するかの向き
+    Vector3 m_corseDir = Vector3.zero;
     private GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
     private bool m_canMove = false;                     //移動が制限されていないか
     private float m_runningTime = 0.0f;                 //走行時間
     private float m_stiffenTime = 0.0f;
     private float m_starTime = 0.0f;
+    private float m_dashTime = 0.0f;
     private bool m_isGoaled = false;                    //自分はゴールしたか
     private bool m_isToldRecord = false;                //自分の走破レコードをホストクライアントに送ったかどうかのフラグ
     private bool m_isToldReady = false;                 //ルームに参加して準備ができたことを一度だけ通信するためのフラグ
@@ -24,14 +26,17 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private bool m_isUsingKiller = false;
     private bool m_isUsingJet = false;
     private bool m_isAttacked = false;
+    private Quaternion m_prevTrasnform;
+    
 
-    public float MOVE_POWER = 50.0f;                   //リジッドボディにかける移動の倍率
-    public float MOVE_POWER_USING_STAR = 110.0f;        //スター使用時のリジッドボディにかける移動の倍率
-    public float MOVE_POWER_USING_JET = 120.0f;        //ジェット使用時のリジッドボディにかける移動の倍率
-    public float MOVE_POWER_USING_KILLER = 130.0f;      //キラー使用時のリジッドボディにかける移動の倍率
+    public float MOVE_POWER = 25.0f;                   //リジッドボディにかける移動の倍率
+    public float MOVE_POWER_USING_STAR = 35.0f;        //スター使用時のリジッドボディにかける移動の倍率
+    public float MOVE_POWER_USING_JET = 50.0f;        //ジェット使用時のリジッドボディにかける移動の倍率
+    public float MOVE_POWER_USING_KILLER = 40.0f;      //キラー使用時のリジッドボディにかける移動の倍率
     public float ROT_POWER = 1.0f;                      //ハンドリング
     public float MAX_STAR_REMAIN_TIME = 10.5f;           //スターの継続時間
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
+    public float MAX_DASH_TIME = 1.0f;
 
     void Start()
     {
@@ -58,6 +63,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //タグをつける
             gameObject.tag = "OwnPlayer";
         }
+
+        m_prevTrasnform = this.transform.rotation;
 
         //1秒間に何回通信するか
         PhotonNetwork.SendRate = 3;
@@ -116,6 +123,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
         PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
     }
 
+    public void SetIsUsingJet()
+	{
+        m_isUsingJet = true;
+	}
+
     //スターを使用しているかを取得する
     public bool GetIsUsingStar()
 	{
@@ -159,8 +171,6 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //そのプレイヤーがスターを使用していたら
             if (isCrash)
 			{
-                //テストで上に吹っ飛ばす
-                //m_rb.AddForce(new Vector3(0.0f, 50.0f, 0.0f));
                 m_isAttacked = true;
                 Debug.Log("Hitted");
 			}
@@ -169,6 +179,10 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
     private void Update()
 	{
+        m_corseDir = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.GetComponent<WayPointChecker>().GetCurrentWayPoint();
+        m_corseDir.Normalize();
+        m_corseDir.y = 0.0f;
+
         //現在のシーンがインゲームでカウントダウンが終了して動ける状態ならば
         if (SceneManager.GetActiveScene().name == "DemoInGame" && m_canMove)
         {
@@ -189,7 +203,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 else if(m_isUsingJet)
 				{
                     m_moveSpeed = m_moveDir * MOVE_POWER_USING_JET;
-                    m_isUsingJet = false;
+                    
                 }
 				else
 				{
@@ -229,9 +243,32 @@ public class AvatarController : MonoBehaviourPunCallbacks
         if(!m_isAttacked)
 		{
             //前方へ加速
-            m_rb.AddForce(m_moveSpeed);
-            //回転を適用する
-            transform.Rotate(m_rot);
+            m_rb.AddForce(m_moveSpeed - m_rb.velocity);
+
+            Transform appliedTrasnform = this.transform;
+            appliedTrasnform.Rotate(m_rot);
+
+            //コースの向きとプレイヤーの前方向が45度以内であれば
+            if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
+			{
+                //通常通りの回転を適用する
+                transform.Rotate(m_rot);
+                m_prevTrasnform = this.transform.rotation;
+            }
+			else
+			{
+                this.transform.rotation = m_prevTrasnform;
+
+                if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
+				{
+                    Quaternion rot;
+                   
+                    rot = Quaternion.LookRotation(m_corseDir- this.transform.forward);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
+
+                    m_prevTrasnform = this.transform.rotation;
+                }
+			}
         }
 		//攻撃されていたら
 		else
@@ -247,6 +284,17 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_isAttacked = false;
             }
 		}
+        if(m_isUsingJet)
+		{
+            m_dashTime += Time.deltaTime;
+            if(m_dashTime >= MAX_DASH_TIME)
+			{
+                m_isUsingJet = false;
+                m_dashTime = 0.0f;
+			}
+		}
+
+        
 
 		if (m_isUsingStar)
 		{

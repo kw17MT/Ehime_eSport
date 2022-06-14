@@ -6,7 +6,7 @@ public class SnapperController : MonoBehaviour
 {
     private Vector3 m_targetPos = Vector3.zero;                 //次の目標地点
     private bool m_shouldCheckNextWayPoint = false;             //次のウェイポイントが更新すべきかどうか
-    private float MOVE_POWER = 2.0f;
+    private float MOVE_POWER = 20.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -37,6 +37,6 @@ public class SnapperController : MonoBehaviour
         moveDir.Normalize();
         //リジッドボディに目標地点方向に力を加える
         Rigidbody rb = this.GetComponent<Rigidbody>();
-        rb.AddForce(moveDir * MOVE_POWER);
+        rb.AddForce((moveDir * MOVE_POWER) - rb.velocity);
     }
 }

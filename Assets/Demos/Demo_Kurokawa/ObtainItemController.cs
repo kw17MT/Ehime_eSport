@@ -64,7 +64,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
             //テストでボタンを押したらスター使用状態にする。
             if (Input.GetKeyDown(KeyCode.L))
             {
-                this.GetComponent<AvatarController>().SetIsUsingStar();
+                this.GetComponent<AvatarController>().SetIsUsingJet();
             }
             if (Input.GetKeyDown(KeyCode.I))
             {

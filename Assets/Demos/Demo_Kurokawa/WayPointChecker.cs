@@ -49,6 +49,11 @@ public class WayPointChecker : MonoBehaviour
         return m_nextWayPointPos;
 	}
 
+    public Vector3 GetCurrentWayPoint()
+    {
+        return m_currentWayPointPos;
+    }
+
     // Update is called once per frame
     void Update()
     {
