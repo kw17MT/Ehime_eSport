@@ -43,6 +43,8 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         var snapper = PhotonNetwork.Instantiate("Snapper", popPos, Quaternion.identity);
         //こちら側でも名前に総合生成数を付与する。
         snapper.name = "Snapper";
+        snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(popPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
+        Debug.Log("プレイヤーの次ポイント : " + this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
     }
 
     void Update()
@@ -64,12 +66,16 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
             //テストでボタンを押したらスター使用状態にする。
             if (Input.GetKeyDown(KeyCode.L))
             {
-                this.GetComponent<AvatarController>().SetIsUsingStar();
+                this.GetComponent<AvatarController>().SetIsUsingJet();
             }
             if (Input.GetKeyDown(KeyCode.I))
             {
-                Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * -2.0f);
+                Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 2.0f);
                 photonView.RPC(nameof(InstantiateSnapper), RpcTarget.All, snapperPos);
+            }
+            if(Input.GetKeyDown(KeyCode.P))
+			{
+                this.GetComponent<AvatarController>().SetIsUsingKiller();
             }
         }
     }

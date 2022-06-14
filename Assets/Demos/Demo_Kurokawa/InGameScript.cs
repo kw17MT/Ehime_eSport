@@ -34,24 +34,18 @@ public class InGameScript : MonoBehaviourPunCallbacks
         int id = GameObject.Find("ParamManager").GetComponent<ParamManage>().GetPlayerID();
 
         // 自身のアバター（ネットワークオブジェクト）を生成する
-        var position = new Vector3(id, 0.0f, 0.0f);
+        string spawnPointName = "PlayerSpawnPoint" + (id - 1);
+        GameObject spawnPoint = GameObject.Find(spawnPointName);
+
+        var position = spawnPoint.transform.position;
         PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+        spawnPoint.GetComponent<PlayerSpawnPoint>().SetPlayerSpawned();
 
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            if (!m_isInstantiateAI)
-            {
-                for (int i = 0; i < 4 - PhotonNetwork.PlayerList.Length; i++)
-                {
-                    //プレイヤーを横に並べていく
-                    var AIPos = new Vector3(i + 1, 0.0f, 0.0f);
-                    //PrefabからAIをルームオブジェクトとして生成
-                    PhotonNetwork.InstantiateRoomObject("AI", AIPos, Quaternion.identity);
-                }
-                //AIを生成した。
-                m_isInstantiateAI = true;
-            }
+            //何もポップさせていないスポーンポイントを探し、AIを生成する
+            FindEmptySpawnPointAndPopAI();
 
             var hashtable = new ExitGames.Client.Photon.Hashtable();
             hashtable.Add("Player1Invincible", 0); 
@@ -73,6 +67,64 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
         //秒数の整数部分の変化を見るために保存する。
         m_prevCountDownNum = (int)m_countDownNum;
+    }
+
+    private void FindEmptySpawnPointAndPopAI()
+	{
+        if (!m_isInstantiateAI)
+        {
+            //ルームにいる他のプレイヤーを取得
+            Player[] allPlayers = PhotonNetwork.PlayerList;
+            //他のプレイヤーに割り当てられている、使えない名前とIDを保存していく配列を定義
+            var cantUsePosition = new List<string>();
+            foreach (var pl in allPlayers)
+            {
+                //既に使っているIDを保存していく
+                cantUsePosition.Add(pl.NickName);
+            }
+
+			//生成しなくてはならないAIの数分回す
+			for (int i = 0; i < PhotonNetwork.CurrentRoom.MaxPlayers - PhotonNetwork.PlayerList.Length; i++)
+			{
+				GameObject AISpawnPoint;
+				//Player1という名前のユーザーがいなければ、ID1を使用する。
+				if (!cantUsePosition.Contains("Player1"))
+				{
+					AISpawnPoint = GameObject.Find("PlayerSpawnPoint0");
+					//PrefabからAIをルームオブジェクトとして生成
+					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+					ai.gameObject.tag = "Player";
+					cantUsePosition.Add("Player1");
+				}
+				else if (!cantUsePosition.Contains("Player2"))
+				{
+					AISpawnPoint = GameObject.Find("PlayerSpawnPoint1");
+					//PrefabからAIをルームオブジェクトとして生成
+					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+					ai.gameObject.tag = "Player";
+					cantUsePosition.Add("Player2");
+				}
+				else if (!cantUsePosition.Contains("Player3"))
+				{
+					AISpawnPoint = GameObject.Find("PlayerSpawnPoint2");
+					//PrefabからAIをルームオブジェクトとして生成
+					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+					ai.gameObject.tag = "Player";
+					cantUsePosition.Add("Player3");
+				}
+				else if (!cantUsePosition.Contains("Player4"))
+				{
+					AISpawnPoint = GameObject.Find("PlayerSpawnPoint3");
+					//PrefabからAIをルームオブジェクトとして生成
+					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+					ai.gameObject.tag = "Player";
+					cantUsePosition.Add("Player4");
+				}
+			}
+
+			//AIを生成した。
+			m_isInstantiateAI = true;
+        }
     }
 
     public void AddReadyPlayerNum()
