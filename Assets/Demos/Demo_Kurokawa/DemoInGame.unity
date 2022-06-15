@@ -576,8 +576,8 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 195868202}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
+  m_IsTrigger: 0
+  m_Enabled: 0
   serializedVersion: 4
   m_Convex: 1
   m_CookingOptions: 30
@@ -2240,6 +2240,10 @@ PrefabInstance:
     - target: {fileID: 198270204793137707, guid: d66545abe77532242aa9b2db2a44da25, type: 3}
       propertyPath: m_Name
       value: EasyStage
+      objectReference: {fileID: 0}
+    - target: {fileID: 198270204793137707, guid: d66545abe77532242aa9b2db2a44da25, type: 3}
+      propertyPath: m_TagString
+      value: Ground
       objectReference: {fileID: 0}
     - target: {fileID: 687842517089874065, guid: d66545abe77532242aa9b2db2a44da25, type: 3}
       propertyPath: m_RootOrder
