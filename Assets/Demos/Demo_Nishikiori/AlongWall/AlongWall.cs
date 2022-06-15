@@ -39,5 +39,25 @@ public class AlongWall
 
         //当たった時の向きをリセットし、スピードをセット
         rigidbody.velocity = m_alongWallSpeed * moveDirection;
+
+#if UNITY_EDITOR
+        //当たった壁の法線を可視化(Debug)
+        DrawNormal(collision.contacts[0].point,normal);
+#endif
+    }
+
+    /// <summary>
+    /// 当たった場所の法線を描画　使用する場合シーンにNormalDebugManagerを置くこと。
+    /// </summary>
+    private void DrawNormal(Vector3 contactPoint,Vector3 normal)
+    {
+        //法線デバッグマネージャを検索
+        GameObject normalDebugManager = GameObject.Find("NormalDebugManager");
+
+        if (normalDebugManager != null)
+        {
+            //あった場合法線デバッグ用オブジェクトを生成するように命令
+            normalDebugManager.GetComponent<NormalDebugManager>().Spawn(contactPoint, normal);
+        }
     }
 }
