@@ -29,8 +29,10 @@ public class MoveObject : MonoBehaviour
 
     void Update()
     {
+#if UNITY_EDITOR
         //デバッグ用、移動方向のベクトルを線で描画
         Debug.DrawRay(m_rigidbody.position, m_moveDirection, Color.green);
+#endif
     }
 
 
