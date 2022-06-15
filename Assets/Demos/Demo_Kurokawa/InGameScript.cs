@@ -13,6 +13,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private GameObject m_memberListText = null;
     private GameObject m_countDownText = null;
     private GameObject m_resultText = null;
+    private GameObject m_paramManager = null;
     private float m_countDownNum = 3.0f;
     private int m_prevCountDownNum = 0;
 
@@ -28,22 +29,44 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
-        PhotonNetwork.ConnectUsingSettings();
+        m_paramManager = GameObject.Find("ParamManager");
 
-        int id = GameObject.Find("ParamManager").GetComponent<ParamManage>().GetPlayerID();
+        if(m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode())
+		{
+            PhotonNetwork.OfflineMode = true;
+            m_paramManager.GetComponent<ParamManage>().SetPlayerID(1);
+        }
+		else
+		{
+            // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
+            PhotonNetwork.ConnectUsingSettings();
+            //シーン遷移をホストに同期する
+            PhotonNetwork.AutomaticallySyncScene = true;
+            //インゲームに遷移したら入室拒否にする。
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+        }
+
+        int id = m_paramManager.GetComponent<ParamManage>().GetPlayerID();
+        //Debug.Log("OfflineMode = " + PhotonNetwork.OfflineMode + "PlayerID = " + id);
 
         // 自身のアバター（ネットワークオブジェクト）を生成する
         string spawnPointName = "PlayerSpawnPoint" + (id - 1);
+
         GameObject spawnPoint = GameObject.Find(spawnPointName);
+        //Debug.Log(spawnPoint.name);
+        Debug.Log(PhotonNetwork.CurrentRoom.Name);
 
         var position = spawnPoint.transform.position;
-        PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+        GameObject ownPlayer = PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+
+        Debug.Log(ownPlayer.name + " " + ownPlayer.tag);
+
         spawnPoint.GetComponent<PlayerSpawnPoint>().SetPlayerSpawned();
 
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
+            Debug.Log("I am Master Client");
             //何もポップさせていないスポーンポイントを探し、AIを生成する
             FindEmptySpawnPointAndPopAI();
 
@@ -59,14 +82,42 @@ public class InGameScript : MonoBehaviourPunCallbacks
         m_countDownText = GameObject.Find("CountDown");
         m_resultText = GameObject.Find("Result");
 
-        //シーン遷移をホストに同期する
-        PhotonNetwork.AutomaticallySyncScene = true;
-
-        //インゲームに遷移したら入室拒否にする。
-        PhotonNetwork.CurrentRoom.IsOpen = false;
-
         //秒数の整数部分の変化を見るために保存する。
         m_prevCountDownNum = (int)m_countDownNum;
+    }
+
+    //オフラインモードの時に使用する
+    public override void OnConnectedToMaster()
+    {
+        if(m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode())
+		{
+            //作成するルームの設定インスタンス
+            RoomOptions roomOptions = new RoomOptions()
+            {
+                //0だと人数制限なし
+                MaxPlayers = 1,
+                //部屋に参加できるか
+                IsOpen = false,
+                //この部屋がロビーにリストされるか
+                IsVisible = false,
+                //ユーザーIDの発布を行う。
+                PublishUserId = true,
+            };
+            //オフラインの部屋を作る
+            PhotonNetwork.CreateRoom(null, roomOptions);
+        }
+    }
+
+    public override void OnJoinedRoom()
+    {
+        string spawnPointName;
+        for(int i = 0; i < 3; i++)
+		{
+            spawnPointName = "PlayerSpawnPoint" + (i + 1);
+            Vector3 popPos = GameObject.Find(spawnPointName).transform.position;
+            GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", popPos, Quaternion.identity);
+            ai.gameObject.tag = "Player";
+        }
     }
 
     private void FindEmptySpawnPointAndPopAI()

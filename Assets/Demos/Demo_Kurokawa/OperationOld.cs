@@ -63,6 +63,11 @@ public class OperationOld : MonoBehaviour
         }
     }
 
+    public string GetDirection()
+	{
+        return direction;
+	}
+
     //’·‰Ÿ‚µ‚©‚Ç‚¤‚©‚ğæ“¾‚·‚éƒQƒbƒ^[
     public bool GetIsLongTouch()
 	{

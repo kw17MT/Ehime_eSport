@@ -64,6 +64,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
             gameObject.name = "OwnPlayer";
             //ƒ^ƒO‚ð‚Â‚¯‚é
             gameObject.tag = "OwnPlayer";
+
+            Debug.Log("OwnPlayer Named");
         }
 
         m_prevTrasnform = this.transform.rotation;
