@@ -5,28 +5,21 @@ using Photon.Pun;
 
 public class GoalScript : MonoBehaviourPunCallbacks
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    //ゴールをくぐったとき
     void OnTriggerEnter(Collider col)
 	{
-        //Debug.Log("goaled");
+        //ゴールをくぐったのが自分のプレイヤーインスタンスだったら
         if(col.gameObject.tag == "OwnPlayer")
         {
-            //Debug.Log("Found Own");
-            if(col.gameObject.GetComponent<ProgressChecker>().CheckCanGoal())
+            //チェックポイントを全部通っていたらゴール判定
+            col.gameObject.GetComponent<ProgressChecker>().CheckCanGoal();
+
+            //コースを3周ゴールしていたら
+            if(col.gameObject.GetComponent<ProgressChecker>().IsFinishRacing())
 			{
+                //プレイヤーがゴールした判定にする。
                 col.gameObject.GetComponent<AvatarController>().SetGoaled();
-			}
+            }
         }
     }
 }

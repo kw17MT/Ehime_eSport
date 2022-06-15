@@ -49,6 +49,9 @@ MonoBehaviour:
   - AddGoaledPlayerNumAndRecordTime
   - TellRecordTime
   - ShowResult
+  - TellReadyOK
+  - TellUsedStar
+  - InstantiateSnapper
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

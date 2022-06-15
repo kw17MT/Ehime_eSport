@@ -5,34 +5,29 @@ using Photon.Pun;
 
 public class OrangePeel : MonoBehaviourPunCallbacks
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
-
-    void OnCollisionEnter(Collision col)
+    //オレンジの皮と重なったら
+    void OnTriggerEnter(Collider col)
 	{
+        //当たったものが自分が操作するプレイヤーであったら
+        if(col.gameObject.tag == "OwnPlayer")
+		{
+            //攻撃された判定にする。
+            col.gameObject.GetComponent<AvatarController>().SetIsAttacked();
+		}
+        //ぶつかった皮を消す
         photonView.RPC(nameof(DestroyHittedOrangePeel), RpcTarget.All, this.gameObject.name);
-        Debug.Log("collisionEnter " + this.gameObject.name);
     }
 
     [PunRPC]
+    //ぶつかった皮の名前でそのインスタンスを破棄する。
     public void DestroyHittedOrangePeel(string hittedOrangePeelName)
     {
+        //引数の皮インスタンスの名前でオブジェクトを検索
         GameObject orange = GameObject.Find(hittedOrangePeelName);
         
         if (orange != null)
         {
-            Debug.Log("destroy " + hittedOrangePeelName);
+            //皮の消去
             Destroy(orange.gameObject);
         }
     }
