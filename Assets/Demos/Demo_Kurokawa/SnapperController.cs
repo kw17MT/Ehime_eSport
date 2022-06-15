@@ -25,9 +25,9 @@ public class SnapperController : MonoBehaviour
 
 	private void OnCollisionEnter(Collision col)
 	{
-        if(col.gameObject.tag != "OwnPlayer")
+        if(col.gameObject.tag != "OwnPlayer" && col.gameObject.tag != "Ground")
 		{
-            Debug.Log("Injured Player");
+            Debug.Log("Snapper Disappear");
             Destroy(this.gameObject);
         }
 	}
