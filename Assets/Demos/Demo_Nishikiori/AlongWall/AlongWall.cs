@@ -36,6 +36,7 @@ public class AlongWall
 
         //壁に沿って動くベクトルを計算し、移動方向として格納
         moveDirection = velocity - (Vector3.Dot(velocity, normal) * normal);
+        moveDirection.Normalize();
 
         //当たった時の向きをリセットし、スピードをセット
         rigidbody.velocity = m_alongWallSpeed * moveDirection;
