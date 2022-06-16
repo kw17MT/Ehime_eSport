@@ -31,7 +31,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
     public void GetRandomItem()
 	{
         //何も持っていなければ
-        if(EnItemType.enOrangePeel == EnItemType.enNothing)
+        if(m_obtainItemType == EnItemType.enNothing)
 		{
             //アイテムのナンバーをランダムに取得
             int type = (int)Random.Range((float)EnItemType.enOrangePeel, (float)EnItemType.enItemTypeNum);
@@ -70,35 +70,35 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         //自分が生成したインスタンスならば
         if (photonView.IsMine)
         {
-   //         //テストでボタンを押したらバナナが出るようにする。
-   //         if (Input.GetKeyDown(KeyCode.K))
-   //         {
-   //             Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * -2.0f);
-   //             photonView.RPC(nameof(InstantiateOrangePeel), RpcTarget.All, orangePeelPos);
-   //         }
-   //         //テストでボタンを押したらスター使用状態にする。
-   //         if (Input.GetKeyDown(KeyCode.J))
-   //         {
-   //             this.GetComponent<AvatarController>().SetIsUsingStar();
-   //         }
-   //         //テストでボタンを押したらキノコ使用状態にする。
-   //         if (Input.GetKeyDown(KeyCode.L))
-   //         {
-   //             this.GetComponent<AvatarController>().SetIsUsingJet();
-   //         }
-   //         //鯛を出す
-   //         if (Input.GetKeyDown(KeyCode.I))
-   //         {
-   //             Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 2.0f);
-   //             photonView.RPC(nameof(InstantiateSnapper), RpcTarget.All, snapperPos);
-   //         }
-   //         //テストでボタンを押したらキラー使用状態にする。
-   //         if (Input.GetKeyDown(KeyCode.P))
-			//{
-   //             this.GetComponent<AvatarController>().SetIsUsingKiller();
-   //         }
+			//         //テストでボタンを押したらバナナが出るようにする。
+			//         if (Input.GetKeyDown(KeyCode.K))
+			//         {
+			//             Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * -2.0f);
+			//             photonView.RPC(nameof(InstantiateOrangePeel), RpcTarget.All, orangePeelPos);
+			//         }
+			//         //テストでボタンを押したらスター使用状態にする。
+			//         if (Input.GetKeyDown(KeyCode.J))
+			//         {
+			//             this.GetComponent<AvatarController>().SetIsUsingStar();
+			//         }
+			//         //テストでボタンを押したらキノコ使用状態にする。
+			//         if (Input.GetKeyDown(KeyCode.L))
+			//         {
+			//             this.GetComponent<AvatarController>().SetIsUsingJet();
+			//         }
+			//         //鯛を出す
+			//         if (Input.GetKeyDown(KeyCode.I))
+			//         {
+			//             Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 2.0f);
+			//             photonView.RPC(nameof(InstantiateSnapper), RpcTarget.All, snapperPos);
+			//         }
+			//         //テストでボタンを押したらキラー使用状態にする。
+			if (Input.GetKeyDown(KeyCode.P))
+			{
+				this.GetComponent<AvatarController>().SetIsUsingKiller();
+			}
 
-            if(Input.GetKeyDown(KeyCode.K))
+			if (Input.GetKeyDown(KeyCode.K))
 			{
                 switch(m_obtainItemType)
 				{

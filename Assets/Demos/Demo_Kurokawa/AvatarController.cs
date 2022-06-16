@@ -34,11 +34,12 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MOVE_POWER_USING_STAR = 35.0f;         //スター使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_JET = 50.0f;          //ジェット使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_KILLER = 60.0f;       //キラー使用時のリジッドボディにかける移動の倍率
-    public float ROT_POWER = 1.0f;                      //ハンドリング
+    public float ROT_POWER = 0.5f;                      //ハンドリング
     public float MAX_STAR_REMAIN_TIME = 10.5f;          //スターの最大継続時間
     public float MAX_KILLER_REMAIN_TIME = 3.0f;         //キラーの最大継続時間
     public float MAX_DASH_TIME = 1.0f;                  //ダッシュの最大継続時間
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
+    public float KILLER_HANDLING_RATE = 5.0f;
 
     void Start()
     {
@@ -279,11 +280,44 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //回転について、FixedUpdateでやると呼び出し回数が少なすぎてガクつくためここで更新
             Quaternion rot;
             //自分の前方向からコースの向きへの回転を計算
-            rot = Quaternion.LookRotation((this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position) - this.transform.forward);
+            Vector3 newForward = (this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position) - this.transform.forward;
+            newForward.y = 0.0f;
+            rot = Quaternion.LookRotation(newForward);
             //緩やかにして適用
-            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 3.0f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * KILLER_HANDLING_RATE);
             //現在の回転を保存
             m_prevTrasnform = this.transform.rotation;
+            return;
+        }
+
+        //現在入力している回転を適用したTransformを適宜
+        Transform appliedTrasnform = this.transform;
+        appliedTrasnform.Rotate(m_rot);
+
+        //コースの向きとプレイヤーの前方向が45度以内であれば
+        if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
+        {
+            //回転を実際に適用する
+            transform.Rotate(m_rot);
+            //適切な回転を保存
+            m_prevTrasnform = this.transform.rotation;
+        }
+        //横に向きすぎているならば
+        else
+        {
+            //前回適用した、適切な回転で補正
+            this.transform.rotation = m_prevTrasnform;
+
+            //よこに向きすぎている
+            if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
+            {
+                Quaternion rot;
+                //コースの向きに戻すような回転を計算して適用する
+                rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
+
+                m_prevTrasnform = this.transform.rotation;
+            }
         }
     }
 
@@ -348,35 +382,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //前方へ加速
             m_rb.AddForce(m_moveSpeed - m_rb.velocity);
 
-            //現在入力している回転を適用したTransformを適宜
-            Transform appliedTrasnform = this.transform;
-            appliedTrasnform.Rotate(m_rot);
-
-            //コースの向きとプレイヤーの前方向が45度以内であれば
-            if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
-			{
-                //回転を実際に適用する
-                transform.Rotate(m_rot);
-                //適切な回転を保存
-                m_prevTrasnform = this.transform.rotation;
-            }
-            //横に向きすぎているならば
-			else
-			{
-                //前回適用した、適切な回転で補正
-                this.transform.rotation = m_prevTrasnform;
-
-                //よこに向きすぎている
-                if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
-				{
-                    Quaternion rot;
-                    //コースの向きに戻すような回転を計算して適用する
-                    rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
-                    transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
-                    
-                    m_prevTrasnform = this.transform.rotation;
-                }
-			}
+           
         }
 		//攻撃されていたら
 		else
