@@ -7,7 +7,7 @@ public class ParamManage : MonoBehaviour
 {
     private int m_orangePeelNum = 0;                    //オンラインでのゲーム中何個オレンジの皮が置かれたか
     private int m_playerID = 0;                         //プレイヤーのID（原則入ったもの順）
-    private bool m_isOfflineMode = false;
+    private bool m_isOfflineMode = false;               //オフラインモードでプレイするか
 
     // Start is called before the first frame update
     void Start()
@@ -28,11 +28,13 @@ public class ParamManage : MonoBehaviour
         return m_playerID;
 	}
 
+    //オフラインモードで開始するように
     public void SetOfflineMode()
 	{
         m_isOfflineMode = true;
 	}
 
+    //オフラインモードか
     public bool GetIsOfflineMode()
 	{
         return m_isOfflineMode;

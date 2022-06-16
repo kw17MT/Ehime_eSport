@@ -16,6 +16,7 @@ public class CameraMove : MonoBehaviour
         //通信の関係上、ここでインスタンスが確保できるまで探す
         if(!m_isGetOwnPlayer)
 		{
+            //自分のインスタンスを取得
             m_ownPlayer = GameObject.Find("OwnPlayer");
             if(m_ownPlayer != null)
 			{
