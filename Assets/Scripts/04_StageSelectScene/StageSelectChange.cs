@@ -13,14 +13,12 @@ public class StageSelectChange : MonoBehaviour
     [SerializeField] string[] m_stageName = null;
     //ステージ名ラベル
     [SerializeField] Text m_stageNameLabel = null;
-
     //難易度スプライト
     [SerializeField] Sprite[] m_difficlutySprite = null;
     //難易度イメージ
     [SerializeField] Image m_difficlutyImage = null;
     //ステージごとの難易度(0,簡単。1,普通。2,難しい)
     [SerializeField]int[] m_stageDifficluty = { 0, 1, 2 };
-
     //ステージ説明文
     [SerializeField] string[] m_stageExplanationSentence = null;
     //ステージ説明文ラベル
@@ -35,61 +33,34 @@ public class StageSelectChange : MonoBehaviour
     }
     //現在選択されているステージ
     EnStageType m_nowSelectStage = EnStageType.enStage1;
-
     //操作システム
     Operation m_operation = null;
-
     //選択移動をしているか
     bool m_selectMove = false;
-
     //移動時間カウンター
     int m_selectMoveCount = 0;
 
     CircleCenterRotateAround m_circleCenterRotateAround = null;
 
+    //ユーザーが設定した情報を格納して置く保管場所
+    UserSettingData m_userSettingData = null;
+
     void Start()
     {
-        //操作システムのゲームオブジェクトを検索しスクリプトを使用する
+        //操作システムのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
-        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しスクリプトを使用する
+        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_circleCenterRotateAround = GameObject.Find("Train").GetComponent<CircleCenterRotateAround>();
     }
 
     //アップデート関数
     void Update()
     {
-        if (!m_selectMove)
-        {
-            //画面が右フリックされたら、
-            if (m_operation.GetNowOperation() == "right")
-            {
-                //次のステージに選択を移動
-                GoNextStage();
-            }
-            //画面が左フリックされたら、
-            if (m_operation.GetNowOperation() == "left")
-            {
-                //前のステージに選択を移動
-                GoBackStage();
-            }
-        }
-
-        //選択されているステージによって分岐
-        switch (m_nowSelectStage)
-        {
-            //ステージ1
-            case EnStageType.enStage1:
-                break;
-            //ステージ2
-            case EnStageType.enStage2:
-                break;
-            //ステージ3
-            case EnStageType.enStage3:
-                break;
-        }
+        //選択するステージを移動する
+        ChangeSelectStage();
 
         //画面が長押しされたら、
-        if (m_operation.GetIsLongTouch())
+        if (m_operation.GetIsLongTouch)
         {
             //次のシーンに遷移させる
             GoNextScene();
@@ -100,6 +71,27 @@ public class StageSelectChange : MonoBehaviour
 
         //ステージ選択シーンのテキストなどのデータを更新
         StageSceneDataUpdate();
+    }
+
+    //選択するステージを移動する関数
+    void ChangeSelectStage()
+    {
+        if (m_selectMove)
+        {
+            return;
+        }
+        //画面が右フリックされたら、
+        if (m_operation.GetNowOperation() == "right")
+        {
+            //次のステージに選択を移動
+            GoNextStage();
+        }
+        //画面が左フリックされたら、
+        if (m_operation.GetNowOperation() == "left")
+        {
+            //前のステージに選択を移動
+            GoBackStage();
+        }
     }
 
     //次のステージに選択を移動する関数
@@ -144,6 +136,12 @@ public class StageSelectChange : MonoBehaviour
         //操作の判定を初期化させる
         m_operation.TachDataInit();
 
+        //ユーザー設定データのゲームオブジェクトを検索し、
+        //ゲームコンポーネントを取得する
+        m_userSettingData = GameObject.Find("UserSettingDataStorageSystem").GetComponent<UserSettingData>();
+        //選択されたステージデータを保存
+        m_userSettingData.GetSetStageType = (int)m_nowSelectStage;
+
         //CPU強さ設定選択シーンに遷移
         SceneManager.LoadScene("06_CpuPowerSettingScene");
     }
@@ -158,7 +156,7 @@ public class StageSelectChange : MonoBehaviour
         m_selectMoveCount++;
 
         //カウントが指定した数値より大きくなったら、
-        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime())
+        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime)
         {
             //選択移動していない状態に戻す
             m_selectMove = false;

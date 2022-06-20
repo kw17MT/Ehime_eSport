@@ -23,47 +23,34 @@ public class CpuPowerSettingChange : MonoBehaviour
     }
     //現在選択されている強さ
     EnCpuPowerType m_nowSelectStrength = EnCpuPowerType.enWeak;
-
     //操作システム
     Operation m_operation = null;
-
     //選択移動をしているか
     bool m_selectMove = false;
-
     //移動時間カウンター
     int m_selectMoveCount = 0;
 
     CircleCenterRotateAround m_circleCenterRotateAround = null;
 
+    //ユーザーが設定した情報を格納して置く保管場所
+    UserSettingData m_userSettingData = null;
+
     void Start()
     {
-        //操作システムのゲームオブジェクトを検索しスクリプトを使用する
+        //操作システムのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
-        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しスクリプトを使用する
+        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_circleCenterRotateAround = GameObject.Find("Train").GetComponent<CircleCenterRotateAround>();
     }
 
     //アップデート関数
     void Update()
     {
-        if (!m_selectMove)
-        {
-            //画面が右フリックされたら、
-            if (m_operation.GetNowOperation() == "right")
-            {
-                //次のCPUの強さに選択を移動
-                GoNextCpuPower();
-            }
-            //画面が左フリックされたら、
-            if (m_operation.GetNowOperation() == "left")
-            {
-                //前のCPUの強さに選択を移動
-                GoBackStage();
-            }
-        }
+        //選択するCPUの強さを移動する
+        ChangeSelectCpuPower();
 
         //画面が長押しされたら、
-        if (m_operation.GetIsLongTouch())
+        if (m_operation.GetIsLongTouch)
         {
             //次のシーンに遷移させる
             GoNextScene();
@@ -74,6 +61,27 @@ public class CpuPowerSettingChange : MonoBehaviour
 
         //CPUの強さラベルを更新
         m_strengthLabel.text = m_strengthName[(int)m_nowSelectStrength];
+    }
+
+    //選択するCPUの強さを移動する
+    void ChangeSelectCpuPower()
+    {
+        if (m_selectMove)
+        {
+            return;
+        }
+        //画面が右フリックされたら、
+        if (m_operation.GetNowOperation() == "right")
+        {
+            //次のCPUの強さに選択を移動
+            GoNextCpuPower();
+        }
+        //画面が左フリックされたら、
+        if (m_operation.GetNowOperation() == "left")
+        {
+            //前のCPUの強さに選択を移動
+            GoBackStage();
+        }
     }
 
     //次のCPUの強さに選択を移動する関数
@@ -107,6 +115,12 @@ public class CpuPowerSettingChange : MonoBehaviour
         //操作の判定を初期化させる
         m_operation.TachDataInit();
 
+        //ユーザー設定データのゲームオブジェクトを検索し、
+        //ゲームコンポーネントを取得する
+        m_userSettingData = GameObject.Find("UserSettingDataStorageSystem").GetComponent<UserSettingData>();
+        //選択されたCPU強さデータを保存
+        m_userSettingData.GetSetCpuPower = (int)m_nowSelectStrength;
+
         //マッチングシーンに遷移
         SceneManager.LoadScene("07_MatchingScene");
     }
@@ -121,7 +135,7 @@ public class CpuPowerSettingChange : MonoBehaviour
         m_selectMoveCount++;
 
         //カウントが指定した数値より大きくなったら、
-        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime())
+        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime)
         {
             //選択移動していない状態に戻す
             m_selectMove = false;

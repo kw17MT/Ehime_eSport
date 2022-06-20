@@ -6,24 +6,21 @@ using UnityEngine.UI;
 /// <summary>
 /// トグル
 /// </summary>
-public class BlindToggle : MonoBehaviour
+public class ToggleOnOff : MonoBehaviour
 {
-    [SerializeField]Image m_backgroundImage = null;
-    [SerializeField]RectTransform m_handle = null;
-    [SerializeField]bool m_onAwake = false;
-
-    /// <summary>
-    /// トグルの値
-    /// </summary>
+    [SerializeField] Image m_backgroundImage = null;
+    [SerializeField] RectTransform m_handle = null;
+    [SerializeField] bool m_onAwake = false;
+    //トグルの値
     [NonSerialized] public bool m_value = false;
 
     float m_handlePosX = 0.0f;
     Sequence m_sequence = null;
 
-    static readonly Color OFF_BG_COLOR = new Color(0.92f, 0.92f, 0.92f);
-    static readonly Color ON_BG_COLOR = new Color(0.2f, 0.84f, 0.3f);
+    static readonly Color m_OFF_BG_COLOR = new Color(0.92f, 0.92f, 0.92f);
+    static readonly Color m_ON_BG_COLOR = new Color(0.2f, 0.84f, 0.3f);
 
-    const float SWITCH_DURATION = 0.36f;
+    const float m_kSwitchDuration = 0.36f;
 
     void Start()
     {
@@ -38,7 +35,7 @@ public class BlindToggle : MonoBehaviour
     public void SwitchToggle()
     {
         m_value = !m_value;
-        UpdateToggle(SWITCH_DURATION);
+        UpdateToggle(m_kSwitchDuration);
     }
 
     /// <summary>
@@ -46,12 +43,22 @@ public class BlindToggle : MonoBehaviour
     /// </summary>
     void UpdateToggle(float duration)
     {
-        var bgColor = m_value ? ON_BG_COLOR : OFF_BG_COLOR;
+        var bgColor = m_value ? m_ON_BG_COLOR : m_OFF_BG_COLOR;
         var handleDestX = m_value ? m_handlePosX : -m_handlePosX;
 
         m_sequence?.Complete();
         m_sequence = DOTween.Sequence();
         m_sequence.Append(m_backgroundImage.DOColor(bgColor, duration))
             .Join(m_handle.DOAnchorPosX(handleDestX, duration / 2));
+    }
+
+    //トグルの値を取得するプロパティ
+    public bool GetToggleValue
+    {
+        //ゲッター
+        get
+        {
+            return m_value;
+        }
     }
 }

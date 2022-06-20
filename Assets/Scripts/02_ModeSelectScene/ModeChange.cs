@@ -11,13 +11,10 @@ public class ModeChange : MonoBehaviour
     [SerializeField] string[] m_modeName = null;
     //モードラベル
     [SerializeField] Text m_modeLabel = null;
-
     //選択移動をしているか
     bool m_selectMove = false;
-
     //移動時間カウンター
     int m_selectMoveCount = 0;
-
     //モードタイプ
     enum EnModeType
     {
@@ -29,46 +26,36 @@ public class ModeChange : MonoBehaviour
     }
     //現在選択されているモード
     EnModeType m_nowSelectMode = EnModeType.enOnlineMode;
-
     //モード説明文
     [SerializeField] string[] m_modeExplanationSentence = null;
     //モード説明文ラベル
     [SerializeField] Text m_modeExplanationLabel = null;
-
     //操作システム
     Operation m_operation = null;
 
     CircleCenterRotateAround m_circleCenterRotateAround = null;
 
+    //ユーザーが設定した情報を格納して置く保管場所
+    UserSettingData m_userSettingData = null;
+
     void Start()
     {
-        //操作システムのゲームオブジェクトを検索しスクリプトを使用する
+        //操作システムのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
-        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しスクリプトを使用する
+
+        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_circleCenterRotateAround = GameObject.Find("Train").GetComponent<CircleCenterRotateAround>();
     }
 
     //アップデート関数
     void Update()
     {
-        if (!m_selectMove)
-        {
-            //画面が右フリックされたら、
-            if (m_operation.GetNowOperation() == "right")
-            {
-                //次のモードに選択を移動
-                GoNextMode();
-            }
-            //画面が左フリックされたら、
-            if (m_operation.GetNowOperation() == "left")
-            {
-                //前のモードに選択を移動
-                GoBackMode();
-            }
-        }
+        //選択しているモードを移動させる関数
+        //操作は左右フリック
+        ChangeSelectMode();
 
         //画面が長押しされたら、
-        if (m_operation.GetIsLongTouch())
+        if (m_operation.GetIsLongTouch)
         {
             //次のシーンに遷移させる
             GoNextScene();
@@ -79,6 +66,28 @@ public class ModeChange : MonoBehaviour
 
         //モードシーンのテキストなどのデータを更新
         ModeSceneDataUpdate();
+    }
+
+    //選択しているモードを移動させる関数
+    void ChangeSelectMode()
+    {
+        if (m_selectMove)
+        {
+            return;
+        }
+
+        //画面が右フリックされたら、
+        if (m_operation.GetNowOperation() == "right")
+        {
+            //次のモードに選択を移動
+            GoNextMode();
+        }
+        //画面が左フリックされたら、
+        if (m_operation.GetNowOperation() == "left")
+        {
+            //前のモードに選択を移動
+            GoBackMode();
+        }
     }
 
     //次のモードに選択を移動する関数
@@ -121,6 +130,12 @@ public class ModeChange : MonoBehaviour
         //操作の判定を初期化させる
         m_operation.TachDataInit();
 
+        //ユーザー設定データのゲームオブジェクトを検索し、
+        //ゲームコンポーネントを取得する
+        m_userSettingData = GameObject.Find("UserSettingDataStorageSystem").GetComponent<UserSettingData>();
+        //選択されたモードデータを保存
+        m_userSettingData.GetSetModeType = (int)m_nowSelectMode;
+
         //選択されているモードによって分岐
         switch (m_nowSelectMode)
         {
@@ -157,7 +172,7 @@ public class ModeChange : MonoBehaviour
         m_selectMoveCount++;
 
         //カウントが指定した数値より大きくなったら、
-        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime())
+        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime)
         {
             //選択移動していない状態に戻す
             m_selectMove = false;

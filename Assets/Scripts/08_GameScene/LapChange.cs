@@ -10,7 +10,6 @@ public class LapChange : MonoBehaviour
 {
     //ラップ数ラベル
     [SerializeField]Text m_lapLabel = null;
-
     //ラップ数
     [SerializeField]int m_lapNo = 1;
 
