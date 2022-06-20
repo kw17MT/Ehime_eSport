@@ -148,10 +148,13 @@ public class Operation : MonoBehaviour
         return NowOperation();
     }
 
-    //長押し中かどうかを取得するゲッター
-    public bool GetIsLongTouch()
+    //長押し中かどうかを取得するプロパティ
+    public bool GetIsLongTouch
     {
-        return m_isLongTouch;
+        get
+        {
+            return m_isLongTouch;
+        }
     }
 
     //タッチのフラグや数値を初期化する関数

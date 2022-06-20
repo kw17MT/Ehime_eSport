@@ -7,59 +7,59 @@ public class CircleCenterRotateAround : MonoBehaviour
 {
     // 中心点
     [SerializeField]GameObject m_center = null;
-
     // 回転軸(Y軸)
     Vector3 m_axis = Vector3.up;
-
     // 円運動周期
     public float m_period = 0.0f;
-
     //周れるかどうか
     bool m_aroundMoveOn = false;
-
     //周る時間カウンター
     int m_aroundCount = 0;
-
     //時計回りか反時計回りか
     int m_reverse = 1;
-
     //操作システム
     Operation m_operation = null;
-
     //タイマーの稼働時間
     [SerializeField]int m_countTime = 0;
 
     void Start()
     {
-        //操作システムのゲームオブジェクトを検索しスクリプトを使用する
+        //操作システムのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
     }
 
     void Update()
     {
-        if (!m_aroundMoveOn)
-        {
-            //画面が右フリックされたら、
-            if (m_operation.GetNowOperation() == "right")
-            {
-                //周れる状態にする
-                m_aroundMoveOn = true;
-                //時計回り
-                m_reverse = 1;
-            }
-            //画面が左フリックされたら、
-            if (m_operation.GetNowOperation() == "left")
-            {
-                //周れる状態にする
-                m_aroundMoveOn = true;
-                //時計回り
-                m_reverse = -1;
-            }
-        }
-
+        //ユーザー操作によって処理を実行
+        UserOperation();
 
         //周る処理を実行
         GoAround();
+    }
+
+    //ユーザー操作によって処理を実行する関数
+    void UserOperation()
+    {
+        if (m_aroundMoveOn)
+        {
+            return;
+        }
+        //画面が右フリックされたら、
+        if (m_operation.GetNowOperation() == "right")
+        {
+            //周れる状態にする
+            m_aroundMoveOn = true;
+            //時計回り
+            m_reverse = 1;
+        }
+        //画面が左フリックされたら、
+        if (m_operation.GetNowOperation() == "left")
+        {
+            //周れる状態にする
+            m_aroundMoveOn = true;
+            //時計回り
+            m_reverse = -1;
+        }
     }
 
     //周る処理関数
@@ -88,9 +88,13 @@ public class CircleCenterRotateAround : MonoBehaviour
         }
     }
 
-    //タイマーの稼働時間を取得するゲッター
-    public int GetCountTime()
+    //タイマーの稼働時間を取得するプロパティ
+    public int GetCountTime
     {
-        return m_countTime;
+        //ゲッター
+        get
+        {
+            return m_countTime;
+        }
     }
 }
