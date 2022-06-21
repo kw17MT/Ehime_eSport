@@ -41,7 +41,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MAX_DASH_TIME = 1.0f;                  //ƒ_ƒbƒVƒ…‚ÌÅ‘åŒp‘±ŠÔ
     public float MAX_STIFFIN_TIME = 1.5f;               //UŒ‚‚ª“–‚½‚Á‚½‚ÌÅ‘åd’¼ŠÔ
     public float KILLER_HANDLING_RATE = 5.0f;
-    public float SPIN_AMOUNT = 0.5f; 
+    public float SPIN_AMOUNT = 0.5f;                    //”í’e‚Ì‰ñ“]—¦
 
     void Start()
     {
