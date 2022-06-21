@@ -20,6 +20,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private float m_starTime = 0.0f;                    //スター時間の使用している時間
     private float m_dashTime = 0.0f;                    //キノコを使ってダッシュしている時間
     private float m_killerTime = 0.0f;                  //キラーを使用している時間
+    private float m_spinedAngle = 0.0f;
     private bool m_isGoaled = false;                    //自分はゴールしたか
     private bool m_isToldRecord = false;                //自分の走破レコードをホストクライアントに送ったかどうかのフラグ
     private bool m_isToldReady = false;                 //ルームに参加して準備ができたことを一度だけ通信するためのフラグ
@@ -40,6 +41,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MAX_DASH_TIME = 1.0f;                  //ダッシュの最大継続時間
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
     public float KILLER_HANDLING_RATE = 5.0f;
+    public float SPIN_AMOUNT = 0.5f; 
 
     void Start()
     {
@@ -69,6 +71,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         //前回の回転を初期化
         m_prevTrasnform = this.transform.rotation;
+
 
         //1秒間に何回通信するか
         PhotonNetwork.SendRate = 3;
@@ -150,6 +153,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public bool GetIsUsingStar()
 	{
         return m_isUsingStar;
+	}
+
+    public bool GetIsAttacked()
+	{
+        return m_isAttacked;
 	}
 
     //ホストへクリアタイムを送る
@@ -290,33 +298,48 @@ public class AvatarController : MonoBehaviourPunCallbacks
             return;
         }
 
-        //現在入力している回転を適用したTransformを適宜
-        Transform appliedTrasnform = this.transform;
-        appliedTrasnform.Rotate(m_rot);
-
-        //コースの向きとプレイヤーの前方向が45度以内であれば
-        if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
+        //入力による回転処理をさせない
+        if (!m_isAttacked)
         {
-            //回転を実際に適用する
-            transform.Rotate(m_rot);
-            //適切な回転を保存
-            m_prevTrasnform = this.transform.rotation;
-        }
-        //横に向きすぎているならば
-        else
-        {
-            //前回適用した、適切な回転で補正
-            this.transform.rotation = m_prevTrasnform;
+            //現在入力している回転を適用したTransformを適宜
+            Transform appliedTrasnform = this.transform;
+            appliedTrasnform.Rotate(m_rot);
 
-            //よこに向きすぎている
-            if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
+            //コースの向きとプレイヤーの前方向が45度以内であれば
+            if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
             {
-                Quaternion rot;
-                //コースの向きに戻すような回転を計算して適用する
-                rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
-                transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
-
+                //回転を実際に適用する
+                transform.Rotate(m_rot);
+                //適切な回転を保存
                 m_prevTrasnform = this.transform.rotation;
+            }
+            //横に向きすぎているならば
+            else
+            {
+
+                //前回適用した、適切な回転で補正
+                this.transform.rotation = m_prevTrasnform;
+
+                //よこに向きすぎている
+                if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
+                {
+                    Quaternion rot;
+                    //コースの向きに戻すような回転を計算して適用する
+                    rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
+
+                    m_prevTrasnform = this.transform.rotation;
+                }
+            }
+        }
+
+        if(m_isAttacked)
+		{
+            m_spinedAngle += SPIN_AMOUNT;
+
+            if(m_spinedAngle < 360.0f)
+			{
+                this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // 回転角度を設定            
             }
         }
     }
@@ -390,10 +413,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //硬直時間をゲーム時間で増やす
             m_stiffenTime += Time.deltaTime;
             //設定した最大硬直時間を超えたら
-            if(m_stiffenTime >= MAX_STIFFIN_TIME)
+
+            if (m_stiffenTime >= MAX_STIFFIN_TIME)
 			{
                 //計測した硬直時間をリセット
                 m_stiffenTime = 0.0f;
+                //被弾時の回転リアクションの総回転量をリセット
+                m_spinedAngle = 0.0f;
                 //攻撃フラグを直す
                 m_isAttacked = false;
             }
