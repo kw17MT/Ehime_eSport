@@ -14,7 +14,6 @@ public class NowRankingChange : MonoBehaviour
     [SerializeField] Text m_rankLabel = null;
     //現在の順位
     [SerializeField] int m_ranking = 1;
-
     //ランク(fir"st",seco"nd",thi"rd",for"th")
     string[] m_rankStr = { "st","nd","rd","th"};
     //順位ごとの色
@@ -29,13 +28,6 @@ public class NowRankingChange : MonoBehaviour
     //アップデート関数
     void Update()
     {
-        //順位が1～4位以外の時はエラー。実行しない。
-        if(1 > m_ranking || m_ranking > 4)
-        {
-            Debug.Log("順位が1～4位ではありません。エラー。");
-            return;
-        }
-
         //現在の順位の値や色などのデータを更新
         RankingDataUpdate();
     }

@@ -42,7 +42,7 @@ public class PostEffect : ScriptableRendererFeature
     /// </summary>
     class GrayScalePass : ScriptableRenderPass
     {
-        private readonly string profilerTag = "GrayScale Pass";
+        readonly string profilerTag = "GrayScale Pass";
 
         public Material postEffectMaterial; // グレースケール計算用マテリアル
 

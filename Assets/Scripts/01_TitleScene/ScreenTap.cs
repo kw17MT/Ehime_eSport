@@ -9,16 +9,14 @@ public class ScreenTap : MonoBehaviour
     [SerializeField] float advanceSpeed = 0.0f;
     //列車の移動範囲
     [SerializeField] float trainMoveRange = 0.0f;
-
     //トランジションシステム
     [SerializeField] TransitionPostEffect m_transitionPostEffect = null;
-
     //操作システム
     Operation m_operation = null;
 
     void Start()
     {
-        //操作システムのゲームオブジェクトを検索しスクリプトを使用する
+        //操作システムのゲームオブジェクトを検索しコンポーネントを取得
         m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
     }
 
@@ -37,14 +35,8 @@ public class ScreenTap : MonoBehaviour
         //カメラに一定の距離まで近づいたら、
         if (this.transform.position.z < trainMoveRange)
         {
-            //トランジション起動
-            m_transitionPostEffect.OnTransition();
-
-            //操作の判定を初期化させる
-            m_operation.TachDataInit();
-
-            //モード選択シーンに遷移
-            SceneManager.LoadScene("02_ModeSelectScene");
+            //シーン遷移処理
+            ChangeScene();
         }
     }
 
@@ -66,5 +58,18 @@ public class ScreenTap : MonoBehaviour
             //列車が前進できる判定にする
             canAdvance = true;
         }
+    }
+
+    //シーン遷移処理関数
+    void ChangeScene()
+    {
+        //トランジション起動
+        m_transitionPostEffect.OnTransition();
+
+        //操作の判定を初期化させる
+        m_operation.TachDataInit();
+
+        //モード選択シーンに遷移
+        SceneManager.LoadScene("02_ModeSelectScene");
     }
 }

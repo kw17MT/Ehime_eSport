@@ -13,12 +13,10 @@ public class CharaSelectChange : MonoBehaviour
     [SerializeField] string[] m_charaName = null;
     //キャラクター名ラベル
     [SerializeField] Text m_charaNameLabel = null;
-
     //キャラクターステータス
     [SerializeField] string[] m_charaStatus = null;
     //キャラステータスラベル
     [SerializeField] Text m_charaStatusLabel = null;
-
     //キャラクター説明文
     [SerializeField] string[] m_charaExplanationSentence = null;
     //キャラクター説明ラベル
@@ -33,47 +31,34 @@ public class CharaSelectChange : MonoBehaviour
     }
     //現在選択されているキャラクター
     EnCharaType m_nowSelectChara = EnCharaType.enMikyan;
-
     //操作システム
     Operation m_operation = null;
-
     //選択移動をしているか
     bool m_selectMove = false;
-
     //移動時間カウンター
     int m_selectMoveCount = 0;
 
     CircleCenterRotateAround m_circleCenterRotateAround = null;
 
+    //ユーザーが設定した情報を格納して置く保管場所
+    UserSettingData m_userSettingData = null;
+
     void Start()
     {
-        //操作システムのゲームオブジェクトを検索しスクリプトを使用する
+        //操作システムのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
-        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しスクリプトを使用する
+        //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_circleCenterRotateAround = GameObject.Find("Train").GetComponent<CircleCenterRotateAround>();
     }
 
     //アップデート関数
     void Update()
     {
-        if (!m_selectMove)
-        {
-            //画面が右フリックされたら、
-            if (m_operation.GetNowOperation() == "right")
-            {
-                //次のキャラクターに選択を移動
-                GoNextChara();
-            }
-            //画面が左フリックされたら、
-            if (m_operation.GetNowOperation() == "left")
-            {
-                //前のキャラクターに選択を移動
-                GoBackChara();
-            }
-        }
+        //選択するキャラクターを移動する
+        ChangeSelectChara();
 
         //画面が長押しされたら、
-        if (m_operation.GetIsLongTouch())
+        if (m_operation.GetIsLongTouch)
         {
             //次のシーンに遷移させる
             GoNextScene();
@@ -84,6 +69,27 @@ public class CharaSelectChange : MonoBehaviour
 
         //キャラ選択シーンのテキストなどのデータを更新
         CharaSelectSceneDataUpdate();
+    }
+
+    //選択するキャラクターを移動する関数
+    void ChangeSelectChara()
+    {
+        if (m_selectMove)
+        {
+            return;
+        }
+        //画面が右フリックされたら、
+        if (m_operation.GetNowOperation() == "right")
+        {
+            //次のキャラクターに選択を移動
+            GoNextChara();
+        }
+        //画面が左フリックされたら、
+        if (m_operation.GetNowOperation() == "left")
+        {
+            //前のキャラクターに選択を移動
+            GoBackChara();
+        }
     }
 
     //次のキャラクターに選択を移動する関数
@@ -132,6 +138,12 @@ public class CharaSelectChange : MonoBehaviour
         //操作の判定を初期化させる
         m_operation.TachDataInit();
 
+        //ユーザー設定データのゲームオブジェクトを検索し、
+        //ゲームコンポーネントを取得する
+        m_userSettingData = GameObject.Find("UserSettingDataStorageSystem").GetComponent<UserSettingData>();
+        //選択されたキャラクターデータを保存
+        m_userSettingData.GetSetCharacter = (int)m_nowSelectChara;
+
         //ステージ選択シーンに遷移
         SceneManager.LoadScene("05_StageSelectScene");
     }
@@ -146,7 +158,7 @@ public class CharaSelectChange : MonoBehaviour
         m_selectMoveCount++;
 
         //カウントが指定した数値より大きくなったら、
-        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime())
+        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime)
         {
             //選択移動していない状態に戻す
             m_selectMove = false;
