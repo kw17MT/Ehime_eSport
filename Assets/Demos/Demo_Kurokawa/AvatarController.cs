@@ -13,6 +13,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     Vector3 m_moveSpeed = Vector3.zero;                 //移動スピード
     Vector3 m_rot = Vector3.zero;                       //どちらに回転するかの向き
     Vector3 m_corseDir = Vector3.zero;                  //現在走っているコースの大まかな方向
+    Vector3 m_alongWallDir = Vector3.zero;
     private GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
     private bool m_canMove = false;                     //移動が制限されていないか
     private float m_runningTime = 0.0f;                 //走行時間
@@ -20,7 +21,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private float m_starTime = 0.0f;                    //スター時間の使用している時間
     private float m_dashTime = 0.0f;                    //キノコを使ってダッシュしている時間
     private float m_killerTime = 0.0f;                  //キラーを使用している時間
-    private float m_spinedAngle = 0.0f;
+    private float m_spinedAngle = 0.0f;                 //被弾して回転した総量
     private bool m_isGoaled = false;                    //自分はゴールしたか
     private bool m_isToldRecord = false;                //自分の走破レコードをホストクライアントに送ったかどうかのフラグ
     private bool m_isToldReady = false;                 //ルームに参加して準備ができたことを一度だけ通信するためのフラグ
@@ -28,6 +29,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private bool m_isUsingKiller = false;               //現在、キラーを使用しているか
     private bool m_isUsingJet = false;                  //現在、ジェットを使用しているか
     private bool m_isAttacked = false;                  //攻撃されたか
+    private bool m_hittedWall = false;                  //壁に当たっているか
     private Quaternion m_prevTrasnform;                 //前回の回転の度合い
     
 
@@ -40,8 +42,10 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MAX_KILLER_REMAIN_TIME = 3.0f;         //キラーの最大継続時間
     public float MAX_DASH_TIME = 1.0f;                  //ダッシュの最大継続時間
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
-    public float KILLER_HANDLING_RATE = 5.0f;
+    public float KILLER_HANDLING_RATE = 5.0f;           //キラーを使用した際のカメラの追従速度
     public float SPIN_AMOUNT = 0.5f;                    //被弾時の回転率
+
+    private AlongWall m_alongWall = null;
 
     void Start()
     {
@@ -71,6 +75,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         //前回の回転を初期化
         m_prevTrasnform = this.transform.rotation;
+
+        m_alongWall = new AlongWall();
 
 
         //1秒間に何回通信するか
@@ -216,9 +222,30 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_isAttacked = true;
 			}
 		}
-	}
 
-    private void Update()
+        if(col.gameObject.tag == "Wall")
+		{
+            m_hittedWall = true;
+            Debug.Log("WALL");
+            m_alongWall.CollisionEnter(col, m_rb, ref m_moveDir);
+            m_alongWallDir = m_moveDir;
+            Debug.Log("AvatarController : m_moveDir = " + m_alongWallDir);
+        }
+    }
+
+	private void OnCollisionStay(Collision col)
+	{
+        if (col.gameObject.tag == "Wall")
+        {
+            m_hittedWall = true;
+            Debug.Log("WALL");
+            m_alongWall.CollisionEnter(col, m_rb, ref m_moveDir);
+            m_alongWallDir = m_moveDir;
+            Debug.Log("AvatarController : m_moveDir = " + m_alongWallDir);
+        }
+    }
+
+	private void Update()
 	{
         //コースの向きを現在のウェイポイント通過状況から調べる
         m_corseDir = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.GetComponent<WayPointChecker>().GetCurrentWayPoint();
@@ -300,7 +327,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         //入力による回転処理をさせない
         if (!m_isAttacked)
-        {
+        { 
             //現在入力している回転を適用したTransformを適宜
             Transform appliedTrasnform = this.transform;
             appliedTrasnform.Rotate(m_rot);
@@ -399,13 +426,17 @@ public class AvatarController : MonoBehaviourPunCallbacks
             return;
         }
 
-        //自分が攻撃されていなければ
-        if (!m_isAttacked)
+        if(!m_isAttacked)
 		{
-            //前方へ加速
+            if(m_hittedWall)
+			{
+                m_moveSpeed = m_alongWallDir * MOVE_POWER;
+                Debug.Log("moveSpeed : " + m_moveSpeed + " m_alongWallDir : " + m_alongWallDir);
+                //前方へ加速
+                
+                m_hittedWall = false;
+            }
             m_rb.AddForce(m_moveSpeed - m_rb.velocity);
-
-           
         }
 		//攻撃されていたら
 		else
