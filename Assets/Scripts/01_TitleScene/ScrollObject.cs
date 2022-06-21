@@ -14,7 +14,10 @@ public class ScrollObject : MonoBehaviour
         transform.Translate(speed * Time.deltaTime, 0, 0);
 
         //スクロールが目標ポイントまで到達したかをチェック
-        if(transform.position.x >= endPosition)ScrollEnd();
+        if (transform.position.x >= endPosition)
+        {
+            ScrollEnd();
+        }
     }
 
     void ScrollEnd()

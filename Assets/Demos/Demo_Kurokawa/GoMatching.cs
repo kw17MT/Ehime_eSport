@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+//デモシーンのオンラインかオフラインかで分岐するシーン
 public class GoMatching : MonoBehaviour
 {
     GameObject operation = null;
@@ -16,20 +17,21 @@ public class GoMatching : MonoBehaviour
     //更新関数
     void Update()
     {
+        //長押しならば
         if (operation.GetComponent<OperationOld>().GetIsLongTouch())
         {
             //マッチングシーンへ
             SceneManager.LoadScene("DemoMatchingScene");
-            Debug.Log("To Standby Scene");
         }
 
+        //右フリックならば
         if (operation.GetComponent<OperationOld>().GetDirection() == "right")
         {
             //インゲームへ直行（シングルプレイ）
             SceneManager.LoadScene("DemoInGame");
+            //シングルプレイモードに設定する
             GameObject pm = GameObject.Find("ParamManager");
             pm.GetComponent<ParamManage>().SetOfflineMode();
-            Debug.Log("To Standby Scene");
         }
     }
 }

@@ -10,32 +10,35 @@ using System.Collections.Generic;
 // MonoBehaviourPunCallbacksを継承して、PUNのコールバックを受け取れるようにする
 public class InGameScript : MonoBehaviourPunCallbacks
 {
-    private GameObject m_memberListText = null;
-    private GameObject m_countDownText = null;
-    private GameObject m_resultText = null;
-    private GameObject m_paramManager = null;
-    private float m_countDownNum = 3.0f;
-    private int m_prevCountDownNum = 0;
+    private GameObject m_memberListText = null;                                         //メンバーリストを表示するテキストインスタンス
+    private GameObject m_countDownText = null;                                          //カウントダウンを表示するテキストインスタンス
+    private GameObject m_resultText = null;                                             //リザルトを表示するテキストインスタンス
+    private GameObject m_paramManager = null;                                           //ゲーム中に使用するパラメータ保存インスタンス
+    private int m_goaledPlayerNum = 0;                                                  //ゴールしたプレイヤーの数
+    private int m_playerReadyNum = 0;                                                   //走行の準備ができているプレイヤーの数
+    private int m_prevCountDownNum = 0;                                                 //カウントダウンしている時、前の数値の整数値
+    private float m_countDownNum = 4.0f;                                                //カウントダウンする際の開始数値
+    private bool m_isInstantiateAI = false;                                             //プレイヤーの不足分をAIで補ったかどうか
+    private bool isShownResult = false;                                                 //リザルトを出しているか
+    private bool m_shouldCountDown = true;                                              //カウントダウンの数字を出すか
+    Dictionary<string, float> m_scoreBoard = new Dictionary<string, float>();           //ゴールしたプレイヤーの名前とタイム一覧
 
-    private int m_goaledPlayerNum = 0;
-    private float[] m_playerGoaledTime = new float[4]{ 0.0f, 0.0f, 0.0f, 0.0f };
-    private bool isShownResult = false;
-    private bool m_shouldCountDown = true;
-
-    Dictionary<string, float> m_scoreBoard = new Dictionary<string, float>();
-
-    private bool m_isInstantiateAI = false;
-    private int m_playerReadyNum = 0;
+    private const int PLAYER_ONE = 1;
+    private const int AI_NUM_IN_SINGLE_PLAY = 3;
 
     private void Start()
     {
+        //ゲーム中のパラメータ保存インスタンスを取得する
         m_paramManager = GameObject.Find("ParamManager");
-
+        //ゲームがオフラインで開始されたら
         if(m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode())
 		{
+            //オフラインモードにする
             PhotonNetwork.OfflineMode = true;
-            m_paramManager.GetComponent<ParamManage>().SetPlayerID(1);
+            //オフラインモードなので、プレイヤーのIDを1にする
+            m_paramManager.GetComponent<ParamManage>().SetPlayerID(PLAYER_ONE);
         }
+        //オンラインモードならば
 		else
 		{
             // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
@@ -46,41 +49,34 @@ public class InGameScript : MonoBehaviourPunCallbacks
             PhotonNetwork.CurrentRoom.IsOpen = false;
         }
 
-        int id = m_paramManager.GetComponent<ParamManage>().GetPlayerID();
-        //Debug.Log("OfflineMode = " + PhotonNetwork.OfflineMode + "PlayerID = " + id);
-
-        // 自身のアバター（ネットワークオブジェクト）を生成する
-        string spawnPointName = "PlayerSpawnPoint" + (id - 1);
-
-        GameObject spawnPoint = GameObject.Find(spawnPointName);
-        //Debug.Log(spawnPoint.name);
-        Debug.Log(PhotonNetwork.CurrentRoom.Name);
-
-        var position = spawnPoint.transform.position;
-        GameObject ownPlayer = PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
-
-        Debug.Log(ownPlayer.name + " " + ownPlayer.tag);
-
-        spawnPoint.GetComponent<PlayerSpawnPoint>().SetPlayerSpawned();
-
-        //ホストのみ実行する部分
+        // 自分のプレイヤーを生成するポイントをIDを使って検索する
+        string spawnPointName = "PlayerSpawnPoint" + (m_paramManager.GetComponent<ParamManage>().GetPlayerID() - 1);
+        //取得したスポーンポイントの座標を取得
+        var position = GameObject.Find(spawnPointName).transform.position;
+        //自分のプレイヤーをスポーンポイントの位置へ生成
+        PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+        //ホストのみ実行する部分（オフラインモードでも呼ばれる）
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            Debug.Log("I am Master Client");
             //何もポップさせていないスポーンポイントを探し、AIを生成する
             FindEmptySpawnPointAndPopAI();
-
+            //各プレイヤーの無敵状態
             var hashtable = new ExitGames.Client.Photon.Hashtable();
             hashtable.Add("Player1Invincible", 0); 
             hashtable.Add("Player2Invincible", 0); 
             hashtable.Add("Player3Invincible", 0); 
             hashtable.Add("Player4Invincible", 0);
             PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
-        }
 
+        }
+        //メンバーリストを表示するテキストインスタンスを取得
         m_memberListText = GameObject.Find("MemberList");
+        //カウントダウンを表示するテキストインスタンスを取得
         m_countDownText = GameObject.Find("CountDown");
+        //リザルトを表示するテキストインスタンスを取得
         m_resultText = GameObject.Find("Result");
+
+
 
         //秒数の整数部分の変化を見るために保存する。
         m_prevCountDownNum = (int)m_countDownNum;
@@ -89,6 +85,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     //オフラインモードの時に使用する
     public override void OnConnectedToMaster()
     {
+        //オフラインモードならば
         if(m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode())
 		{
             //作成するルームの設定インスタンス
@@ -108,20 +105,29 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
     }
 
+    //オフラインのルームに入ったら
     public override void OnJoinedRoom()
     {
+        //スポーンポイントの検索用名前の定義
         string spawnPointName;
-        for(int i = 0; i < 3; i++)
+        //オフラインモードのため、AIを3体用意
+        for(int i = 0; i < AI_NUM_IN_SINGLE_PLAY; i++)
 		{
+            //AIにスポーンポイントを1から3まで順番に割り振る
             spawnPointName = "PlayerSpawnPoint" + (i + 1);
+            //スポーン位置を取得
             Vector3 popPos = GameObject.Find(spawnPointName).transform.position;
+            //AIを生成
             GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", popPos, Quaternion.identity);
+            //Playerとタグ付けする
             ai.gameObject.tag = "Player";
         }
     }
 
+    //スポーンしていないポイントを見つけ、そこにAIをスポーンさせる（オンラインモード時に使用）
     private void FindEmptySpawnPointAndPopAI()
 	{
+        //AIを生成していなければ
         if (!m_isInstantiateAI)
         {
             //ルームにいる他のプレイヤーを取得
@@ -138,8 +144,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
 			for (int i = 0; i < PhotonNetwork.CurrentRoom.MaxPlayers - PhotonNetwork.PlayerList.Length; i++)
 			{
 				GameObject AISpawnPoint;
-				//Player1という名前のユーザーがいなければ、ID1を使用する。
-				if (!cantUsePosition.Contains("Player1"))
+                //Player1という名前のユーザーがいなければ、ID1を使用する。
+                if (!cantUsePosition.Contains("Player1"))
 				{
 					AISpawnPoint = GameObject.Find("PlayerSpawnPoint0");
 					//PrefabからAIをルームオブジェクトとして生成
@@ -178,6 +184,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
     }
 
+    //準備ができたプレイヤーの数をインクリメント（ホストプレイヤーが使用）
     public void AddReadyPlayerNum()
 	{
         m_playerReadyNum++;
@@ -192,19 +199,24 @@ public class InGameScript : MonoBehaviourPunCallbacks
         this.m_goaledPlayerNum++;
     }
 
+    //カウントダウンの数値を共有する通信関数（ホストが送信）
     [PunRPC]
     private void SetCountDownTime(int countDownTime)
 	{
         m_countDownText.GetComponent<Text>().text = countDownTime.ToString();
     }
 
+    //全てのプレイヤーに移動を許可する通信関数
     [PunRPC]
     private void SetPlayerMovable()
 	{
+        //自分のプレイヤーインスタンスを移動可能にする
         GameObject.Find("OwnPlayer").GetComponent<AvatarController>().SetMovable();
+        //カウントダウンのテキストを破棄
         Destroy(m_countDownText.gameObject);
     }
 
+    //各プレイヤーから送られてきたタイムを映し出す
     [PunRPC]
     private void ShowResult(Dictionary<string, float> scoreBoard)
     {
@@ -218,6 +230,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
     void Update()
 	{
+        //プレイヤーリストを更新する
         m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
         foreach (var player in PhotonNetwork.PlayerList)
         {
@@ -227,7 +240,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
-            //Debug.Log(m_playerReadyNum + "      /      "+ PhotonNetwork.PlayerList.Length);
+            //カウントダウンすべきで、発信準備できたプレイヤーの数がルーム内のプレイヤー数と一致した時
             if (m_shouldCountDown && m_playerReadyNum == PhotonNetwork.PlayerList.Length)
             {
                 //マッチング待機時間をゲーム時間で減らしていく
@@ -235,6 +248,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 //待ち時間がなくなったら
                 if (m_countDownNum < 0.0f)
                 {
+                    //カウントダウンをやめる
                     m_shouldCountDown = false;
                     //game開始フラグを立てるように通信を送る
                     photonView.RPC(nameof(SetPlayerMovable), RpcTarget.All);

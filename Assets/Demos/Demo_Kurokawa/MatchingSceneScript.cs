@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 using System;
 using System.Collections.Generic;
 
-// MonoBehaviourPunCallbacksを継承して、PUNのコールバックを受け取れるようにする
 //マッチング中の挙動のクラス
 public class MatchingSceneScript : MonoBehaviourPunCallbacks
 {
@@ -16,7 +15,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
 
     int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
-    float m_matchingWaitTime = 500.0f;                       //残り待機時間
+    float m_matchingWaitTime = 500.0f;                      //残り待機時間
     bool m_isInstantiateAI = false;                         //AIインスタンスを生成したか
 
     void Start()
@@ -36,6 +35,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         PhotonNetwork.AutomaticallySyncScene = true;
     }
 
+    //プレイヤーがルームに入ったら
     public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
         m_memberListText.GetComponent<Text>().text = ".+ *SpecialRoomMember * +.\n";
@@ -46,6 +46,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         }
     }
 
+    //プレイヤーがルームから出てったら
     public override void OnPlayerLeftRoom(Player player)
 	{
         m_memberListText.GetComponent<Text>().text = ".+ *SpecialRoomMember * +.\n";
@@ -129,7 +130,6 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
 		}
         //プレイヤーのIDを記録する
 		m_paramManager.GetComponent<ParamManage>().SetPlayerID(id);
-
 
         m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
         //ルームのメンバーリストを更新する。

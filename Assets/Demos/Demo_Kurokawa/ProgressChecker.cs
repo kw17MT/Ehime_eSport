@@ -5,25 +5,25 @@ using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 
+//このスクリプトが割り当てられたインスタンスのチェックポイント管理インスタンス
 public class ProgressChecker : MonoBehaviour
 {
-    public int MAX_CHECKPOINT_NUM = 3;                  //ステージに配置されるチェックポイントの数
-    public int MAX_RAP_NUM = 1;                         //何周するか
+    private GameObject m_rapCountText = null;               //周回回数を提示するテキストインスタンス
+    private int m_rapCount = 0;                             //ゲーム中の周回回数
+    private List<bool> m_checkPoint = new List<bool>();     //通過したチェックポイントの保存配列
 
-    private List<bool> m_checkPoint = new List<bool>();
-    private int m_rapCount = 0;
-    private GameObject m_rapCountText = null;
-
+    public int MAX_CHECKPOINT_NUM = 3;                      //ステージに配置されるチェックポイントの数
+    public int MAX_RAP_NUM = 1;                             //何周するか
 
     void Start()
     {
         //チェックポイントを初期化
         for (int i = 0; i < MAX_CHECKPOINT_NUM; i++)
 		{
+            //指定したチェックポイント分配列を伸ばしていく
             m_checkPoint.Add(false);
 		}
-
-        //ラップカウントのテキストを追加
+        //ラップカウントのテキストを取得
         m_rapCountText = GameObject.Find("RapCount");
         //現在のラップ数と最大ラップ数を表示
         m_rapCountText.GetComponent<Text>().text = "Rap : " + m_rapCount + " / " + MAX_RAP_NUM;
@@ -72,11 +72,10 @@ public class ProgressChecker : MonoBehaviour
 
         //ラップ数の更新
         m_rapCountText.GetComponent<Text>().text = "Rap : " + m_rapCount + " / " + MAX_RAP_NUM;
-
-        //ゴールできる
+        //ゴールできたことを返す
         return true;
     }
-
+        
     //レースを終えるか
     public bool IsFinishRacing()
 	{

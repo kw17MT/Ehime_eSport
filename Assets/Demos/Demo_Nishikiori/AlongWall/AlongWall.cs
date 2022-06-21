@@ -8,7 +8,7 @@ using UnityEngine;
 public class AlongWall
 {
     //壁沿いに移動する速度。
-    public float m_alongWallSpeed { get; set; } = 5.0f;
+    public float m_alongWallSpeed { get; set; } = 25.0f;
 
     //衝突判定とするゲームオブジェクトのタグ
     public string m_collideTag { get; set; } = "Wall";
@@ -30,16 +30,20 @@ public class AlongWall
         //剛体の移動方向を取得
         Vector3 velocity = rigidbody.velocity;
         velocity.Normalize();
+        Debug.Log("Velocity " + velocity);
 
         //接触した当たり判定の法線を取得
         Vector3 normal = collision.contacts[0].normal;
 
+        Debug.Log("Normal " + normal);
+
         //壁に沿って動くベクトルを計算し、移動方向として格納
         moveDirection = velocity - (Vector3.Dot(velocity, normal) * normal);
-        moveDirection.Normalize();
+        Debug.Log(moveDirection);
+        //moveDirection.Normalize();
 
         //当たった時の向きをリセットし、スピードをセット
-        rigidbody.velocity = m_alongWallSpeed * moveDirection;
+        //rigidbody.velocity = m_alongWallSpeed * moveDirection;
 
 #if UNITY_EDITOR
         //当たった壁の法線を可視化(Debug)
