@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
+using Photon.Pun;
 
 //このスクリプトが割り当てられたインスタンスのチェックポイント管理インスタンス
 public class ProgressChecker : MonoBehaviour
@@ -64,8 +65,17 @@ public class ProgressChecker : MonoBehaviour
         //完走したラップ数を増やす
         m_rapCount++;
 
+        //次のウェイポイントの番号をルームプロパティに保存
+        var hashtable = new ExitGames.Client.Photon.Hashtable();
+        //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
+        string name = PhotonNetwork.NickName + "RapCount";
+        //ウェイポイント番号を設定
+        hashtable[name] = m_rapCount;
+        //ルームプロパティの更新
+        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+
         //フラグを元に戻す
-        for(int i = 0; i < MAX_CHECKPOINT_NUM; i++)
+        for (int i = 0; i < MAX_CHECKPOINT_NUM; i++)
 		{
             m_checkPoint[i] = false;
 		}

@@ -16,7 +16,10 @@ public class OrangePeel : MonoBehaviourPunCallbacks
             col.gameObject.GetComponent<AvatarController>().SetIsAttacked();
 		}
         //Ç‘Ç¬Ç©Ç¡ÇΩîÁÇè¡Ç∑
-        photonView.RPC(nameof(DestroyHittedOrangePeel), RpcTarget.All, this.gameObject.name);
+        //photonView.RPC(nameof(DestroyHittedOrangePeel), RpcTarget.All, this.gameObject.name);
+        Debug.Log("Destroy Target : " + this.gameObject.name);
+
+        Destroy(this.gameObject);
     }
 
     [PunRPC]
@@ -31,5 +34,9 @@ public class OrangePeel : MonoBehaviourPunCallbacks
             //îÁÇÃè¡ãé
             Destroy(orange.gameObject);
         }
+		else
+		{
+            Debug.Log("Failed Destroy Peel");
+		}
     }
 }

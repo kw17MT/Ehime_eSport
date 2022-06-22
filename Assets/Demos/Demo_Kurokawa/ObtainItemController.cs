@@ -74,8 +74,15 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 			if (Input.GetKeyDown(KeyCode.K))
 			{
 				Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * -2.0f);
-				photonView.RPC(nameof(InstantiateOrangePeel), RpcTarget.All, orangePeelPos);
-			}
+				//photonView.RPC(nameof(InstantiateOrangePeel), RpcTarget.All, orangePeelPos);
+
+                //ゲーム全体で生成したオレンジの皮の数を把握できるように、ローカルのインスタンスでもメモする。
+                //m_paramManager.GetComponent<ParamManage>().AddOrangePeelNum();
+                //ローカルでオレンジの皮を指定された座標に生成
+                var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
+                //こちら側でも名前に総合生成数を付与する。
+                //orange.name = "OrangePeel" + m_paramManager.GetComponent<ParamManage>().GetOrangePeelNumOnField();
+            }
 			//テストでボタンを押したらスター使用状態にする。
 			if (Input.GetKeyDown(KeyCode.J))
 			{
@@ -89,9 +96,16 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 			//鯛を出す
 			if (Input.GetKeyDown(KeyCode.I))
 			{
-				Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 2.0f);
-				photonView.RPC(nameof(InstantiateSnapper), RpcTarget.All, snapperPos);
-			}
+				Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 3.0f);
+				//photonView.RPC(nameof(InstantiateSnapper), RpcTarget.All, snapperPos);
+
+                //ローカルでオレンジの皮を指定された座標に生成
+                var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
+                //名前。
+                snapper.name = "Snapper";
+                //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
+                snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
+            }
 			//テストでボタンを押したらキラー使用状態にする。
 			if (Input.GetKeyDown(KeyCode.P))
 			{
