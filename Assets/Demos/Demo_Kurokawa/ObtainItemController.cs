@@ -41,30 +41,6 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         Debug.Log("取得したアイテム番号　＝　" + m_obtainItemType);
     }
 
-    //オレンジの皮を自分の後ろに置く
-    [PunRPC]
-    public void InstantiateOrangePeel(Vector3 popPos)
-    {
-        //ゲーム全体で生成したオレンジの皮の数を把握できるように、ローカルのインスタンスでもメモする。
-        m_paramManager.GetComponent<ParamManage>().AddOrangePeelNum();
-        //ローカルでオレンジの皮を指定された座標に生成
-        var orange = PhotonNetwork.Instantiate("OrangePeel", popPos, Quaternion.identity);
-        //こちら側でも名前に総合生成数を付与する。
-        orange.name = "OrangePeel" + m_paramManager.GetComponent<ParamManage>().GetOrangePeelNumOnField();
-    }
-
-    //プレイヤーが呼び出す。タイを自分の前に置く
-    [PunRPC]
-    public void InstantiateSnapper(Vector3 popPos)
-    {
-        //ローカルでオレンジの皮を指定された座標に生成
-        var snapper = PhotonNetwork.Instantiate("Snapper", popPos, Quaternion.identity);
-        //名前。
-        snapper.name = "Snapper";
-        //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
-        snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(popPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
-    }
-
     void Update()
     {
         //自分が生成したインスタンスならば
@@ -73,15 +49,10 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 			//テストでボタンを押したらバナナが出るようにする。
 			if (Input.GetKeyDown(KeyCode.K))
 			{
+                //オレンジの皮のポップ位置を自機の後ろにする
 				Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * -2.0f);
-				//photonView.RPC(nameof(InstantiateOrangePeel), RpcTarget.All, orangePeelPos);
-
-                //ゲーム全体で生成したオレンジの皮の数を把握できるように、ローカルのインスタンスでもメモする。
-                //m_paramManager.GetComponent<ParamManage>().AddOrangePeelNum();
-                //ローカルでオレンジの皮を指定された座標に生成
+                //オレンジの皮をネットワークオブジェクトとしてインスタンス化
                 var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
-                //こちら側でも名前に総合生成数を付与する。
-                //orange.name = "OrangePeel" + m_paramManager.GetComponent<ParamManage>().GetOrangePeelNumOnField();
             }
 			//テストでボタンを押したらスター使用状態にする。
 			if (Input.GetKeyDown(KeyCode.J))
@@ -96,14 +67,12 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 			//鯛を出す
 			if (Input.GetKeyDown(KeyCode.I))
 			{
-				Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 3.0f);
-				//photonView.RPC(nameof(InstantiateSnapper), RpcTarget.All, snapperPos);
-
+                //タイのポップ位置を自機の前にする
+                Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 3.0f);
                 //ローカルでオレンジの皮を指定された座標に生成
                 var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
-                //名前。
-                snapper.name = "Snapper";
                 //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
+                Debug.Log(this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
                 snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
             }
 			//テストでボタンを押したらキラー使用状態にする。
@@ -117,25 +86,36 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                 switch(m_obtainItemType)
 				{
                     case EnItemType.enOrangePeel :
+                        //オレンジの皮のポップ位置を自機の後ろにする
                         Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * -2.0f);
-                        photonView.RPC(nameof(InstantiateOrangePeel), RpcTarget.All, orangePeelPos);
+                        //オレンジの皮をネットワークオブジェクトとしてインスタンス化
+                        var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
+                        //何も持っていない状態にする
                         m_obtainItemType = EnItemType.enNothing;
                         break;
                     case EnItemType.enOrangeJet:
                         this.GetComponent<AvatarController>().SetIsUsingJet();
+                        //何も持っていない状態にする
                         m_obtainItemType = EnItemType.enNothing;
                         break;
                     case EnItemType.enTrain:
                         this.GetComponent<AvatarController>().SetIsUsingKiller();
+                        //何も持っていない状態にする
                         m_obtainItemType = EnItemType.enNothing;
                         break;
                     case EnItemType.enStar:
                         this.GetComponent<AvatarController>().SetIsUsingStar();
+                        //何も持っていない状態にする
                         m_obtainItemType = EnItemType.enNothing;
                         break;
                     case EnItemType.enSnapperCannon:
-                        Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 2.0f);
-                        photonView.RPC(nameof(InstantiateSnapper), RpcTarget.All, snapperPos);
+                        //タイのポップ位置を自機の前にする
+                        Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 3.0f);
+                        //ローカルでオレンジの皮を指定された座標に生成
+                        var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
+                        //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
+                        snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
+                        //何も持っていない状態にする
                         m_obtainItemType = EnItemType.enNothing;
                         break;
                     default:

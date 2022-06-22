@@ -32,6 +32,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private bool m_isUsingJet = false;                  //現在、ジェットを使用しているか
     private bool m_isAttacked = false;                  //攻撃されたか
     private bool m_hittedWall = false;                  //壁に当たっているか
+    private bool m_isInvincible = false;
     private Quaternion m_prevTrasnform;                 //前回の回転の度合い
     
 
@@ -46,9 +47,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
     public float KILLER_HANDLING_RATE = 5.0f;           //キラーを使用した際のカメラの追従速度
     public float SPIN_AMOUNT = 1.5f;                    //被弾時の回転率
-    private float ROTATE_ACCELERATION_RATE = 0.001f;
+    private float ROTATE_ACCELERATION_RATE = 0.001f;    //回転の加速度
 
-    private AlongWall m_alongWall = null;
+    private AlongWall m_alongWall = null;               //壁ずり時の移動方向を更新するインスタンス
 
     void Start()
     {
@@ -78,11 +79,10 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         //前回の回転を初期化
         m_prevTrasnform = this.transform.rotation;
-
+        //壁ずりインスタンスを生成
         m_alongWall = new AlongWall();
-
+        //操作を行うインスタンスの取得
         m_orepation = GameObject.Find("OperationManager");
-
 
         //1秒間に何回通信するか
         PhotonNetwork.SendRate = 15;
@@ -103,15 +103,15 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //自分自身の無敵状態をルームプロパティ上の無敵状態に同期させる
             if (name == key)
 			{
-                bool isUsingStar = false;
+                bool isPlayerInvincible = false;
                 //バリューをint型で取得
-                int isUsing = (PhotonNetwork.CurrentRoom.CustomProperties[prop.Key] is int value) ? value : 0;
-                if (isUsing == 1)
+                int isInvincivle = (PhotonNetwork.CurrentRoom.CustomProperties[prop.Key] is int value) ? value : 0;
+                if (isInvincivle == 1)
 				{
                     //スターを使用している状態にする
-                    isUsingStar = true;
+                    isPlayerInvincible = true;
 				}
-                m_isUsingStar = isUsingStar;
+                m_isInvincible = isPlayerInvincible;
             }
             Debug.Log($"{prop.Key}: {prop.Value}");
         }
@@ -132,8 +132,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //自分が攻撃されたことを設定する
     public void SetIsAttacked()
     {
-        //スターもキラーも使用していない状態ならば
-        if(!m_isUsingKiller && !m_isUsingStar)
+        //無敵状態（スターもキラーも使用していない状態）ならば
+        if(!m_isInvincible)
 		{
             //攻撃された
             m_isAttacked = true;
@@ -143,6 +143,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //スターを使用している状態にする
     public void SetIsUsingStar()
 	{
+        //スターを使用している状態
+        m_isUsingStar = true;
         //ルームプロパティの自分の無敵状態を名前を使って検索、変更を行う
         var hashtable = new ExitGames.Client.Photon.Hashtable();
         string name = PhotonNetwork.NickName + "Invincible";
@@ -160,8 +162,15 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //キラーを使用している状態にする
     public void SetIsUsingKiller()
 	{
+        //キラーを使用している
         m_isUsingKiller = true;
-	}
+        //ルームプロパティの自分の無敵状態を名前を使って検索、変更を行う
+        var hashtable = new ExitGames.Client.Photon.Hashtable();
+        string name = PhotonNetwork.NickName + "Invincible";
+        hashtable[name] = 1;
+        //ルームプロパティを更新
+        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+    }
 
     //スターを使用しているかを取得する
     public bool GetIsUsingStar()
@@ -198,13 +207,18 @@ public class AvatarController : MonoBehaviourPunCallbacks
 	{
         if(col.gameObject.name == "Snapper(Clone)")
 		{
-            m_isAttacked = true;
+            //自分のゲーム内のタイインスタンスの削除
             Destroy(col.gameObject);
-            Debug.Log("Snapper(Clone)");
+            //キラーもスターも使っていなければ
+            if (!m_isInvincible)
+            {
+                //攻撃された
+                m_isAttacked = true;
+            }
+            Debug.Log("Attacked By Snapper(Clone)");
 		}
         if (col.gameObject.name == "OrangePeel(Clone)")
         {
-            m_isAttacked = true;
             Destroy(col.gameObject);
             Debug.Log("OrangePeel(Clone)");
         }
@@ -221,36 +235,22 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //攻撃を受けたか
             bool isCrash = false;
             //そのプレイヤーが無敵で、自分がスターもキラーも使っていなけば
-            if (stat == 1 && !m_isUsingStar && !m_isUsingKiller)
-			{
-                //攻撃を受けた
-                isCrash = true;
-			}
-
-            if (isCrash)
+            if (stat == 1 && !m_isInvincible)
 			{
                 //自分のプレイヤーは攻撃を受けた
                 m_isAttacked = true;
-			}
-		}
-        //プレイヤーでなく、タイならば
-		else if(col.gameObject.name == "Snapper")
-		{
-            //キラーもスターも使っていなければ
-            if(!m_isUsingKiller && !m_isUsingStar)
-			{
-                //攻撃された
-                m_isAttacked = true;
-			}
+            }
 		}
 
+        //衝突先が壁の時
         if(col.gameObject.tag == "Wall")
 		{
+            //壁に当たった
             m_hittedWall = true;
-            Debug.Log("WALL");
+            //現在の移動方向をもとに壁ずり移動の方向を計算
             m_alongWall.CollisionEnter(col, m_rb, ref m_moveDir);
+            //移動方向を更新
             m_alongWallDir = m_moveDir;
-            Debug.Log("AvatarController : m_moveDir = " + m_alongWallDir);
         }
     }
 
@@ -289,13 +289,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 switch(m_orepation.GetComponent<OperationOld>().GetTouchedScreenDirection())
 				{
                     case "right":
-                        //dir = this.transform.right;
                         m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
                         //入力による回転量
                         m_rot = new Vector3(0.0f, ROT_POWER * m_rotateAcceleration, 0.0f);
                         break;
                     case "left":
-                        //dir = (this.transform.right * -1.0f);
                         m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
                         //入力による回転量
                         m_rot = new Vector3(0.0f, -ROT_POWER * m_rotateAcceleration, 0.0f) ;
@@ -304,7 +302,6 @@ public class AvatarController : MonoBehaviourPunCallbacks
                         m_rotateAcceleration = 0.0f;
                         m_rot = Vector3.zero;
                         break;
-
                 }
                 dir += this.transform.forward * (Input.GetAxis("Vertical"));//this.transform.forward;
                 m_moveDir = dir;
@@ -330,9 +327,6 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 {
                     m_moveSpeed = m_moveDir * MOVE_POWER;
                 }
-
-                ////入力による回転量
-                //m_rot = new Vector3(0.0f, Input.GetAxis("Horizontal") * ROT_POWER, 0.0f);
             }
 
             //ゴールしていなったら
@@ -345,6 +339,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 			{
                 //クリアタイムをホストだけに送る
                 photonView.RPC(nameof(TellRecordTime), RpcTarget.MasterClient, PhotonNetwork.NickName, m_runningTime);
+                //報告済み
                 m_isToldRecord = true;
             }
 
@@ -391,7 +386,6 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //横に向きすぎているならば
             else
             {
-
                 //前回適用した、適切な回転で補正
                 this.transform.rotation = m_prevTrasnform;
 
@@ -419,14 +413,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
         }
     }
 
-	//環境に依存されない、一定期間のUpdate関数（移動はここにかくこと）
-	private void FixedUpdate()
-    {
+    private void MoveByUsingKiller()
+	{
         //キラーを使っていたら
         if (m_isUsingKiller)
         {
             //次のウェイポイントへの向きを計算
-			Vector3 direction = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
+            Vector3 direction = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
             //正規化
             direction.Normalize();
             //高さはいらない
@@ -437,8 +430,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //キラーを使用している時間をゲームタイムでインクリメント
             m_killerTime += Time.deltaTime;
             //最大継続時間を超えたら
-            if(m_killerTime >= MAX_KILLER_REMAIN_TIME)
-			{
+            if (m_killerTime >= MAX_KILLER_REMAIN_TIME)
+            {
                 //時間をリセット
                 m_killerTime = 0.0f;
                 //キラーを使っていない状態にする
@@ -462,20 +455,43 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 {
                     m_starTime = 0.0f;
                     m_isUsingStar = false;
-
-                    var hashtable = new ExitGames.Client.Photon.Hashtable();
-                    string name = PhotonNetwork.NickName + "Invincible";
-                    hashtable[name] = 0;
-                    PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
                 }
             }
 
             //キラー使用中は以降の処理を実行しない
             return;
         }
+    }
 
-        if(!m_isAttacked)
+    private void BreakIvincible()
+	{
+        if (!m_isUsingStar && !m_isUsingKiller)
+        {
+            //ルームプロパティを毎フレーム更新させないように、無敵を解除した時だけルームプロパティ側もFALSEに
+            if (m_isInvincible)
+            {
+                m_isInvincible = false;
+                var hashtable = new ExitGames.Client.Photon.Hashtable();
+                string name = PhotonNetwork.NickName + "Invincible";
+                hashtable[name] = 0;
+                PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+            }
+        }
+
+    }
+
+    //環境に依存されない、一定期間のUpdate関数（移動はここにかくこと）
+    private void FixedUpdate()
+    {
+        //キラー使用時の移動。キラー使用時はこの関数以降の処理は行わない
+        MoveByUsingKiller();
+
+        BreakIvincible();
+
+
+        if (!m_isAttacked)
 		{
+            //壁ずり状態ならば
             if(m_hittedWall)
 			{
                 m_moveSpeed = m_alongWallDir * MOVE_POWER;
@@ -484,6 +500,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 
                 m_hittedWall = false;
             }
+            //そうでないなら通常通り移動
             m_rb.AddForce(m_moveSpeed - m_rb.velocity);
         }
 		//攻撃されていたら
