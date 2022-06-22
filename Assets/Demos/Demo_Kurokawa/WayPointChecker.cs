@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
+
 
 //ウェイポイント経過処理と次のウェイポイントを提示するクラス
 public class WayPointChecker : MonoBehaviour
@@ -56,6 +59,17 @@ public class WayPointChecker : MonoBehaviour
         }
         //新しいポイントの座標を取得
         m_nextWayPointPos = nextWayPoint.transform.position;
+
+        //次のウェイポイントの番号をルームプロパティに保存
+        var hashtable = new ExitGames.Client.Photon.Hashtable();
+        //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
+        string name = PhotonNetwork.NickName + "WayPointNumber";
+        //ウェイポイント番号を設定
+        hashtable[name] = m_nextWayPointNumber;
+        //ルームプロパティの更新
+        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+
+
 
         //このインスタンスの持ち主が鯛であれば
         if (gameObject.name == "Snapper")

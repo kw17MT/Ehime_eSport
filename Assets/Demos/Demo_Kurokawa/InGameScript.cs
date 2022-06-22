@@ -66,8 +66,17 @@ public class InGameScript : MonoBehaviourPunCallbacks
             hashtable.Add("Player2Invincible", 0); 
             hashtable.Add("Player3Invincible", 0); 
             hashtable.Add("Player4Invincible", 0);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
+            hashtable.Add("Player1WayPointNumber", 0);
+            hashtable.Add("Player2WayPointNumber", 0);
+            hashtable.Add("Player3WayPointNumber", 0);
+            hashtable.Add("Player4WayPointNumber", 0);
+
+            hashtable.Add("Player1RapCount", 0);
+            hashtable.Add("Player2RapCount", 0);
+            hashtable.Add("Player3RapCount", 0);
+            hashtable.Add("Player4RapCount", 0);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
         }
         //メンバーリストを表示するテキストインスタンスを取得
         m_memberListText = GameObject.Find("MemberList");
@@ -103,6 +112,45 @@ public class InGameScript : MonoBehaviourPunCallbacks
             //オフラインの部屋を作る
             PhotonNetwork.CreateRoom(null, roomOptions);
         }
+    }
+
+    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+    {
+            //自分のプレイヤーの無敵状態を示すキー部分を作成
+        string myName = PhotonNetwork.NickName + "WayPointNumber";
+        string myRapCount = PhotonNetwork.NickName + "RapCount";
+        //自分の次のウェイポイントを取得
+        int nextwayPoint = (PhotonNetwork.CurrentRoom.CustomProperties[myName] is int value) ? value : 0;
+        int currentMyRapCount = (PhotonNetwork.CurrentRoom.CustomProperties[myRapCount] is int count) ? count : 0;
+        int currentPlace = 1;
+        //順位を決める
+        for (int i = 1; i < 5; i++)
+		{
+            //プレイヤーＮのルームプロパティのキーを作成
+            string wayPointName = "Player" + i + "WayPointNumber";
+            //そのキーが自分であれば
+            if(myName == wayPointName)
+			{
+                //順位の比較はしない
+                continue;
+			}
+            //プレイヤーＮの次のウェイポイント番号を取得
+            int wayPointNumber = (PhotonNetwork.CurrentRoom.CustomProperties[wayPointName] is int point) ? point : 0;
+            //他のプレイヤーの方が自分より進んでいれば
+            if(wayPointNumber > nextwayPoint)
+			{
+                string rapCountKey = "Player" + i + "RapCount";
+                int otherRapCount = (PhotonNetwork.CurrentRoom.CustomProperties[rapCountKey] is int rapCount) ? rapCount : 0;
+                //相手のラップ数が多ければ
+                if(currentMyRapCount <= otherRapCount)
+				{
+                    //自分の順位を一つ下す
+                    currentPlace += 1;
+                }
+			}
+        }
+        //自分の順位を保存
+        m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
     }
 
     //オフラインのルームに入ったら
@@ -234,6 +282,13 @@ public class InGameScript : MonoBehaviourPunCallbacks
         m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
         foreach (var player in PhotonNetwork.PlayerList)
         {
+         
+            if(PhotonNetwork.NickName == player.NickName)
+			{
+                m_memberListText.GetComponent<Text>().text += player.NickName + " : " + m_paramManager.GetComponent<ParamManage>().GetPlace() + "\n";
+                continue;
+            }
+
             m_memberListText.GetComponent<Text>().text += player.NickName + "\n";
         }
 

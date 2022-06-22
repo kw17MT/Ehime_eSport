@@ -24,7 +24,7 @@ public class SnapperController : MonoBehaviour
         if(col.gameObject.tag != "OwnPlayer" && col.gameObject.tag != "Ground")
 		{
             //è¡Ç∑ÅBÅiï«Ç≈Ç†Ç¡ÇƒÇ‡è¡Ç¶ÇÈÇÊÇ§Ç…Åj
-            Destroy(this.gameObject);
+            Destroy(this.gameObject, 0.5f);
         }
 	}
 

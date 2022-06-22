@@ -7,6 +7,7 @@ public class ParamManage : MonoBehaviour
 {
     private int m_orangePeelNum = 0;                    //オンラインでのゲーム中何個オレンジの皮が置かれたか
     private int m_playerID = 0;                         //プレイヤーのID（原則入ったもの順）
+    private int m_place = 0;                            //現在のプレイヤーの順位
     private bool m_isOfflineMode = false;               //オフラインモードでプレイするか
 
     // Start is called before the first frame update
@@ -51,4 +52,16 @@ public class ParamManage : MonoBehaviour
 	{
         return m_orangePeelNum;
 	}
+
+    //自分の順位を記録
+    public void SetPlace(int place)
+    {
+        m_place = place;
+    }
+
+    //自分の順位を取得
+    public int GetPlace()
+    {
+        return m_place;
+    }
 }

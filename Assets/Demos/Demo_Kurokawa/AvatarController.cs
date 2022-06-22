@@ -15,6 +15,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     Vector3 m_corseDir = Vector3.zero;                  //現在走っているコースの大まかな方向
     Vector3 m_alongWallDir = Vector3.zero;
     private GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
+    private GameObject m_orepation = null;
     private bool m_canMove = false;                     //移動が制限されていないか
     private float m_runningTime = 0.0f;                 //走行時間
     private float m_stiffenTime = 0.0f;                 //攻撃された時の硬直している時間
@@ -22,6 +23,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private float m_dashTime = 0.0f;                    //キノコを使ってダッシュしている時間
     private float m_killerTime = 0.0f;                  //キラーを使用している時間
     private float m_spinedAngle = 0.0f;                 //被弾して回転した総量
+    private float m_rotateAcceleration = 0.0f;
     private bool m_isGoaled = false;                    //自分はゴールしたか
     private bool m_isToldRecord = false;                //自分の走破レコードをホストクライアントに送ったかどうかのフラグ
     private bool m_isToldReady = false;                 //ルームに参加して準備ができたことを一度だけ通信するためのフラグ
@@ -37,13 +39,14 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MOVE_POWER_USING_STAR = 35.0f;         //スター使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_JET = 50.0f;          //ジェット使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_KILLER = 60.0f;       //キラー使用時のリジッドボディにかける移動の倍率
-    public float ROT_POWER = 0.5f;                      //ハンドリング
+    public float ROT_POWER = 0.01f;                      //ハンドリング
     public float MAX_STAR_REMAIN_TIME = 10.5f;          //スターの最大継続時間
     public float MAX_KILLER_REMAIN_TIME = 3.0f;         //キラーの最大継続時間
     public float MAX_DASH_TIME = 1.0f;                  //ダッシュの最大継続時間
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
     public float KILLER_HANDLING_RATE = 5.0f;           //キラーを使用した際のカメラの追従速度
-    public float SPIN_AMOUNT = 0.5f;                    //被弾時の回転率
+    public float SPIN_AMOUNT = 1.5f;                    //被弾時の回転率
+    private float ROTATE_ACCELERATION_RATE = 0.001f;
 
     private AlongWall m_alongWall = null;
 
@@ -78,11 +81,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         m_alongWall = new AlongWall();
 
+        m_orepation = GameObject.Find("OperationManager");
+
 
         //1秒間に何回通信するか
-        PhotonNetwork.SendRate = 3;
+        PhotonNetwork.SendRate = 15;
         //1秒間に何回同期を行うか
-        PhotonNetwork.SerializationRate = 3;
+        PhotonNetwork.SerializationRate = 15;
     }
 
     //ルームプロパティの何かが更新された時の関数
@@ -95,12 +100,15 @@ public class AvatarController : MonoBehaviourPunCallbacks
             string name = PhotonNetwork.NickName + "Invincible";
             //更新された部分のキー部分をStringで取得
             string key = prop.Key.ToString();
+            //自分自身の無敵状態をルームプロパティ上の無敵状態に同期させる
             if (name == key)
 			{
                 bool isUsingStar = false;
+                //バリューをint型で取得
                 int isUsing = (PhotonNetwork.CurrentRoom.CustomProperties[prop.Key] is int value) ? value : 0;
                 if (isUsing == 1)
 				{
+                    //スターを使用している状態にする
                     isUsingStar = true;
 				}
                 m_isUsingStar = isUsingStar;
@@ -188,8 +196,21 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //何かが衝突したら
     private void OnCollisionEnter(Collision col)
 	{
+        if(col.gameObject.name == "Snapper(Clone)")
+		{
+            m_isAttacked = true;
+            Destroy(col.gameObject);
+            Debug.Log("Snapper(Clone)");
+		}
+        if (col.gameObject.name == "OrangePeel(Clone)")
+        {
+            m_isAttacked = true;
+            Destroy(col.gameObject);
+            Debug.Log("OrangePeel(Clone)");
+        }
+
         //衝突対象が他のプレイヤーならば
-        if(col.gameObject.tag == "Player")
+        if (col.gameObject.tag == "Player")
         {
             //コリジョンの持ち主のPhotonNetworkに関する変数を取得
             Player pl = col.gameObject.GetComponent<PhotonView>().Owner;
@@ -261,7 +282,34 @@ public class AvatarController : MonoBehaviourPunCallbacks
             if (photonView.IsMine)
             {
                 //前方向に移動
-                m_moveDir = this.transform.forward * (Input.GetAxis("Vertical"));
+                //m_moveDir = this.transform.forward * (Input.GetAxis("Vertical"));
+
+                Vector3 dir = Vector3.zero;
+
+                switch(m_orepation.GetComponent<OperationOld>().GetTouchedScreenDirection())
+				{
+                    case "right":
+                        //dir = this.transform.right;
+                        m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
+                        //入力による回転量
+                        m_rot = new Vector3(0.0f, ROT_POWER * m_rotateAcceleration, 0.0f);
+                        break;
+                    case "left":
+                        //dir = (this.transform.right * -1.0f);
+                        m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
+                        //入力による回転量
+                        m_rot = new Vector3(0.0f, -ROT_POWER * m_rotateAcceleration, 0.0f) ;
+                        break;
+                    default:
+                        m_rotateAcceleration = 0.0f;
+                        m_rot = Vector3.zero;
+                        break;
+
+                }
+                dir += this.transform.forward * (Input.GetAxis("Vertical"));//this.transform.forward;
+                m_moveDir = dir;
+
+
                 //キラーを使っている時の移動スピードを計算する。
                 if (m_isUsingKiller)
                 {
@@ -283,8 +331,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
                     m_moveSpeed = m_moveDir * MOVE_POWER;
                 }
 
-                //入力による回転量
-                m_rot = new Vector3(0.0f, Input.GetAxis("Horizontal") * ROT_POWER, 0.0f);
+                ////入力による回転量
+                //m_rot = new Vector3(0.0f, Input.GetAxis("Horizontal") * ROT_POWER, 0.0f);
             }
 
             //ゴールしていなったら

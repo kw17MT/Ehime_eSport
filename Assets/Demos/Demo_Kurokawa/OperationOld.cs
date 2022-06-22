@@ -11,19 +11,16 @@ public class OperationOld : MonoBehaviour
     private bool isTouching = false;                            //現在タッチしているか
     private bool isLongTouch = false;                           //長押しかどうか
     private bool isDecideDirWhenLongTouch = false;              //一定時間長押ししている時、その時点での方向を確認したか
-    private GameObject rotateObject = null;                     //回転させるゲームオブジェクト
 
     public bool isWorkEveryFrame = false;                       //毎フレームタッチの移動方向を調べるか。ゲームシーンで切り替え可
 
     void Start()
     {
-        //回転の対象となるゲームオブジェクトを名前で検索する
-        rotateObject = GameObject.Find("Cube");
     }
 
     //どの方向にフリックしたか判断する関数
     void DecideDirection()
-	{
+    {
         //タッチを離した時の画面上の位置を取得
         touchEndPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
         //X,Y方向の移動量を計算
@@ -64,15 +61,34 @@ public class OperationOld : MonoBehaviour
     }
 
     public string GetDirection()
-	{
+    {
         return direction;
-	}
+    }
 
     //長押しかどうかを取得するゲッター
     public bool GetIsLongTouch()
-	{
+    {
         return isLongTouch;
-	}
+    }
+
+    public string GetTouchedScreenDirection()
+    {
+        if (isTouching)
+        {
+            if (Input.mousePosition.x >= Screen.width / 2.0f)
+            {
+                return "right";
+            }
+            else
+            {
+                return "left";
+            }
+        }
+        else
+        {
+            return "nothing";
+        }
+    }
 
     //更新関数
     void Update()
@@ -87,42 +103,30 @@ public class OperationOld : MonoBehaviour
             touchStartPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
         }
 
-        if (rotateObject != null)
+        //毎フレームタッチの移動量を取得するモードならば
+        if (isWorkEveryFrame)
         {
-
-
-            //毎フレームタッチの移動量を取得するモードならば
-            if (isWorkEveryFrame)
+            //タッチしているとき、一番初めのタップ一から現在のタップ位置でフリック方向を決定する
+            if (isTouching)
             {
-                //タッチしているとき、一番初めのタップ一から現在のタップ位置でフリック方向を決定する
-                if (isTouching)
-                {
-                    //前フレームのタッチ位置と現在のフレームのタッチ位置が一緒だったらオブジェクトを回転させない
-                    // if (touchEndPos.magnitude != new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z).magnitude)
-                    //{
-                    //最終地点（現在のタップ位置）を更新してフリック方向を決定する
-                    DecideDirection();
-                    //回転対象のオブジェクトにフリック方向を与える
-                    rotateObject.GetComponent<ObjectRotation>().Rotate(direction);
-                    // }
-                }
+                //最終地点（現在のタップ位置）を更新してフリック方向を決定する
+                DecideDirection();
             }
-            //タップ開始位置からタップを離したところまでをフリック操作とみなすモードならば
-            else
-            {
-                //タップが離された時
-                if (Input.GetMouseButtonUp(0))
-                {
-                    //タッチのフラグや数値を初期化する
-                    TachDataInit();
-                    //どの方向にフリックしたか判断する
-                    DecideDirection();
-                    //オブジェクトをフリックした方向に回転させる
-                    rotateObject.GetComponent<ObjectRotation>().Rotate(direction);
-                }
-            }
-
         }
+        //タップ開始位置からタップを離したところまでをフリック操作とみなすモードならば
+        else
+        {
+            //タップが離された時
+            if (Input.GetMouseButtonUp(0))
+            {
+                //タッチのフラグや数値を初期化する
+                TachDataInit();
+                //どの方向にフリックしたか判断する
+                DecideDirection();
+            }
+        }
+
+
 
         //タップが離されたとき、
         if (Input.GetMouseButtonUp(0))
@@ -132,7 +136,7 @@ public class OperationOld : MonoBehaviour
         }
 
         if (isTouching)
-		{
+        {
             //タッチしている時間をゲームタイムで計測
             touchTime += Time.deltaTime;
 
@@ -151,13 +155,15 @@ public class OperationOld : MonoBehaviour
                 }
             }
 
-            if(isLongTouch)
-			{
+            if (isLongTouch)
+            {
                 //長押し中のデバック表記
                 //Debug.Log("counting! " + touchTime);
             }
         }
     }
+
+
 
     //タッチのフラグや数値を初期化する関数
     void TachDataInit()
