@@ -23,8 +23,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private bool m_shouldCountDown = true;                                              //カウントダウンの数字を出すか
     Dictionary<string, float> m_scoreBoard = new Dictionary<string, float>();           //ゴールしたプレイヤーの名前とタイム一覧
 
-    private const int PLAYER_ONE = 1;
-    private const int AI_NUM_IN_SINGLE_PLAY = 3;
+    private const int PLAYER_ONE = 1;                                                   //シングルプレイヤーだった時に設定するプレイヤーID
+    private const int AI_NUM_IN_SINGLE_PLAY = 3;                                        //シングルプレイヤーだった時のAIの数
 
     private void Start()
     {
@@ -116,7 +116,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
-            //自分のプレイヤーの無敵状態を示すキー部分を作成
+        //自分のプレイヤーの無敵状態を示すキー部分を作成
         string myName = PhotonNetwork.NickName + "WayPointNumber";
         string myRapCount = PhotonNetwork.NickName + "RapCount";
         //自分の次のウェイポイントを取得
@@ -285,7 +285,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
          
             if(PhotonNetwork.NickName == player.NickName)
 			{
-                m_memberListText.GetComponent<Text>().text += player.NickName + " : " + m_paramManager.GetComponent<ParamManage>().GetPlace() + "\n";
+                m_memberListText.GetComponent<Text>().text += player.NickName + " / Place : " + m_paramManager.GetComponent<ParamManage>().GetPlace() + "\n";
                 continue;
             }
 
