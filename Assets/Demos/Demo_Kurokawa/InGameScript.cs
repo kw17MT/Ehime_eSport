@@ -44,7 +44,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             m_paramManager.GetComponent<ParamManage>().SetPlayerID(PLAYER_ONE);
         }
         //オンラインモードならば
-		else 
+		else
 		{
             // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
             PhotonNetwork.ConnectUsingSettings();
@@ -67,9 +67,9 @@ public class InGameScript : MonoBehaviourPunCallbacks
             FindEmptySpawnPointAndPopAI();
             //各プレイヤーの無敵状態
             var hashtable = new ExitGames.Client.Photon.Hashtable();
-            hashtable.Add("Player1Invincible", 0); 
-            hashtable.Add("Player2Invincible", 0); 
-            hashtable.Add("Player3Invincible", 0); 
+            hashtable.Add("Player1Invincible", 0);
+            hashtable.Add("Player2Invincible", 0);
+            hashtable.Add("Player3Invincible", 0);
             hashtable.Add("Player4Invincible", 0);
 
             hashtable.Add("Player1WayPointNumber", 0);
@@ -283,27 +283,13 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
     void Update()
 	{
-        //プレイヤーリストを更新する
-        m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
-        foreach (var player in PhotonNetwork.PlayerList)
-        {
-         
-            if(PhotonNetwork.NickName == player.NickName)
-			{
-                m_memberListText.GetComponent<Text>().text += player.NickName + " / Place : " + m_paramManager.GetComponent<ParamManage>().GetPlace() + "\n";
-                continue;
-            }
-
-            m_memberListText.GetComponent<Text>().text += player.NickName + "\n";
-        }
-
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             //カウントダウンすべきで、発信準備できたプレイヤーの数がルーム内のプレイヤー数と一致した時
             if (m_shouldCountDown && m_playerReadyNum == PhotonNetwork.PlayerList.Length)
             {
-             
+
                 //マッチング待機時間をゲーム時間で減らしていく
                 m_countDownNum -= Time.deltaTime;
                 //待ち時間がなくなったら
