@@ -55,7 +55,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
         //リジッドボディを取得
         m_rb = GetComponent<Rigidbody>();
         //インゲーム中であれば
-        if (SceneManager.GetActiveScene().name == "DemoInGame")
+        if (SceneManager.GetActiveScene().name == "08_GameScene")
         {
             //重力をオンにする
             m_rb.useGravity = true;
@@ -81,7 +81,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         m_alongWall = new AlongWall();
 
-        m_orepation = GameObject.Find("OperationManager");
+        m_orepation = GameObject.Find("OperationSystem");
 
 
         //1秒間に何回通信するか
@@ -276,7 +276,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
         m_corseDir.y = 0.0f;
 
         //現在のシーンがインゲームでカウントダウンが終了して動ける状態ならば
-        if (SceneManager.GetActiveScene().name == "DemoInGame" && m_canMove)
+        if (SceneManager.GetActiveScene().name == "08_GameScene" && m_canMove)
         {
             // 自身が生成したオブジェクトだけに移動処理を行う
             if (photonView.IsMine)
@@ -286,7 +286,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
                 Vector3 dir = Vector3.zero;
 
-                switch(m_orepation.GetComponent<OperationOld>().GetTouchedScreenDirection())
+                switch(m_orepation.GetComponent<Operation>().GetTouchedScreenDirection())
 				{
                     case "right":
                         //dir = this.transform.right;

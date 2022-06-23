@@ -26,12 +26,17 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private const int PLAYER_ONE = 1;
     private const int AI_NUM_IN_SINGLE_PLAY = 3;
 
+    private GameObject m_userSetting = null;
+
     private void Start()
     {
         //ゲーム中のパラメータ保存インスタンスを取得する
         m_paramManager = GameObject.Find("ParamManager");
+
+        m_userSetting = GameObject.Find("UserSettingDataStorageSystem");
+
         //ゲームがオフラインで開始されたら
-        if(m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode())
+        if (m_userSetting.GetComponent<UserSettingData>().GetSetModeType == 1/*m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode()*/)
 		{
             //オフラインモードにする
             PhotonNetwork.OfflineMode = true;
@@ -39,7 +44,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             m_paramManager.GetComponent<ParamManage>().SetPlayerID(PLAYER_ONE);
         }
         //オンラインモードならば
-		else
+		else 
 		{
             // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
             PhotonNetwork.ConnectUsingSettings();
@@ -95,7 +100,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         //オフラインモードならば
-        if(m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode())
+        if(m_userSetting.GetComponent<UserSettingData>().GetSetModeType == 1/*m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode()*/)
 		{
             //作成するルームの設定インスタンス
             RoomOptions roomOptions = new RoomOptions()
@@ -298,6 +303,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             //カウントダウンすべきで、発信準備できたプレイヤーの数がルーム内のプレイヤー数と一致した時
             if (m_shouldCountDown && m_playerReadyNum == PhotonNetwork.PlayerList.Length)
             {
+             
                 //マッチング待機時間をゲーム時間で減らしていく
                 m_countDownNum -= Time.deltaTime;
                 //待ち時間がなくなったら

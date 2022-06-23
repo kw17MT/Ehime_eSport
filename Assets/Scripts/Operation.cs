@@ -201,4 +201,23 @@ public class Operation : MonoBehaviour
         //’·‰Ÿ‚µŽžŠÔ“Ç‚Ýã‚°ŠJŽn
         m_isLongTouch = NowOperation() == "touch" ? true : false;
     }
+
+    public string GetTouchedScreenDirection()
+    {
+        if (m_isTouching)
+        {
+            if (Input.mousePosition.x >= Screen.width / 2.0f)
+            {
+                return "right";
+            }
+            else
+            {
+                return "left";
+            }
+        }
+        else
+        {
+            return "nothing";
+        }
+    }
 }
