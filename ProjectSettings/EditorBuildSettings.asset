@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Demos/Demo_Kurokawa/DemoMatchingScene.unity
     guid: 17d28aa01a6e904409736ad5deb98102
   - enabled: 1
-    path: Assets/Demos/Demo_Kurokawa/DemoInGame.unity
+    path: Assets/Scenes/08_GameScene/08_GameScene.unity
     guid: 822214aa80dc9a54692ea64f47aad08e
   - enabled: 1
     path: Assets/Scenes/01_TitleScene/01_TitleScene.unity
