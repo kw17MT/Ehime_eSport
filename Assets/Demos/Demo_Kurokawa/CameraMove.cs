@@ -10,7 +10,7 @@ public class CameraMove : MonoBehaviour
     private Vector3 m_prevPlayerForward = Vector3.zero;
     private Vector3 m_prevCameraPos = Vector3.zero;
 
-    public float BEHIND_RATE_FROM_PLAYER = 8.0f; //カメラの位置をどのくらいプレイヤーの後ろにするか
+    public float BEHIND_RATE_FROM_PLAYER = 5.0f; //カメラの位置をどのくらいプレイヤーの後ろにするか
     public float UPPER_RATE_FROM_PLAYER = 5.0f;   //カメラの位置をどのくらいプレイヤーの上にするか
 
 	private void Start()

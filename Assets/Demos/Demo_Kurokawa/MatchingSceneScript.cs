@@ -9,7 +9,6 @@ using System.Collections.Generic;
 //マッチング中の挙動のクラス
 public class MatchingSceneScript : MonoBehaviourPunCallbacks
 {
-    GameObject m_memberListText = null;                     //メンバーリストを表示するテキストインスタンス
     GameObject m_waitTimeText = null;                       //残り待機時間を表示するテキストインスタンス
     GameObject m_operation = null;                          //操作管理のインスタンス
     GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
@@ -21,14 +20,11 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     void Start()
     {
         //操作を監視するため、操作インスタンスを取得
-        m_operation = GameObject.Find("OperationManager");
+        m_operation = GameObject.Find("OperationSystem");
         // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
         PhotonNetwork.ConnectUsingSettings();
-        //名前でメンバーを表示するインスタンスを取得
-        m_memberListText = GameObject.Find("MemberList");
-        m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
         //マッチング待機時間を表示するインスタンスを取得
-        m_waitTimeText = GameObject.Find("WaitTime");
+        m_waitTimeText = GameObject.Find("LimitTimeLabel");
         //シーン間で保持するパラメータインスタンス
         m_paramManager = GameObject.Find("ParamManager");
         //シーンの遷移はホストクライアントに依存する
@@ -38,23 +34,13 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     //プレイヤーがルームに入ったら
     public override void OnPlayerEnteredRoom(Player newPlayer)
 	{
-        m_memberListText.GetComponent<Text>().text = ".+ *SpecialRoomMember * +.\n";
-        //ルームのメンバーリストを更新する。
-        foreach (var pl in PhotonNetwork.PlayerList)
-        {
-            m_memberListText.GetComponent<Text>().text += pl.NickName + "\n";
-        }
+
     }
 
     //プレイヤーがルームから出てったら
     public override void OnPlayerLeftRoom(Player player)
 	{
-        m_memberListText.GetComponent<Text>().text = ".+ *SpecialRoomMember * +.\n";
-        //ルームのメンバーリストを更新する。
-        foreach (var pl in PhotonNetwork.PlayerList)
-        {
-            m_memberListText.GetComponent<Text>().text += pl.NickName + "\n";
-        }
+
     }
 
     //作成するルームの設定インスタンス
@@ -130,13 +116,6 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
 		}
         //プレイヤーのIDを記録する
 		m_paramManager.GetComponent<ParamManage>().SetPlayerID(id);
-
-        m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
-        //ルームのメンバーリストを更新する。
-        foreach (var pl in PhotonNetwork.PlayerList)
-        {
-            m_memberListText.GetComponent<Text>().text += pl.NickName + "\n";
-        }
     }
 
     //関数の通信の際に必要な表記
@@ -201,13 +180,6 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
 
     void Update()
     {
-        m_memberListText.GetComponent<Text>().text = ".+*SpecialRoomMember*+.\n";
-        //ルームのメンバーリストを更新する。
-        foreach (var pl in PhotonNetwork.PlayerList)
-        {
-            m_memberListText.GetComponent<Text>().text += pl.NickName + "\n";
-        }
-
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
