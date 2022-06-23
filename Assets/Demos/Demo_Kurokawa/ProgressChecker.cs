@@ -24,10 +24,6 @@ public class ProgressChecker : MonoBehaviour
             //指定したチェックポイント分配列を伸ばしていく
             m_checkPoint.Add(false);
 		}
-        //ラップカウントのテキストを取得
-        m_rapCountText = GameObject.Find("RapCount");
-        //現在のラップ数と最大ラップ数を表示
-        m_rapCountText.GetComponent<Text>().text = "Rap : " + m_rapCount + " / " + MAX_RAP_NUM;
     }
 
     //どの地点を通過したかを文字列で確認
@@ -85,7 +81,7 @@ public class ProgressChecker : MonoBehaviour
         //ゴールできたことを返す
         return true;
     }
-        
+
     //レースを終えるか
     public bool IsFinishRacing()
 	{

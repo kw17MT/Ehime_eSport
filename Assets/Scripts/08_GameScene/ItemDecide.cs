@@ -34,6 +34,8 @@ public class ItemDecide : MonoBehaviour
     //前回表示したアイテムスプライトの配列番号
     int itemSpriteBeforeActiveArrayNum = 0;
 
+    ObtainItemController obtainItemController = null;
+
     void Start()
     {
         //アイテムのデータを初期化
@@ -47,8 +49,9 @@ public class ItemDecide : MonoBehaviour
         {
             //アイテムを持っていない状態
             case EnItemState.enNothingState:
+                obtainItemController = GameObject.Find("OwnPlayer").GetComponent<ObtainItemController>();
                 //アイテムを獲得したら、
-                if (Input.GetButtonDown("Fire1"))
+                if (obtainItemController.GetObtainItemType() != -1)
                 {
                     //抽選状態に移行
                     itemState = EnItemState.enLotteryState;
@@ -64,6 +67,11 @@ public class ItemDecide : MonoBehaviour
                 //抽選が終了したら、
                 if (isLotteryFinish)
                 {
+                    //
+                    obtainItemController.SetIsLotteryFinish(true);
+
+                    //決定したアイテム画像を最終表示画像にする
+                    itemImage.sprite = itemSprite[obtainItemController.GetObtainItemType()];
                     //点滅状態に移行
                     itemState = EnItemState.enBlinkingState;
                     //点滅処理のコルーチンを開始
@@ -76,7 +84,7 @@ public class ItemDecide : MonoBehaviour
             //決定した後の点滅状態
             case EnItemState.enBlinkingState:
                 //アイテムが使われたら
-                if (Input.GetButtonDown("Fire1"))
+                if (obtainItemController.GetObtainItemType() == -1)
                 {
                     //点滅処理のコルーチンが終了していなかったら
                     if (!isBlinkingFinish)
@@ -153,5 +161,8 @@ public class ItemDecide : MonoBehaviour
         itemImage.color = new Color(itemImage.color.r, itemImage.color.g, itemImage.color.b, 0.0f);
         //点滅処理は終了していない判定に設定しておく
         isBlinkingFinish = false;
+
+        //
+        obtainItemController.SetIsLotteryFinish(false);
     }
 }
