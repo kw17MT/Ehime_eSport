@@ -5,7 +5,6 @@ using UnityEngine;
 //自分のプレイヤーのため記録場所で、通信からは遮断したクラス
 public class ParamManage : MonoBehaviour
 {
-    private int m_orangePeelNum = 0;                    //オンラインでのゲーム中何個オレンジの皮が置かれたか
     private int m_playerID = 0;                         //プレイヤーのID（原則入ったもの順）
     private int m_place = 0;                            //現在のプレイヤーの順位
     private bool m_isOfflineMode = false;               //オフラインモードでプレイするか
@@ -39,18 +38,6 @@ public class ParamManage : MonoBehaviour
     public bool GetIsOfflineMode()
 	{
         return m_isOfflineMode;
-	}
-
-    //ステージ上に置かれたオレンジの皮を集計
-    public void AddOrangePeelNum()
-	{
-        m_orangePeelNum++;
-	}
-
-    //ゲーム中に置かれたオレンジの皮の総数
-    public int GetOrangePeelNumOnField()
-	{
-        return m_orangePeelNum;
 	}
 
     //自分の順位を記録
