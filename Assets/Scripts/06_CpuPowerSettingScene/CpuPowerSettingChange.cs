@@ -121,8 +121,15 @@ public class CpuPowerSettingChange : MonoBehaviour
         //選択されたCPU強さデータを保存
         m_userSettingData.GetSetCpuPower = (int)m_nowSelectStrength;
 
-        //マッチングシーンに遷移
-        SceneManager.LoadScene("07_MatchingScene");
+        if(m_userSettingData.GetSetModeType == 0)
+		{
+            //マッチングシーンに遷移
+            SceneManager.LoadScene("07_MatchingScene");
+        }
+		else if(m_userSettingData.GetSetModeType == 1)
+		{
+            SceneManager.LoadScene("08_GameScene");
+        }
     }
 
     //電車の移動に合わせて選択しているデータを合わせるカウンター

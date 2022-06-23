@@ -5,110 +5,111 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-// MonoBehaviourPunCallbacks‚ğŒp³‚µ‚ÄAphotonViewƒvƒƒpƒeƒB‚ğg‚¦‚é‚æ‚¤‚É‚·‚é
+// MonoBehaviourPunCallbacksã‚’ç¶™æ‰¿ã—ã¦ã€photonViewãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’ä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 public class AvatarController : MonoBehaviourPunCallbacks
 {
-    Rigidbody m_rb = null;                              //Š„‚è“–‚Ä‚ç‚ê‚½ƒŠƒWƒbƒhƒ{ƒfƒB
-    Vector3 m_moveDir = Vector3.zero;                   //ˆÚ“®‚·‚é•ûŒü
-    Vector3 m_moveSpeed = Vector3.zero;                 //ˆÚ“®ƒXƒs[ƒh
-    Vector3 m_rot = Vector3.zero;                       //‚Ç‚¿‚ç‚É‰ñ“]‚·‚é‚©‚ÌŒü‚«
-    Vector3 m_corseDir = Vector3.zero;                  //Œ»İ‘–‚Á‚Ä‚¢‚éƒR[ƒX‚Ì‘å‚Ü‚©‚È•ûŒü
+    Rigidbody m_rb = null;                              //å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸãƒªã‚¸ãƒƒãƒ‰ãƒœãƒ‡ã‚£
+    Vector3 m_moveDir = Vector3.zero;                   //ç§»å‹•ã™ã‚‹æ–¹å‘
+    Vector3 m_moveSpeed = Vector3.zero;                 //ç§»å‹•ã‚¹ãƒ”ãƒ¼ãƒ‰
+    Vector3 m_rot = Vector3.zero;                       //ã©ã¡ã‚‰ã«å›è»¢ã™ã‚‹ã‹ã®å‘ã
+    Vector3 m_corseDir = Vector3.zero;                  //ç¾åœ¨èµ°ã£ã¦ã„ã‚‹ã‚³ãƒ¼ã‚¹ã®å¤§ã¾ã‹ãªæ–¹å‘
     Vector3 m_alongWallDir = Vector3.zero;
-    private GameObject m_paramManager = null;           //ƒpƒ‰ƒ[ƒ^‚ğ•Û‘¶‚·‚éƒCƒ“ƒXƒ^ƒ“ƒXiƒV[ƒ“Œ×‚¬j
+    private GameObject m_paramManager = null;           //ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’ä¿å­˜ã™ã‚‹ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ï¼ˆã‚·ãƒ¼ãƒ³è·¨ãï¼‰
     private GameObject m_orepation = null;
-    private bool m_canMove = false;                     //ˆÚ“®‚ª§ŒÀ‚³‚ê‚Ä‚¢‚È‚¢‚©
-    private float m_runningTime = 0.0f;                 //‘–sŠÔ
-    private float m_stiffenTime = 0.0f;                 //UŒ‚‚³‚ê‚½‚Ìd’¼‚µ‚Ä‚¢‚éŠÔ
-    private float m_starTime = 0.0f;                    //ƒXƒ^[ŠÔ‚Ìg—p‚µ‚Ä‚¢‚éŠÔ
-    private float m_dashTime = 0.0f;                    //ƒLƒmƒR‚ğg‚Á‚Äƒ_ƒbƒVƒ…‚µ‚Ä‚¢‚éŠÔ
-    private float m_killerTime = 0.0f;                  //ƒLƒ‰[‚ğg—p‚µ‚Ä‚¢‚éŠÔ
-    private float m_spinedAngle = 0.0f;                 //”í’e‚µ‚Ä‰ñ“]‚µ‚½‘—Ê
+    private bool m_canMove = false;                     //ç§»å‹•ãŒåˆ¶é™ã•ã‚Œã¦ã„ãªã„ã‹
+    private float m_runningTime = 0.0f;                 //èµ°è¡Œæ™‚é–“
+    private float m_stiffenTime = 0.0f;                 //æ”»æ’ƒã•ã‚ŒãŸæ™‚ã®ç¡¬ç›´ã—ã¦ã„ã‚‹æ™‚é–“
+    private float m_starTime = 0.0f;                    //ã‚¹ã‚¿ãƒ¼æ™‚é–“ã®ä½¿ç”¨ã—ã¦ã„ã‚‹æ™‚é–“
+    private float m_dashTime = 0.0f;                    //ã‚­ãƒã‚³ã‚’ä½¿ã£ã¦ãƒ€ãƒƒã‚·ãƒ¥ã—ã¦ã„ã‚‹æ™‚é–“
+    private float m_killerTime = 0.0f;                  //ã‚­ãƒ©ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹æ™‚é–“
+    private float m_spinedAngle = 0.0f;                 //è¢«å¼¾ã—ã¦å›è»¢ã—ãŸç·é‡
     private float m_rotateAcceleration = 0.0f;
-    private bool m_isGoaled = false;                    //©•ª‚ÍƒS[ƒ‹‚µ‚½‚©
-    private bool m_isToldRecord = false;                //©•ª‚Ì‘–”jƒŒƒR[ƒh‚ğƒzƒXƒgƒNƒ‰ƒCƒAƒ“ƒg‚É‘—‚Á‚½‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
-    private bool m_isToldReady = false;                 //ƒ‹[ƒ€‚ÉQ‰Á‚µ‚Ä€”õ‚ª‚Å‚«‚½‚±‚Æ‚ğˆê“x‚¾‚¯’ÊM‚·‚é‚½‚ß‚Ìƒtƒ‰ƒO
-    private bool m_isUsingStar = false;                 //Œ»İAƒXƒ^[‚ğg—p‚µ‚Ä‚¢‚é‚©
-    private bool m_isUsingKiller = false;               //Œ»İAƒLƒ‰[‚ğg—p‚µ‚Ä‚¢‚é‚©
-    private bool m_isUsingJet = false;                  //Œ»İAƒWƒFƒbƒg‚ğg—p‚µ‚Ä‚¢‚é‚©
-    private bool m_isAttacked = false;                  //UŒ‚‚³‚ê‚½‚©
-    private bool m_hittedWall = false;                  //•Ç‚É“–‚½‚Á‚Ä‚¢‚é‚©
+    private bool m_isGoaled = false;                    //è‡ªåˆ†ã¯ã‚´ãƒ¼ãƒ«ã—ãŸã‹
+    private bool m_isToldRecord = false;                //è‡ªåˆ†ã®èµ°ç ´ãƒ¬ã‚³ãƒ¼ãƒ‰ã‚’ãƒ›ã‚¹ãƒˆã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã«é€ã£ãŸã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
+    private bool m_isToldReady = false;                 //ãƒ«ãƒ¼ãƒ ã«å‚åŠ ã—ã¦æº–å‚™ãŒã§ããŸã“ã¨ã‚’ä¸€åº¦ã ã‘é€šä¿¡ã™ã‚‹ãŸã‚ã®ãƒ•ãƒ©ã‚°
+    private bool m_isUsingStar = false;                 //ç¾åœ¨ã€ã‚¹ã‚¿ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹ã‹
+    private bool m_isUsingKiller = false;               //ç¾åœ¨ã€ã‚­ãƒ©ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹ã‹
+    private bool m_isUsingJet = false;                  //ç¾åœ¨ã€ã‚¸ã‚§ãƒƒãƒˆã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹ã‹
+    private bool m_isAttacked = false;                  //æ”»æ’ƒã•ã‚ŒãŸã‹
+    private bool m_hittedWall = false;                  //å£ã«å½“ãŸã£ã¦ã„ã‚‹ã‹
     private bool m_isInvincible = false;
-    private Quaternion m_prevTrasnform;                 //‘O‰ñ‚Ì‰ñ“]‚Ì“x‡‚¢
+    private Quaternion m_prevTrasnform;                 //å‰å›ã®å›è»¢ã®åº¦åˆã„
     
 
-    public float MOVE_POWER = 25.0f;                  @//ƒŠƒWƒbƒhƒ{ƒfƒB‚É‚©‚¯‚éˆÚ“®‚Ì”{—¦
-    public float MOVE_POWER_USING_STAR = 35.0f;         //ƒXƒ^[g—p‚ÌƒŠƒWƒbƒhƒ{ƒfƒB‚É‚©‚¯‚éˆÚ“®‚Ì”{—¦
-    public float MOVE_POWER_USING_JET = 50.0f;          //ƒWƒFƒbƒgg—p‚ÌƒŠƒWƒbƒhƒ{ƒfƒB‚É‚©‚¯‚éˆÚ“®‚Ì”{—¦
-    public float MOVE_POWER_USING_KILLER = 60.0f;       //ƒLƒ‰[g—p‚ÌƒŠƒWƒbƒhƒ{ƒfƒB‚É‚©‚¯‚éˆÚ“®‚Ì”{—¦
-    public float ROT_POWER = 0.01f;                      //ƒnƒ“ƒhƒŠƒ“ƒO
-    public float MAX_STAR_REMAIN_TIME = 10.5f;          //ƒXƒ^[‚ÌÅ‘åŒp‘±ŠÔ
-    public float MAX_KILLER_REMAIN_TIME = 3.0f;         //ƒLƒ‰[‚ÌÅ‘åŒp‘±ŠÔ
-    public float MAX_DASH_TIME = 1.0f;                  //ƒ_ƒbƒVƒ…‚ÌÅ‘åŒp‘±ŠÔ
-    public float MAX_STIFFIN_TIME = 1.5f;               //UŒ‚‚ª“–‚½‚Á‚½‚ÌÅ‘åd’¼ŠÔ
-    public float KILLER_HANDLING_RATE = 5.0f;           //ƒLƒ‰[‚ğg—p‚µ‚½Û‚ÌƒJƒƒ‰‚Ì’Ç]‘¬“x
-    public float SPIN_AMOUNT = 1.5f;                    //”í’e‚Ì‰ñ“]—¦
-    private float ROTATE_ACCELERATION_RATE = 0.001f;    //‰ñ“]‚Ì‰Á‘¬“x
+    public float MOVE_POWER = 25.0f;                  ã€€//ãƒªã‚¸ãƒƒãƒ‰ãƒœãƒ‡ã‚£ã«ã‹ã‘ã‚‹ç§»å‹•ã®å€ç‡
+    public float MOVE_POWER_USING_STAR = 35.0f;         //ã‚¹ã‚¿ãƒ¼ä½¿ç”¨æ™‚ã®ãƒªã‚¸ãƒƒãƒ‰ãƒœãƒ‡ã‚£ã«ã‹ã‘ã‚‹ç§»å‹•ã®å€ç‡
+    public float MOVE_POWER_USING_JET = 50.0f;          //ã‚¸ã‚§ãƒƒãƒˆä½¿ç”¨æ™‚ã®ãƒªã‚¸ãƒƒãƒ‰ãƒœãƒ‡ã‚£ã«ã‹ã‘ã‚‹ç§»å‹•ã®å€ç‡
+    public float MOVE_POWER_USING_KILLER = 60.0f;       //ã‚­ãƒ©ãƒ¼ä½¿ç”¨æ™‚ã®ãƒªã‚¸ãƒƒãƒ‰ãƒœãƒ‡ã‚£ã«ã‹ã‘ã‚‹ç§»å‹•ã®å€ç‡
+    public float ROT_POWER = 0.01f;                      //ãƒãƒ³ãƒ‰ãƒªãƒ³ã‚°
+    public float MAX_STAR_REMAIN_TIME = 10.5f;          //ã‚¹ã‚¿ãƒ¼ã®æœ€å¤§ç¶™ç¶šæ™‚é–“
+    public float MAX_KILLER_REMAIN_TIME = 3.0f;         //ã‚­ãƒ©ãƒ¼ã®æœ€å¤§ç¶™ç¶šæ™‚é–“
+    public float MAX_DASH_TIME = 1.0f;                  //ãƒ€ãƒƒã‚·ãƒ¥ã®æœ€å¤§ç¶™ç¶šæ™‚é–“
+    public float MAX_STIFFIN_TIME = 1.5f;               //æ”»æ’ƒãŒå½“ãŸã£ãŸæ™‚ã®æœ€å¤§ç¡¬ç›´æ™‚é–“
+    public float KILLER_HANDLING_RATE = 5.0f;           //ã‚­ãƒ©ãƒ¼ã‚’ä½¿ç”¨ã—ãŸéš›ã®ã‚«ãƒ¡ãƒ©ã®è¿½å¾“é€Ÿåº¦
+    public float SPIN_AMOUNT = 1.5f;                    //è¢«å¼¾æ™‚ã®å›è»¢ç‡
+    private float ROTATE_ACCELERATION_RATE = 0.001f;    //å›è»¢ã®åŠ é€Ÿåº¦
 
-    private AlongWall m_alongWall = null;               //•Ç‚¸‚è‚ÌˆÚ“®•ûŒü‚ğXV‚·‚éƒCƒ“ƒXƒ^ƒ“ƒX
+    private AlongWall m_alongWall = null;               //å£ãšã‚Šæ™‚ã®ç§»å‹•æ–¹å‘ã‚’æ›´æ–°ã™ã‚‹ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 
     void Start()
     {
-        //ƒŠƒWƒbƒhƒ{ƒfƒB‚ğæ“¾
+        //ãƒªã‚¸ãƒƒãƒ‰ãƒœãƒ‡ã‚£ã‚’å–å¾—
         m_rb = GetComponent<Rigidbody>();
-        //ƒCƒ“ƒQ[ƒ€’†‚Å‚ ‚ê‚Î
-        if (SceneManager.GetActiveScene().name == "DemoInGame")
+        //ã‚¤ãƒ³ã‚²ãƒ¼ãƒ ä¸­ã§ã‚ã‚Œã°
+        if (SceneManager.GetActiveScene().name == "08_GameScene")
         {
-            //d—Í‚ğƒIƒ“‚É‚·‚é
+            //é‡åŠ›ã‚’ã‚ªãƒ³ã«ã™ã‚‹
             m_rb.useGravity = true;
-            //ƒCƒ“ƒQ[ƒ€‚ÉˆÚs‚Å‚«‚½‚±‚Æ‚ğ’ÊM
+            //ã‚¤ãƒ³ã‚²ãƒ¼ãƒ ã«ç§»è¡Œã§ããŸã“ã¨ã‚’é€šä¿¡
             photonView.RPC(nameof(TellReadyOK), RpcTarget.MasterClient);
         }
-        //ƒQ[ƒ€’†‚Ìƒpƒ‰ƒ[ƒ^•Û‘¶ƒCƒ“ƒXƒ^ƒ“ƒX‚ğæ“¾
+        //ã‚²ãƒ¼ãƒ ä¸­ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ä¿å­˜ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’å–å¾—
         m_paramManager = GameObject.Find("ParamManager");
-        //ƒlƒbƒgƒ[ƒN‚Å“¯Šú‚³‚ê‚é–¼‘O‚ğİ’è
+        //ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ã§åŒæœŸã•ã‚Œã‚‹åå‰ã‚’è¨­å®š
         PhotonNetwork.NickName = "Player" + m_paramManager.GetComponent<ParamManage>().GetPlayerID();
         gameObject.tag = "Player";
-        //©•ª‚ª¶¬‚³‚ê‚½ƒCƒ“ƒXƒ^ƒ“ƒX‚Å‚ ‚ê‚Î
+        //è‡ªåˆ†ãŒç”Ÿæˆã•ã‚ŒãŸã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã§ã‚ã‚Œã°
         if (photonView.IsMine)
         {
-            //’T‚µ‚â‚·‚¢–¼‘O‚ğ•t‚¯‚éBiƒqƒGƒ‰ƒ‹ƒL[‚É‚à“K—p‚³‚ê‚éj
+            //æ¢ã—ã‚„ã™ã„åå‰ã‚’ä»˜ã‘ã‚‹ã€‚ï¼ˆãƒ’ã‚¨ãƒ©ãƒ«ã‚­ãƒ¼ã«ã‚‚é©ç”¨ã•ã‚Œã‚‹ï¼‰
             gameObject.name = "OwnPlayer";
-            //ƒ^ƒO‚ğ‚Â‚¯‚é
+            //ã‚¿ã‚°ã‚’ã¤ã‘ã‚‹
             gameObject.tag = "OwnPlayer";
         }
 
-        //‘O‰ñ‚Ì‰ñ“]‚ğ‰Šú‰»
+        //å‰å›ã®å›è»¢ã‚’åˆæœŸåŒ–
         m_prevTrasnform = this.transform.rotation;
-        //•Ç‚¸‚èƒCƒ“ƒXƒ^ƒ“ƒX‚ğ¶¬
+        //å£ãšã‚Šã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç”Ÿæˆ
         m_alongWall = new AlongWall();
-        //‘€ì‚ğs‚¤ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìæ“¾
-        m_orepation = GameObject.Find("OperationManager");
 
-        //1•bŠÔ‚É‰½‰ñ’ÊM‚·‚é‚©
+        m_orepation = GameObject.Find("OperationSystem");
+
+
+        //1ç§’é–“ã«ä½•å›é€šä¿¡ã™ã‚‹ã‹
         PhotonNetwork.SendRate = 15;
-        //1•bŠÔ‚É‰½‰ñ“¯Šú‚ğs‚¤‚©
+        //1ç§’é–“ã«ä½•å›åŒæœŸã‚’è¡Œã†ã‹
         PhotonNetwork.SerializationRate = 15;
     }
 
-    //ƒ‹[ƒ€ƒvƒƒpƒeƒB‚Ì‰½‚©‚ªXV‚³‚ê‚½‚ÌŠÖ”
+    //ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®ä½•ã‹ãŒæ›´æ–°ã•ã‚ŒãŸæ™‚ã®é–¢æ•°
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
-        //XV‚³‚ê‚½ƒ‹[ƒ€‚ÌƒJƒXƒ^ƒ€ƒvƒƒpƒeƒB‚ÌƒyƒA‚ğƒRƒ“ƒ\[ƒ‹‚Éo—Í‚·‚é
+        //æ›´æ–°ã•ã‚ŒãŸãƒ«ãƒ¼ãƒ ã®ã‚«ã‚¹ã‚¿ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®ãƒšã‚¢ã‚’ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã«å‡ºåŠ›ã™ã‚‹
         foreach (var prop in propertiesThatChanged)
         {
-            //ŠeƒvƒŒƒCƒ„[‚Ì–³“Gó‘Ô‚ğ¦‚·ƒL[•”•ª‚ğì¬
+            //å„ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç„¡æ•µçŠ¶æ…‹ã‚’ç¤ºã™ã‚­ãƒ¼éƒ¨åˆ†ã‚’ä½œæˆ
             string name = PhotonNetwork.NickName + "Invincible";
-            //XV‚³‚ê‚½•”•ª‚ÌƒL[•”•ª‚ğString‚Åæ“¾
+            //æ›´æ–°ã•ã‚ŒãŸéƒ¨åˆ†ã®ã‚­ãƒ¼éƒ¨åˆ†ã‚’Stringã§å–å¾—
             string key = prop.Key.ToString();
-            //©•ª©g‚Ì–³“Gó‘Ô‚ğƒ‹[ƒ€ƒvƒƒpƒeƒBã‚Ì–³“Gó‘Ô‚É“¯Šú‚³‚¹‚é
+            //è‡ªåˆ†è‡ªèº«ã®ç„¡æ•µçŠ¶æ…‹ã‚’ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ä¸Šã®ç„¡æ•µçŠ¶æ…‹ã«åŒæœŸã•ã›ã‚‹
             if (name == key)
 			{
                 bool isPlayerInvincible = false;
-                //ƒoƒŠƒ…[‚ğintŒ^‚Åæ“¾
+                //ãƒãƒªãƒ¥ãƒ¼ã‚’intå‹ã§å–å¾—
                 int isInvincivle = (PhotonNetwork.CurrentRoom.CustomProperties[prop.Key] is int value) ? value : 0;
                 if (isInvincivle == 1)
 				{
-                    //ƒXƒ^[‚ğg—p‚µ‚Ä‚¢‚éó‘Ô‚É‚·‚é
+                    //ã‚¹ã‚¿ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹çŠ¶æ…‹ã«ã™ã‚‹
                     isPlayerInvincible = true;
 				}
                 m_isInvincible = isPlayerInvincible;
@@ -117,62 +118,62 @@ public class AvatarController : MonoBehaviourPunCallbacks
         }
     }
 
-    //ƒvƒŒƒCƒ„[‚ÌƒCƒ“ƒvƒbƒg‚ğó‚¯‚¢‚ê‚ÄˆÚ“®‰Â”\‚É‚·‚é
+    //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¤ãƒ³ãƒ—ãƒƒãƒˆã‚’å—ã‘ã„ã‚Œã¦ç§»å‹•å¯èƒ½ã«ã™ã‚‹
     public void SetMovable()
     {
         m_canMove = true;
     }
 
-    //ƒvƒŒƒCƒ„[‚ªƒS[ƒ‹‚µ‚½‚©‚ğİ’è‚·‚é
+    //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã‚´ãƒ¼ãƒ«ã—ãŸã‹ã‚’è¨­å®šã™ã‚‹
     public void SetGoaled()
     {
         m_isGoaled = true;
     }
 
-    //©•ª‚ªUŒ‚‚³‚ê‚½‚±‚Æ‚ğİ’è‚·‚é
+    //è‡ªåˆ†ãŒæ”»æ’ƒã•ã‚ŒãŸã“ã¨ã‚’è¨­å®šã™ã‚‹
     public void SetIsAttacked()
     {
-        //–³“Gó‘ÔiƒXƒ^[‚àƒLƒ‰[‚àg—p‚µ‚Ä‚¢‚È‚¢ó‘Ôj‚È‚ç‚Î
+        //ç„¡æ•µçŠ¶æ…‹ï¼ˆã‚¹ã‚¿ãƒ¼ã‚‚ã‚­ãƒ©ãƒ¼ã‚‚ä½¿ç”¨ã—ã¦ã„ãªã„çŠ¶æ…‹ï¼‰ãªã‚‰ã°
         if(!m_isInvincible)
 		{
-            //UŒ‚‚³‚ê‚½
+            //æ”»æ’ƒã•ã‚ŒãŸ
             m_isAttacked = true;
         }
     }
 
-    //ƒXƒ^[‚ğg—p‚µ‚Ä‚¢‚éó‘Ô‚É‚·‚é
+    //ã‚¹ã‚¿ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹çŠ¶æ…‹ã«ã™ã‚‹
     public void SetIsUsingStar()
 	{
-        //ƒXƒ^[‚ğg—p‚µ‚Ä‚¢‚éó‘Ô
+        //ã‚¹ã‚¿ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹çŠ¶æ…‹
         m_isUsingStar = true;
-        //ƒ‹[ƒ€ƒvƒƒpƒeƒB‚Ì©•ª‚Ì–³“Gó‘Ô‚ğ–¼‘O‚ğg‚Á‚ÄŒŸõA•ÏX‚ğs‚¤
+        //ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®è‡ªåˆ†ã®ç„¡æ•µçŠ¶æ…‹ã‚’åå‰ã‚’ä½¿ã£ã¦æ¤œç´¢ã€å¤‰æ›´ã‚’è¡Œã†
         var hashtable = new ExitGames.Client.Photon.Hashtable();
         string name = PhotonNetwork.NickName + "Invincible";
         hashtable[name] = 1;
-        //ƒ‹[ƒ€ƒvƒƒpƒeƒB‚ğXV
+        //ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’æ›´æ–°
         PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
     }
 
-    //ƒWƒFƒbƒg‚ğg—p‚µ‚Ä‚¢‚éó‘Ô‚É‚·‚é
+    //ã‚¸ã‚§ãƒƒãƒˆã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹çŠ¶æ…‹ã«ã™ã‚‹
     public void SetIsUsingJet()
 	{
         m_isUsingJet = true;
 	}
 
-    //ƒLƒ‰[‚ğg—p‚µ‚Ä‚¢‚éó‘Ô‚É‚·‚é
+    //ã‚­ãƒ©ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹çŠ¶æ…‹ã«ã™ã‚‹
     public void SetIsUsingKiller()
 	{
-        //ƒLƒ‰[‚ğg—p‚µ‚Ä‚¢‚é
+        //ã‚­ãƒ©ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹
         m_isUsingKiller = true;
-        //ƒ‹[ƒ€ƒvƒƒpƒeƒB‚Ì©•ª‚Ì–³“Gó‘Ô‚ğ–¼‘O‚ğg‚Á‚ÄŒŸõA•ÏX‚ğs‚¤
+        //ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®è‡ªåˆ†ã®ç„¡æ•µçŠ¶æ…‹ã‚’åå‰ã‚’ä½¿ã£ã¦æ¤œç´¢ã€å¤‰æ›´ã‚’è¡Œã†
         var hashtable = new ExitGames.Client.Photon.Hashtable();
         string name = PhotonNetwork.NickName + "Invincible";
         hashtable[name] = 1;
-        //ƒ‹[ƒ€ƒvƒƒpƒeƒB‚ğXV
+        //ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’æ›´æ–°
         PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
     }
 
-    //ƒXƒ^[‚ğg—p‚µ‚Ä‚¢‚é‚©‚ğæ“¾‚·‚é
+    //ã‚¹ã‚¿ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹ã‹ã‚’å–å¾—ã™ã‚‹
     public bool GetIsUsingStar()
 	{
         return m_isUsingStar;
@@ -183,18 +184,18 @@ public class AvatarController : MonoBehaviourPunCallbacks
         return m_isAttacked;
 	}
 
-    //ƒzƒXƒg‚ÖƒNƒŠƒAƒ^ƒCƒ€‚ğ‘—‚é
+    //ãƒ›ã‚¹ãƒˆã¸ã‚¯ãƒªã‚¢ã‚¿ã‚¤ãƒ ã‚’é€ã‚‹
     [PunRPC]
     void TellRecordTime(string name, float time)
     {
         GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNameAndRecordTime(name, time);
     }
 
-    //©g‚ªƒŒ[ƒX‚ÌQ‰Á‚Ì—pˆÓ‚ª‚Å‚«‚½‚©ƒzƒXƒg‚É‘—‚é
+    //è‡ªèº«ãŒãƒ¬ãƒ¼ã‚¹ã®å‚åŠ ã®ç”¨æ„ãŒã§ããŸã‹ãƒ›ã‚¹ãƒˆã«é€ã‚‹
     [PunRPC]
     private void TellReadyOK()
     {
-        //‰½‰ñ‚à‘—‚ç‚È‚¢‚æ‚¤‚É‚·‚éi’ÊM‚ÌŠÖŒWãƒtƒ‰ƒO‚ÅŒ©‹É‚ß‚éj
+        //ä½•å›ã‚‚é€ã‚‰ãªã„ã‚ˆã†ã«ã™ã‚‹ï¼ˆé€šä¿¡ã®é–¢ä¿‚ä¸Šãƒ•ãƒ©ã‚°ã§è¦‹æ¥µã‚ã‚‹ï¼‰
         if (!m_isToldReady)
         {
             GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddReadyPlayerNum();
@@ -202,17 +203,17 @@ public class AvatarController : MonoBehaviourPunCallbacks
         }
     }
 
-    //‰½‚©‚ªÕ“Ë‚µ‚½‚ç
+    //ä½•ã‹ãŒè¡çªã—ãŸã‚‰
     private void OnCollisionEnter(Collision col)
 	{
         if(col.gameObject.name == "Snapper(Clone)")
 		{
-            //©•ª‚ÌƒQ[ƒ€“à‚Ìƒ^ƒCƒCƒ“ƒXƒ^ƒ“ƒX‚Ìíœ
+            //è‡ªåˆ†ã®ã‚²ãƒ¼ãƒ å†…ã®ã‚¿ã‚¤ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®å‰Šé™¤
             Destroy(col.gameObject);
-            //ƒLƒ‰[‚àƒXƒ^[‚àg‚Á‚Ä‚¢‚È‚¯‚ê‚Î
+            //ã‚­ãƒ©ãƒ¼ã‚‚ã‚¹ã‚¿ãƒ¼ã‚‚ä½¿ã£ã¦ã„ãªã‘ã‚Œã°
             if (!m_isInvincible)
             {
-                //UŒ‚‚³‚ê‚½
+                //æ”»æ’ƒã•ã‚ŒãŸ
                 m_isAttacked = true;
             }
             Debug.Log("Attacked By Snapper(Clone)");
@@ -223,33 +224,33 @@ public class AvatarController : MonoBehaviourPunCallbacks
             Debug.Log("OrangePeel(Clone)");
         }
 
-        //Õ“Ë‘ÎÛ‚ª‘¼‚ÌƒvƒŒƒCƒ„[‚È‚ç‚Î
+        //è¡çªå¯¾è±¡ãŒä»–ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãªã‚‰ã°
         if (col.gameObject.tag == "Player")
         {
-            //ƒRƒŠƒWƒ‡ƒ“‚Ì‚¿å‚ÌPhotonNetwork‚ÉŠÖ‚·‚é•Ï”‚ğæ“¾
+            //ã‚³ãƒªã‚¸ãƒ§ãƒ³ã®æŒã¡ä¸»ã®PhotonNetworkã«é–¢ã™ã‚‹å¤‰æ•°ã‚’å–å¾—
             Player pl = col.gameObject.GetComponent<PhotonView>().Owner;
-            //‚»‚ÌƒvƒŒƒCƒ„[‚Ì–³“Gó‘Ô‚ğƒ‹[ƒ€ƒvƒƒpƒeƒB‚©‚ç‚Á‚Ä‚­‚é
+            //ãã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç„¡æ•µçŠ¶æ…‹ã‚’ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‹ã‚‰æŒã£ã¦ãã‚‹
             string plName = pl.NickName + "Invincible";
             int stat = (PhotonNetwork.CurrentRoom.CustomProperties[plName] is int value) ? value : 0;
 
-            //UŒ‚‚ğó‚¯‚½‚©
+            //æ”»æ’ƒã‚’å—ã‘ãŸã‹
             bool isCrash = false;
-            //‚»‚ÌƒvƒŒƒCƒ„[‚ª–³“G‚ÅA©•ª‚ªƒXƒ^[‚àƒLƒ‰[‚àg‚Á‚Ä‚¢‚È‚¯‚Î
+            //ãã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒç„¡æ•µã§ã€è‡ªåˆ†ãŒã‚¹ã‚¿ãƒ¼ã‚‚ã‚­ãƒ©ãƒ¼ã‚‚ä½¿ã£ã¦ã„ãªã‘ã°
             if (stat == 1 && !m_isInvincible)
 			{
-                //©•ª‚ÌƒvƒŒƒCƒ„[‚ÍUŒ‚‚ğó‚¯‚½
+                //è‡ªåˆ†ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¯æ”»æ’ƒã‚’å—ã‘ãŸ
                 m_isAttacked = true;
             }
 		}
 
-        //Õ“Ëæ‚ª•Ç‚Ì
+        //è¡çªå…ˆãŒå£ã®æ™‚
         if(col.gameObject.tag == "Wall")
 		{
-            //•Ç‚É“–‚½‚Á‚½
+            //å£ã«å½“ãŸã£ãŸ
             m_hittedWall = true;
-            //Œ»İ‚ÌˆÚ“®•ûŒü‚ğ‚à‚Æ‚É•Ç‚¸‚èˆÚ“®‚Ì•ûŒü‚ğŒvZ
+            //ç¾åœ¨ã®ç§»å‹•æ–¹å‘ã‚’ã‚‚ã¨ã«å£ãšã‚Šç§»å‹•ã®æ–¹å‘ã‚’è¨ˆç®—
             m_alongWall.CollisionEnter(col, m_rb, ref m_moveDir);
-            //ˆÚ“®•ûŒü‚ğXV
+            //ç§»å‹•æ–¹å‘ã‚’æ›´æ–°
             m_alongWallDir = m_moveDir;
         }
     }
@@ -268,34 +269,34 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
 	private void Update()
 	{
-        //ƒR[ƒX‚ÌŒü‚«‚ğŒ»İ‚ÌƒEƒFƒCƒ|ƒCƒ“ƒg’Ê‰ßó‹µ‚©‚ç’²‚×‚é
+        //ã‚³ãƒ¼ã‚¹ã®å‘ãã‚’ç¾åœ¨ã®ã‚¦ã‚§ã‚¤ãƒã‚¤ãƒ³ãƒˆé€šéçŠ¶æ³ã‹ã‚‰èª¿ã¹ã‚‹
         m_corseDir = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.GetComponent<WayPointChecker>().GetCurrentWayPoint();
-        //³‹K‰»
+        //æ­£è¦åŒ–
         m_corseDir.Normalize();
-        //‚‚³‚Ì•ûŒü‚Í‚¢‚ç‚È‚¢
+        //é«˜ã•ã®æ–¹å‘ã¯ã„ã‚‰ãªã„
         m_corseDir.y = 0.0f;
 
-        //Œ»İ‚ÌƒV[ƒ“‚ªƒCƒ“ƒQ[ƒ€‚ÅƒJƒEƒ“ƒgƒ_ƒEƒ“‚ªI—¹‚µ‚Ä“®‚¯‚éó‘Ô‚È‚ç‚Î
-        if (SceneManager.GetActiveScene().name == "DemoInGame" && m_canMove)
+        //ç¾åœ¨ã®ã‚·ãƒ¼ãƒ³ãŒã‚¤ãƒ³ã‚²ãƒ¼ãƒ ã§ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³ãŒçµ‚äº†ã—ã¦å‹•ã‘ã‚‹çŠ¶æ…‹ãªã‚‰ã°
+        if (SceneManager.GetActiveScene().name == "08_GameScene" && m_canMove)
         {
-            // ©g‚ª¶¬‚µ‚½ƒIƒuƒWƒFƒNƒg‚¾‚¯‚ÉˆÚ“®ˆ—‚ğs‚¤
+            // è‡ªèº«ãŒç”Ÿæˆã—ãŸã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã ã‘ã«ç§»å‹•å‡¦ç†ã‚’è¡Œã†
             if (photonView.IsMine)
             {
-                //‘O•ûŒü‚ÉˆÚ“®
+                //å‰æ–¹å‘ã«ç§»å‹•
                 //m_moveDir = this.transform.forward * (Input.GetAxis("Vertical"));
 
                 Vector3 dir = Vector3.zero;
 
-                switch(m_orepation.GetComponent<OperationOld>().GetTouchedScreenDirection())
+                switch(m_orepation.GetComponent<Operation>().GetTouchedScreenDirection())
 				{
                     case "right":
                         m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
-                        //“ü—Í‚É‚æ‚é‰ñ“]—Ê
+                        //å…¥åŠ›ã«ã‚ˆã‚‹å›è»¢é‡
                         m_rot = new Vector3(0.0f, ROT_POWER * m_rotateAcceleration, 0.0f);
                         break;
                     case "left":
                         m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
-                        //“ü—Í‚É‚æ‚é‰ñ“]—Ê
+                        //å…¥åŠ›ã«ã‚ˆã‚‹å›è»¢é‡
                         m_rot = new Vector3(0.0f, -ROT_POWER * m_rotateAcceleration, 0.0f) ;
                         break;
                     default:
@@ -307,43 +308,43 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_moveDir = dir;
 
 
-                //ƒLƒ‰[‚ğg‚Á‚Ä‚¢‚é‚ÌˆÚ“®ƒXƒs[ƒh‚ğŒvZ‚·‚éB
+                //ã‚­ãƒ©ãƒ¼ã‚’ä½¿ã£ã¦ã„ã‚‹æ™‚ã®ç§»å‹•ã‚¹ãƒ”ãƒ¼ãƒ‰ã‚’è¨ˆç®—ã™ã‚‹ã€‚
                 if (m_isUsingKiller)
                 {
                     m_moveSpeed = m_moveDir * MOVE_POWER_USING_KILLER;
                 }
-                //ƒXƒ^[‚ğg‚Á‚Ä‚¢‚é‚ÌˆÚ“®ƒXƒs[ƒh‚ğŒvZ‚·‚éB
+                //ã‚¹ã‚¿ãƒ¼ã‚’ä½¿ã£ã¦ã„ã‚‹æ™‚ã®ç§»å‹•ã‚¹ãƒ”ãƒ¼ãƒ‰ã‚’è¨ˆç®—ã™ã‚‹ã€‚
                 else if (m_isUsingStar)
 				{
                     m_moveSpeed = m_moveDir * MOVE_POWER_USING_STAR;
                 }
-                //ƒLƒmƒR‚ğg‚Á‚Ä‚¢‚é‚ÌˆÚ“®ƒXƒs[ƒh‚ğŒvZ‚·‚éB
+                //ã‚­ãƒã‚³ã‚’ä½¿ã£ã¦ã„ã‚‹æ™‚ã®ç§»å‹•ã‚¹ãƒ”ãƒ¼ãƒ‰ã‚’è¨ˆç®—ã™ã‚‹ã€‚
                 else if (m_isUsingJet)
 				{
                     m_moveSpeed = m_moveDir * MOVE_POWER_USING_JET;
                 }
-                //’Êí‚ÌˆÚ“®ƒXƒs[ƒh‚ğŒvZ‚·‚éB
+                //é€šå¸¸æ™‚ã®ç§»å‹•ã‚¹ãƒ”ãƒ¼ãƒ‰ã‚’è¨ˆç®—ã™ã‚‹ã€‚
                 else
                 {
                     m_moveSpeed = m_moveDir * MOVE_POWER;
                 }
             }
 
-            //ƒS[ƒ‹‚µ‚Ä‚¢‚È‚Á‚½‚ç
+            //ã‚´ãƒ¼ãƒ«ã—ã¦ã„ãªã£ãŸã‚‰
             if(!m_isGoaled)
 			{
-                //‘–sŠÔ‚ğƒQ[ƒ€ƒ^ƒCƒ€‚ÅŒv‘ª‚µ‘±‚¯‚éB
+                //èµ°è¡Œæ™‚é–“ã‚’ã‚²ãƒ¼ãƒ ã‚¿ã‚¤ãƒ ã§è¨ˆæ¸¬ã—ç¶šã‘ã‚‹ã€‚
                 m_runningTime += Time.deltaTime;
             }
 			else if(!m_isToldRecord)
 			{
-                //ƒNƒŠƒAƒ^ƒCƒ€‚ğƒzƒXƒg‚¾‚¯‚É‘—‚é
+                //ã‚¯ãƒªã‚¢ã‚¿ã‚¤ãƒ ã‚’ãƒ›ã‚¹ãƒˆã ã‘ã«é€ã‚‹
                 photonView.RPC(nameof(TellRecordTime), RpcTarget.MasterClient, PhotonNetwork.NickName, m_runningTime);
-                //•ñÏ‚İ
+                //å ±å‘Šæ¸ˆã¿
                 m_isToldRecord = true;
             }
 
-			//YƒLƒ‹
+			//Yã‚­ãƒ«
 			if (this.transform.position.y <= -2.0f)
 			{
 				this.transform.position = new Vector3(0.0f, 2.0f, 0.0f);
@@ -355,45 +356,45 @@ public class AvatarController : MonoBehaviourPunCallbacks
 	{
         if (m_isUsingKiller)
         {
-            //‰ñ“]‚É‚Â‚¢‚ÄAFixedUpdate‚Å‚â‚é‚ÆŒÄ‚Ño‚µ‰ñ”‚ª­‚È‚·‚¬‚ÄƒKƒN‚Â‚­‚½‚ß‚±‚±‚ÅXV
+            //å›è»¢ã«ã¤ã„ã¦ã€FixedUpdateã§ã‚„ã‚‹ã¨å‘¼ã³å‡ºã—å›æ•°ãŒå°‘ãªã™ãã¦ã‚¬ã‚¯ã¤ããŸã‚ã“ã“ã§æ›´æ–°
             Quaternion rot;
-            //©•ª‚Ì‘O•ûŒü‚©‚çƒR[ƒX‚ÌŒü‚«‚Ö‚Ì‰ñ“]‚ğŒvZ
+            //è‡ªåˆ†ã®å‰æ–¹å‘ã‹ã‚‰ã‚³ãƒ¼ã‚¹ã®å‘ãã¸ã®å›è»¢ã‚’è¨ˆç®—
             Vector3 newForward = (this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position) - this.transform.forward;
             newForward.y = 0.0f;
             rot = Quaternion.LookRotation(newForward);
-            //ŠÉ‚â‚©‚É‚µ‚Ä“K—p
+            //ç·©ã‚„ã‹ã«ã—ã¦é©ç”¨
             transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * KILLER_HANDLING_RATE);
-            //Œ»İ‚Ì‰ñ“]‚ğ•Û‘¶
+            //ç¾åœ¨ã®å›è»¢ã‚’ä¿å­˜
             m_prevTrasnform = this.transform.rotation;
             return;
         }
 
-        //“ü—Í‚É‚æ‚é‰ñ“]ˆ—‚ğ‚³‚¹‚È‚¢
+        //å…¥åŠ›ã«ã‚ˆã‚‹å›è»¢å‡¦ç†ã‚’ã•ã›ãªã„
         if (!m_isAttacked)
         { 
-            //Œ»İ“ü—Í‚µ‚Ä‚¢‚é‰ñ“]‚ğ“K—p‚µ‚½Transform‚ğ“K‹X
+            //ç¾åœ¨å…¥åŠ›ã—ã¦ã„ã‚‹å›è»¢ã‚’é©ç”¨ã—ãŸTransformã‚’é©å®œ
             Transform appliedTrasnform = this.transform;
             appliedTrasnform.Rotate(m_rot);
 
-            //ƒR[ƒX‚ÌŒü‚«‚ÆƒvƒŒƒCƒ„[‚Ì‘O•ûŒü‚ª45“xˆÈ“à‚Å‚ ‚ê‚Î
+            //ã‚³ãƒ¼ã‚¹ã®å‘ãã¨ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‰æ–¹å‘ãŒ45åº¦ä»¥å†…ã§ã‚ã‚Œã°
             if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
             {
-                //‰ñ“]‚ğÀÛ‚É“K—p‚·‚é
+                //å›è»¢ã‚’å®Ÿéš›ã«é©ç”¨ã™ã‚‹
                 transform.Rotate(m_rot);
-                //“KØ‚È‰ñ“]‚ğ•Û‘¶
+                //é©åˆ‡ãªå›è»¢ã‚’ä¿å­˜
                 m_prevTrasnform = this.transform.rotation;
             }
-            //‰¡‚ÉŒü‚«‚·‚¬‚Ä‚¢‚é‚È‚ç‚Î
+            //æ¨ªã«å‘ãã™ãã¦ã„ã‚‹ãªã‚‰ã°
             else
             {
-                //‘O‰ñ“K—p‚µ‚½A“KØ‚È‰ñ“]‚Å•â³
+                //å‰å›é©ç”¨ã—ãŸã€é©åˆ‡ãªå›è»¢ã§è£œæ­£
                 this.transform.rotation = m_prevTrasnform;
 
-                //‚æ‚±‚ÉŒü‚«‚·‚¬‚Ä‚¢‚é
+                //ã‚ˆã“ã«å‘ãã™ãã¦ã„ã‚‹
                 if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
                 {
                     Quaternion rot;
-                    //ƒR[ƒX‚ÌŒü‚«‚É–ß‚·‚æ‚¤‚È‰ñ“]‚ğŒvZ‚µ‚Ä“K—p‚·‚é
+                    //ã‚³ãƒ¼ã‚¹ã®å‘ãã«æˆ»ã™ã‚ˆã†ãªå›è»¢ã‚’è¨ˆç®—ã—ã¦é©ç”¨ã™ã‚‹
                     rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
                     transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
 
@@ -408,37 +409,37 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
             if(m_spinedAngle < 360.0f)
 			{
-                this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // ‰ñ“]Šp“x‚ğİ’è            
+                this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // å›è»¢è§’åº¦ã‚’è¨­å®š            
             }
         }
     }
 
     private void MoveByUsingKiller()
 	{
-        //ƒLƒ‰[‚ğg‚Á‚Ä‚¢‚½‚ç
+        //ã‚­ãƒ©ãƒ¼ã‚’ä½¿ã£ã¦ã„ãŸã‚‰
         if (m_isUsingKiller)
         {
-            //Ÿ‚ÌƒEƒFƒCƒ|ƒCƒ“ƒg‚Ö‚ÌŒü‚«‚ğŒvZ
+            //æ¬¡ã®ã‚¦ã‚§ã‚¤ãƒã‚¤ãƒ³ãƒˆã¸ã®å‘ãã‚’è¨ˆç®—
             Vector3 direction = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
-            //³‹K‰»
+            //æ­£è¦åŒ–
             direction.Normalize();
-            //‚‚³‚Í‚¢‚ç‚È‚¢
+            //é«˜ã•ã¯ã„ã‚‰ãªã„
             direction.y = 0.0f;
-            //TRASNFORM‚ÅˆÊ’u‚ğXViRigidbody‚ğg‚¤‚Æ‘¬‚³‚ào‚È‚¢‚µA‘¬‚­‚µ‚½‚çƒR[ƒXƒAƒEƒg‚·‚é
+            //TRASNFORMã§ä½ç½®ã‚’æ›´æ–°ï¼ˆRigidbodyã‚’ä½¿ã†ã¨é€Ÿã•ã‚‚å‡ºãªã„ã—ã€é€Ÿãã—ãŸã‚‰ã‚³ãƒ¼ã‚¹ã‚¢ã‚¦ãƒˆã™ã‚‹
             this.transform.position += direction * 1.5f;
 
-            //ƒLƒ‰[‚ğg—p‚µ‚Ä‚¢‚éŠÔ‚ğƒQ[ƒ€ƒ^ƒCƒ€‚ÅƒCƒ“ƒNƒŠƒƒ“ƒg
+            //ã‚­ãƒ©ãƒ¼ã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹æ™‚é–“ã‚’ã‚²ãƒ¼ãƒ ã‚¿ã‚¤ãƒ ã§ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆ
             m_killerTime += Time.deltaTime;
-            //Å‘åŒp‘±ŠÔ‚ğ’´‚¦‚½‚ç
+            //æœ€å¤§ç¶™ç¶šæ™‚é–“ã‚’è¶…ãˆãŸã‚‰
             if (m_killerTime >= MAX_KILLER_REMAIN_TIME)
             {
-                //ŠÔ‚ğƒŠƒZƒbƒg
+                //æ™‚é–“ã‚’ãƒªã‚»ãƒƒãƒˆ
                 m_killerTime = 0.0f;
-                //ƒLƒ‰[‚ğg‚Á‚Ä‚¢‚È‚¢ó‘Ô‚É‚·‚é
+                //ã‚­ãƒ©ãƒ¼ã‚’ä½¿ã£ã¦ã„ãªã„çŠ¶æ…‹ã«ã™ã‚‹
                 m_isUsingKiller = false;
             }
 
-            //ƒAƒCƒeƒ€‚Ìd‚ËŠ|‚¯‚ğ‚³‚¹‚È‚¢‚æ‚¤‚ÉAg—p’†‚¾‚Á‚½ƒAƒCƒeƒ€‚ÌŒp‘±ŠÔ‚àŒ¸‚ç‚µ‚Ä‚¢‚­B
+            //ã‚¢ã‚¤ãƒ†ãƒ ã®é‡ã­æ›ã‘ã‚’ã•ã›ãªã„ã‚ˆã†ã«ã€ä½¿ç”¨ä¸­ã ã£ãŸã‚¢ã‚¤ãƒ†ãƒ ã®ç¶™ç¶šæ™‚é–“ã‚‚æ¸›ã‚‰ã—ã¦ã„ãã€‚
             if (m_isUsingJet)
             {
                 m_dashTime += Time.deltaTime;
@@ -458,7 +459,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 }
             }
 
-            //ƒLƒ‰[g—p’†‚ÍˆÈ~‚Ìˆ—‚ğÀs‚µ‚È‚¢
+            //ã‚­ãƒ©ãƒ¼ä½¿ç”¨ä¸­ã¯ä»¥é™ã®å‡¦ç†ã‚’å®Ÿè¡Œã—ãªã„
             return;
         }
     }
@@ -467,7 +468,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 	{
         if (!m_isUsingStar && !m_isUsingKiller)
         {
-            //ƒ‹[ƒ€ƒvƒƒpƒeƒB‚ğ–ˆƒtƒŒ[ƒ€XV‚³‚¹‚È‚¢‚æ‚¤‚ÉA–³“G‚ğ‰ğœ‚µ‚½‚¾‚¯ƒ‹[ƒ€ƒvƒƒpƒeƒB‘¤‚àFALSE‚É
+            //ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’æ¯ãƒ•ãƒ¬ãƒ¼ãƒ æ›´æ–°ã•ã›ãªã„ã‚ˆã†ã«ã€ç„¡æ•µã‚’è§£é™¤ã—ãŸæ™‚ã ã‘ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£å´ã‚‚FALSEã«
             if (m_isInvincible)
             {
                 m_isInvincible = false;
@@ -480,10 +481,10 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
     }
 
-    //ŠÂ‹«‚ÉˆË‘¶‚³‚ê‚È‚¢Aˆê’èŠúŠÔ‚ÌUpdateŠÖ”iˆÚ“®‚Í‚±‚±‚É‚©‚­‚±‚Æj
+    //ç’°å¢ƒã«ä¾å­˜ã•ã‚Œãªã„ã€ä¸€å®šæœŸé–“ã®Updateé–¢æ•°ï¼ˆç§»å‹•ã¯ã“ã“ã«ã‹ãã“ã¨ï¼‰
     private void FixedUpdate()
     {
-        //ƒLƒ‰[g—p‚ÌˆÚ“®BƒLƒ‰[g—p‚Í‚±‚ÌŠÖ”ˆÈ~‚Ìˆ—‚Ís‚í‚È‚¢
+        //ã‚­ãƒ©ãƒ¼ä½¿ç”¨æ™‚ã®ç§»å‹•ã€‚ã‚­ãƒ©ãƒ¼ä½¿ç”¨æ™‚ã¯ã“ã®é–¢æ•°ä»¥é™ã®å‡¦ç†ã¯è¡Œã‚ãªã„
         MoveByUsingKiller();
 
         BreakIvincible();
@@ -491,47 +492,47 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         if (!m_isAttacked)
 		{
-            //•Ç‚¸‚èó‘Ô‚È‚ç‚Î
+            //å£ãšã‚ŠçŠ¶æ…‹ãªã‚‰ã°
             if(m_hittedWall)
 			{
                 m_moveSpeed = m_alongWallDir * MOVE_POWER;
                 Debug.Log("moveSpeed : " + m_moveSpeed + " m_alongWallDir : " + m_alongWallDir);
-                //‘O•û‚Ö‰Á‘¬
+                //å‰æ–¹ã¸åŠ é€Ÿ
                 
                 m_hittedWall = false;
             }
-            //‚»‚¤‚Å‚È‚¢‚È‚ç’Êí’Ê‚èˆÚ“®
+            //ãã†ã§ãªã„ãªã‚‰é€šå¸¸é€šã‚Šç§»å‹•
             m_rb.AddForce(m_moveSpeed - m_rb.velocity);
         }
-		//UŒ‚‚³‚ê‚Ä‚¢‚½‚ç
+		//æ”»æ’ƒã•ã‚Œã¦ã„ãŸã‚‰
 		else
 		{
-            //d’¼ŠÔ‚ğƒQ[ƒ€ŠÔ‚Å‘‚â‚·
+            //ç¡¬ç›´æ™‚é–“ã‚’ã‚²ãƒ¼ãƒ æ™‚é–“ã§å¢—ã‚„ã™
             m_stiffenTime += Time.deltaTime;
-            //İ’è‚µ‚½Å‘åd’¼ŠÔ‚ğ’´‚¦‚½‚ç
+            //è¨­å®šã—ãŸæœ€å¤§ç¡¬ç›´æ™‚é–“ã‚’è¶…ãˆãŸã‚‰
 
             if (m_stiffenTime >= MAX_STIFFIN_TIME)
 			{
-                //Œv‘ª‚µ‚½d’¼ŠÔ‚ğƒŠƒZƒbƒg
+                //è¨ˆæ¸¬ã—ãŸç¡¬ç›´æ™‚é–“ã‚’ãƒªã‚»ãƒƒãƒˆ
                 m_stiffenTime = 0.0f;
-                //”í’e‚Ì‰ñ“]ƒŠƒAƒNƒVƒ‡ƒ“‚Ì‘‰ñ“]—Ê‚ğƒŠƒZƒbƒg
+                //è¢«å¼¾æ™‚ã®å›è»¢ãƒªã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã®ç·å›è»¢é‡ã‚’ãƒªã‚»ãƒƒãƒˆ
                 m_spinedAngle = 0.0f;
-                //UŒ‚ƒtƒ‰ƒO‚ğ’¼‚·
+                //æ”»æ’ƒãƒ•ãƒ©ã‚°ã‚’ç›´ã™
                 m_isAttacked = false;
             }
 		}
 
-        //ƒWƒFƒbƒg‚ğg—p‚µ‚Ä‚¢‚é‚È‚ç‚Î
+        //ã‚¸ã‚§ãƒƒãƒˆã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹ãªã‚‰ã°
         if(m_isUsingJet)
 		{
-            //g—pŠÔ‚ğ‘‚â‚µ‚Ä
+            //ä½¿ç”¨æ™‚é–“ã‚’å¢—ã‚„ã—ã¦
             m_dashTime += Time.deltaTime;
-            //Å‘åŒp‘±ŠÔ‚ğ’´‚¦‚½‚ç
+            //æœ€å¤§ç¶™ç¶šæ™‚é–“ã‚’è¶…ãˆãŸã‚‰
             if(m_dashTime >= MAX_DASH_TIME)
 			{
-                //g‚Á‚Ä‚¢‚È‚¢‚±‚Æ‚É‚µ‚Ä
+                //ä½¿ã£ã¦ã„ãªã„ã“ã¨ã«ã—ã¦
                 m_isUsingJet = false;
-                //ƒ^ƒCƒ€‚àƒŠƒZƒbƒg
+                //ã‚¿ã‚¤ãƒ ã‚‚ãƒªã‚»ãƒƒãƒˆ
                 m_dashTime = 0.0f;
 			}
 		}
@@ -543,7 +544,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 				m_starTime = 0.0f;
 				m_isUsingStar = false;
 
-                //ƒ‹[ƒ€ƒvƒƒpƒeƒB‚Ì–³“Gó‘Ô‚à–ß‚µ‚Ä‚¨‚­
+                //ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®ç„¡æ•µçŠ¶æ…‹ã‚‚æˆ»ã—ã¦ãŠã
 				var hashtable = new ExitGames.Client.Photon.Hashtable();
 				string name = PhotonNetwork.NickName + "Invincible";
 				hashtable[name] = 0;

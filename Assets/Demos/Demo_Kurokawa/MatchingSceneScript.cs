@@ -185,7 +185,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
             if (m_matchingWaitTime < -2.0f)
             {
                 //ゲーム開始
-                SceneManager.LoadScene("DemoInGame");
+                SceneManager.LoadScene("08_GameScene");
             }
         }
         //待機時間の秒数が変わったらそれを同期する
@@ -212,10 +212,10 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             //ホストクライアントがボタンを長押しすると
-            if(m_operation.GetComponent<OperationOld>().GetIsLongTouch())
+            if(m_operation.GetComponent<Operation>().GetIsLongTouch)
 			{
                 //強制的にインゲームに遷移する
-                SceneManager.LoadScene("DemoInGame");
+                SceneManager.LoadScene("08_GameScene");
             }
 
             //残り時間を他プレイヤーと同期する
