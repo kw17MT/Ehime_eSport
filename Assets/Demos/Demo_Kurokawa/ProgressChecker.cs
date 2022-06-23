@@ -14,7 +14,7 @@ public class ProgressChecker : MonoBehaviour
     private List<bool> m_checkPoint = new List<bool>();     //通過したチェックポイントの保存配列
 
     public int MAX_CHECKPOINT_NUM = 3;                      //ステージに配置されるチェックポイントの数
-    public int MAX_RAP_NUM = 1;                             //何周するか
+    public int MAX_RAP_NUM = 3;                             //何周するか
 
     void Start()
     {
@@ -24,10 +24,8 @@ public class ProgressChecker : MonoBehaviour
             //指定したチェックポイント分配列を伸ばしていく
             m_checkPoint.Add(false);
 		}
-        //ラップカウントのテキストを取得
-        m_rapCountText = GameObject.Find("RapCount");
-        //現在のラップ数と最大ラップ数を表示
-        m_rapCountText.GetComponent<Text>().text = "Rap : " + m_rapCount + " / " + MAX_RAP_NUM;
+
+        GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_rapCount);
     }
 
     //どの地点を通過したかを文字列で確認
@@ -65,6 +63,8 @@ public class ProgressChecker : MonoBehaviour
         //完走したラップ数を増やす
         m_rapCount++;
 
+        GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_rapCount);
+
         //次のウェイポイントの番号をルームプロパティに保存
         var hashtable = new ExitGames.Client.Photon.Hashtable();
         //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
@@ -80,8 +80,6 @@ public class ProgressChecker : MonoBehaviour
             m_checkPoint[i] = false;
 		}
 
-        //ラップ数の更新
-        m_rapCountText.GetComponent<Text>().text = "Rap : " + m_rapCount + " / " + MAX_RAP_NUM;
         //ゴールできたことを返す
         return true;
     }

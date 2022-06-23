@@ -25,6 +25,11 @@ public class NowRankingChange : MonoBehaviour
         new Vector4(0.0f,0.0f,0.0f,1.0f)            //黒色
     };
 
+    public void SetRanking(int rank)
+	{
+        m_ranking = rank;
+	}
+
     //アップデート関数
     void Update()
     {
