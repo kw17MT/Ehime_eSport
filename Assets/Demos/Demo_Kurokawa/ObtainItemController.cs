@@ -60,7 +60,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
     {
         //自分が生成したインスタンスならば、
         //かつ、抽選演出が終了していたならば、
-        if (photonView.IsMine && m_isLotteryFinish)
+        if (photonView.IsMine/* && m_isLotteryFinish*/)
         {
 			//テストでボタンを押したらバナナが出るようにする。
 			if (Input.GetKeyDown(KeyCode.K))

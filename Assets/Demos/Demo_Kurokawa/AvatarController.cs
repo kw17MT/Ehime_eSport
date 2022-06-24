@@ -40,7 +40,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MOVE_POWER_USING_STAR = 35.0f;         //スター使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_JET = 50.0f;          //ジェット使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_KILLER = 60.0f;       //キラー使用時のリジッドボディにかける移動の倍率
-    public float ROT_POWER = 0.01f;                      //ハンドリング
+    public float ROT_POWER = 100.0f;                      //ハンドリング
     public float MAX_STAR_REMAIN_TIME = 10.5f;          //スターの最大継続時間
     public float MAX_KILLER_REMAIN_TIME = 3.0f;         //キラーの最大継続時間
     public float MAX_DASH_TIME = 1.0f;                  //ダッシュの最大継続時間
@@ -291,13 +291,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
 				{
                     case "right":
                         m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
-                        //入力による回転量
-                        m_rot = new Vector3(0.0f, ROT_POWER * m_rotateAcceleration, 0.0f);
+                        //入力による回転量、フレームレートに回転量が依存しないようにゲームタイムを乗算
+                        m_rot = new Vector3(0.0f, ROT_POWER * m_rotateAcceleration * Time.deltaTime, 0.0f);
                         break;
                     case "left":
                         m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
-                        //入力による回転量
-                        m_rot = new Vector3(0.0f, -ROT_POWER * m_rotateAcceleration, 0.0f) ;
+                        //入力による回転量、フレームレートに回転量が依存しないようにゲームタイムを乗算
+                        m_rot = new Vector3(0.0f, -ROT_POWER * m_rotateAcceleration * Time.deltaTime, 0.0f) ;
                         break;
                     default:
                         m_rotateAcceleration = 0.0f;
