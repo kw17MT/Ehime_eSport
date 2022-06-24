@@ -6,96 +6,96 @@ using System;
 using System.Collections.Generic;
 using Photon.Pun;
 
-//‚±‚ÌƒXƒNƒŠƒvƒg‚ªŠ„‚è“–‚Ä‚ç‚ê‚½ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìƒ`ƒFƒbƒNƒ|ƒCƒ“ƒgŠÇ—ƒCƒ“ƒXƒ^ƒ“ƒX
+//ã“ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆç®¡ç†ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
 public class ProgressChecker : MonoBehaviour
 {
-    private GameObject m_rapCountText = null;               //ü‰ñ‰ñ”‚ğ’ñ¦‚·‚éƒeƒLƒXƒgƒCƒ“ƒXƒ^ƒ“ƒX
-    private int m_rapCount = 0;                             //ƒQ[ƒ€’†‚Ìü‰ñ‰ñ”
-    private List<bool> m_checkPoint = new List<bool>();     //’Ê‰ß‚µ‚½ƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Ì•Û‘¶”z—ñ
+    private GameObject m_rapCountText = null;               //å‘¨å›å›æ•°ã‚’æç¤ºã™ã‚‹ãƒ†ã‚­ã‚¹ãƒˆã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
+    private int m_rapCount = 0;                             //ã‚²ãƒ¼ãƒ ä¸­ã®å‘¨å›å›æ•°
+    private List<bool> m_checkPoint = new List<bool>();     //é€šéã—ãŸãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆã®ä¿å­˜é…åˆ—
 
-    public int MAX_CHECKPOINT_NUM = 3;                      //ƒXƒe[ƒW‚É”z’u‚³‚ê‚éƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Ì”
-    public int MAX_RAP_NUM = 3;                             //‰½ü‚·‚é‚©
+    public int MAX_CHECKPOINT_NUM = 3;                      //ã‚¹ãƒ†ãƒ¼ã‚¸ã«é…ç½®ã•ã‚Œã‚‹ãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆã®æ•°
+    public int MAX_RAP_NUM = 3;                             //ä½•å‘¨ã™ã‚‹ã‹
 
     void Start()
     {
-        //ƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚ğ‰Šú‰»
+        //ãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆã‚’åˆæœŸåŒ–
         for (int i = 0; i < MAX_CHECKPOINT_NUM; i++)
 		{
-            //w’è‚µ‚½ƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg•ª”z—ñ‚ğL‚Î‚µ‚Ä‚¢‚­
+            //æŒ‡å®šã—ãŸãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆåˆ†é…åˆ—ã‚’ä¼¸ã°ã—ã¦ã„ã
             m_checkPoint.Add(false);
 		}
 
         GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_rapCount);
     }
 
-    //‚Ç‚Ì’n“_‚ğ’Ê‰ß‚µ‚½‚©‚ğ•¶š—ñ‚ÅŠm”F
+    //ã©ã®åœ°ç‚¹ã‚’é€šéã—ãŸã‹ã‚’æ–‡å­—åˆ—ã§ç¢ºèª
     public void SetThroughPointName(string name)
 	{
-        //ƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Ì”‚¾‚¯Œ©‚é
+        //ãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆã®æ•°ã ã‘è¦‹ã‚‹
         for(int i = 0; i < MAX_CHECKPOINT_NUM; i++)
 		{
-            //ƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚Æ‚O`‚Ì”‚ğ‘g‚İ‡‚í‚¹‚é
+            //ãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆã¨ï¼ï½ã®æ•°ã‚’çµ„ã¿åˆã‚ã›ã‚‹
             string pointName = "CheckPoint" + i;
-            //‚»‚Ì•¶š—ñ‚Æ’Ê‰İ‚Ì˜A—‚ª‚«‚½•¶š—ñ‚ª“¯‚¶‚È‚ç‚Î
+            //ãã®æ–‡å­—åˆ—ã¨é€šè²¨ã®é€£çµ¡ãŒããŸæ–‡å­—åˆ—ãŒåŒã˜ãªã‚‰ã°
             if(name == pointName)
 			{
-                //’Ê‰ß‚µ‚½‚±‚Æ‚ğŠm”F
+                //é€šéã—ãŸã“ã¨ã‚’ç¢ºèª
                 m_checkPoint[i] = true;
-                //ˆÈ~‚Í‚ ‚í‚È‚¢‚Í‚¸‚Å‚ ‚é‚©‚çAFOR•¶‚©‚ç‚Å‚éB
+                //ä»¥é™ã¯ã‚ã‚ãªã„ã¯ãšã§ã‚ã‚‹ã‹ã‚‰ã€FORæ–‡ã‹ã‚‰ã§ã‚‹ã€‚
                 break;
 			}
 		}
 	}
 
-    //ƒS[ƒ‹‚Å‚«‚é‚©ƒ`ƒFƒbƒN‚·‚é
+    //ã‚´ãƒ¼ãƒ«ã§ãã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
     public bool CheckCanGoal()
 	{
-        //‘S‚Ä‚Ìƒ`ƒFƒbƒNƒ|ƒCƒ“ƒg‚ğ
+        //å…¨ã¦ã®ãƒã‚§ãƒƒã‚¯ãƒã‚¤ãƒ³ãƒˆã‚’
         foreach(var isThrough in m_checkPoint)
         {
-            //’Ê‚Á‚Ä‚¢‚È‚¯‚ê‚Î
+            //é€šã£ã¦ã„ãªã‘ã‚Œã°
             if(!isThrough)
 			{
-                //ƒS[ƒ‹‚Å‚«‚È‚¢
+                //ã‚´ãƒ¼ãƒ«ã§ããªã„
                 return false;
 			}
 		}
-        //Š®‘–‚µ‚½ƒ‰ƒbƒv”‚ğ‘‚â‚·
+        //å®Œèµ°ã—ãŸãƒ©ãƒƒãƒ—æ•°ã‚’å¢—ã‚„ã™
         m_rapCount++;
 
         GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_rapCount);
 
-        //Ÿ‚ÌƒEƒFƒCƒ|ƒCƒ“ƒg‚Ì”Ô†‚ğƒ‹[ƒ€ƒvƒƒpƒeƒB‚É•Û‘¶
+        //æ¬¡ã®ã‚¦ã‚§ã‚¤ãƒã‚¤ãƒ³ãƒˆã®ç•ªå·ã‚’ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã«ä¿å­˜
         var hashtable = new ExitGames.Client.Photon.Hashtable();
-        //ƒvƒŒƒCƒ„[–¼{WayPointNumber‚Æ‚¢‚¤–¼‘O‚ğì¬ ex.)Player2WayPointNumber
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åï¼‹WayPointNumberã¨ã„ã†åå‰ã‚’ä½œæˆ ex.)Player2WayPointNumber
         string name = PhotonNetwork.NickName + "RapCount";
-        //ƒEƒFƒCƒ|ƒCƒ“ƒg”Ô†‚ğİ’è
+        //ã‚¦ã‚§ã‚¤ãƒã‚¤ãƒ³ãƒˆç•ªå·ã‚’è¨­å®š
         hashtable[name] = m_rapCount;
-        //ƒ‹[ƒ€ƒvƒƒpƒeƒB‚ÌXV
+        //ãƒ«ãƒ¼ãƒ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã®æ›´æ–°
         PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
-        //ƒtƒ‰ƒO‚ğŒ³‚É–ß‚·
+        //ãƒ•ãƒ©ã‚°ã‚’å…ƒã«æˆ»ã™
         for (int i = 0; i < MAX_CHECKPOINT_NUM; i++)
 		{
             m_checkPoint[i] = false;
 		}
 
-        //ƒS[ƒ‹‚Å‚«‚½‚±‚Æ‚ğ•Ô‚·
+        //ã‚´ãƒ¼ãƒ«ã§ããŸã“ã¨ã‚’è¿”ã™
         return true;
     }
 
-    //ƒŒ[ƒX‚ğI‚¦‚é‚©
+    //ãƒ¬ãƒ¼ã‚¹ã‚’çµ‚ãˆã‚‹ã‹
     public bool IsFinishRacing()
 	{
-        //Å‘åƒ‰ƒbƒv”‚ğ’´‚¦‚Ä‚¢‚½‚ç
+        //æœ€å¤§ãƒ©ãƒƒãƒ—æ•°ã‚’è¶…ãˆã¦ã„ãŸã‚‰
         if(m_rapCount >= MAX_RAP_NUM)
 		{
-            //I‚¦‚é
+            //çµ‚ãˆã‚‹
             return true;
 		}
         else
 		{
-            //‘±‚¯‚é
+            //ç¶šã‘ã‚‹
             return false;
 		}
 	}
