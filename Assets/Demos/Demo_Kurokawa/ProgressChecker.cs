@@ -83,7 +83,7 @@ public class ProgressChecker : MonoBehaviour
         //ゴールできたことを返す
         return true;
     }
-        
+
     //レースを終えるか
     public bool IsFinishRacing()
 	{
