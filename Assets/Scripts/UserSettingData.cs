@@ -10,6 +10,16 @@ public class UserSettingData : MonoBehaviour
 {
     //モード
     int m_modeType = 0;
+    //BGMボリューム
+    int m_bgmBolume = 0;
+    //SEボリューム
+    int m_seBolume = 0;
+    //キャラクターボイスボリューム
+    int m_charaVoiceBolume = 0;
+    //ナレーションボイスボリューム
+    int m_narrationVoiceBolume = 0;
+    //バイブレーション機能のオンオフ
+    bool m_isVibration = true;
     //ブラインドモードかどうか
     bool m_isBlindMode = false;
     //ステージ
@@ -39,6 +49,91 @@ public class UserSettingData : MonoBehaviour
         set
         {
             m_modeType = value;
+        }
+    }
+
+    //BGMボリュームのプロパティ
+    public int GetSetBgmVolume
+    {
+        //アクセッサ
+
+        //ゲッター
+        get
+        {
+            return m_bgmBolume;
+        }
+        //セッター
+        set
+        {
+            m_bgmBolume = value;
+        }
+    }
+
+    //SEボリュームのプロパティ
+    public int GetSetSeVolume
+    {
+        //アクセッサ
+
+        //ゲッター
+        get
+        {
+            return m_seBolume;
+        }
+        //セッター
+        set
+        {
+            m_seBolume = value;
+        }
+    }
+
+    //キャラクターボイスボリュームのプロパティ
+    public int GetSetCharaVoiceVolume
+    {
+        //アクセッサ
+
+        //ゲッター
+        get
+        {
+            return m_charaVoiceBolume;
+        }
+        //セッター
+        set
+        {
+            m_charaVoiceBolume = value;
+        }
+    }
+
+    //ナレーションボイスボリュームのプロパティ
+    public int GetSetNarrationVoiceVolume
+    {
+        //アクセッサ
+
+        //ゲッター
+        get
+        {
+            return m_narrationVoiceBolume;
+        }
+        //セッター
+        set
+        {
+            m_narrationVoiceBolume = value;
+        }
+    }
+
+    //バイブレーション機能のオンオフのプロパティ
+    public bool GetSetVibration
+    {
+        //アクセッサ
+
+        //ゲッター
+        get
+        {
+            return m_isVibration;
+        }
+        //セッター
+        set
+        {
+            m_isVibration = value;
         }
     }
 

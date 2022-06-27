@@ -53,12 +53,17 @@ public class ToggleOnOff : MonoBehaviour
     }
 
     //トグルの値を取得するプロパティ
-    public bool GetToggleValue
+    public bool GetSetToggleValue
     {
         //ゲッター
         get
         {
             return m_value;
+        }
+        //セッター
+        set
+        {
+            m_value = value;
         }
     }
 }

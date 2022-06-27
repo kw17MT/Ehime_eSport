@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CatchData : MonoBehaviour
 {
     //ユーザーが設定した情報を格納して置く保管場所
     UserSettingData m_userSettingData = null;
-    //ブラインダーゲームオブジェクト
-    GameObject m_blinderPanel = null;
+    //ブラインダーの黒画像
+    Image m_blinderPanelImage = null;
 
     void Start()
     {
@@ -17,13 +18,13 @@ public class CatchData : MonoBehaviour
         //今まで保存されたデータをコンソールにデバック表示
         m_userSettingData.IndicateDebugLog();
 
-        //ブラインドモードがOFFのとき、
-        if(!m_userSettingData.GetSetBlindMode)
+        //ブラインドモードがONのとき、
+        if(m_userSettingData.GetSetBlindMode)
         {
             //ブラインダーのゲームオブジェクトを取得
-            m_blinderPanel = GameObject.Find("BlinderPanel");
-            //真っ暗だった画面を元に戻す
-            m_blinderPanel.SetActive(false);
+            m_blinderPanelImage = GameObject.Find("BlinderPanel").GetComponent<Image>();
+            //ブラインダーを表示させる
+            m_blinderPanelImage.enabled = true;
         }
     }
 }

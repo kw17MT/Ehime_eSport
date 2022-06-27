@@ -474,7 +474,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2138247679191899478, guid: 777a6c1229a931241a77591a6a104107, type: 3}
       propertyPath: m_Name
-      value: NarrationVoiceBolumeSlider
+      value: NarrationVoiceVolumeSlider
       objectReference: {fileID: 0}
     - target: {fileID: 2138247679191899479, guid: 777a6c1229a931241a77591a6a104107, type: 3}
       propertyPath: m_Pivot.x
@@ -684,7 +684,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2138247679191899478, guid: 777a6c1229a931241a77591a6a104107, type: 3}
       propertyPath: m_Name
-      value: SeBolumeSlider
+      value: SeVolumeSlider
       objectReference: {fileID: 0}
     - target: {fileID: 2138247679191899479, guid: 777a6c1229a931241a77591a6a104107, type: 3}
       propertyPath: m_Pivot.x
@@ -2177,7 +2177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2138247679191899478, guid: 777a6c1229a931241a77591a6a104107, type: 3}
       propertyPath: m_Name
-      value: CharaVoiceBolumeSlider
+      value: CharaVoiceVolumeSlider
       objectReference: {fileID: 0}
     - target: {fileID: 2138247679191899479, guid: 777a6c1229a931241a77591a6a104107, type: 3}
       propertyPath: m_Pivot.x
@@ -2423,7 +2423,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2138247679191899478, guid: 777a6c1229a931241a77591a6a104107, type: 3}
       propertyPath: m_Name
-      value: BgmBolumeSlider
+      value: BgmVolumeSlider
       objectReference: {fileID: 0}
     - target: {fileID: 2138247679191899479, guid: 777a6c1229a931241a77591a6a104107, type: 3}
       propertyPath: m_Pivot.x
