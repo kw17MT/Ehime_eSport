@@ -6,11 +6,14 @@ using Photon.Pun;
 //プレイヤーが取得しているアイテムの管理と使用するクラス。
 public class ObtainItemController : MonoBehaviourPunCallbacks
 {
-    private GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
-    private EnItemType m_obtainItemType = EnItemType.enNothing;
+    GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
+    EnItemType m_obtainItemType = EnItemType.enNothing;
+
+    //アイテムシャッフル演出が終了したかフラグ
+    bool m_isLotteryFinish = false;
 
     //アイテムの種類
-    private enum EnItemType
+    enum EnItemType
 	{
         enNothing = -1,
         enOrangePeel,                                   //オレンジの皮
@@ -21,7 +24,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         enItemTypeNum                                   //アイテムの種類の数
 	}
 
-    private void Start()
+    void Start()
 	{
         //ゲーム中のパラメータを保存するインスタンスを取得
         m_paramManager = GameObject.Find("ParamManager");
@@ -36,15 +39,28 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
             //アイテムのナンバーをランダムに取得
             int type = (int)Random.Range((float)EnItemType.enOrangePeel, (float)EnItemType.enItemTypeNum);
             m_obtainItemType = (EnItemType)type;
-        }
 
-        Debug.Log("取得したアイテム番号　＝　" + m_obtainItemType);
+            Debug.Log("取得したアイテム番号　＝　" + m_obtainItemType);
+        }
+    }
+
+    //入手したアイテムのタイプを取得
+    public int GetObtainItemType()
+    {
+        return (int)m_obtainItemType;
+    }
+
+    //抽選演出が終了したかどうかのフラグのセッター
+    public void SetIsLotteryFinish(bool isLotteryFinish)
+    {
+        m_isLotteryFinish = isLotteryFinish;
     }
 
     void Update()
     {
-        //自分が生成したインスタンスならば
-        if (photonView.IsMine)
+        //自分が生成したインスタンスならば、
+        //かつ、抽選演出が終了していたならば、
+        if (photonView.IsMine/* && m_isLotteryFinish*/)
         {
 			//テストでボタンを押したらバナナが出るようにする。
 			if (Input.GetKeyDown(KeyCode.K))
@@ -90,23 +106,15 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                         Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * -2.0f);
                         //オレンジの皮をネットワークオブジェクトとしてインスタンス化
                         var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
-                        //何も持っていない状態にする
-                        m_obtainItemType = EnItemType.enNothing;
                         break;
                     case EnItemType.enOrangeJet:
                         this.GetComponent<AvatarController>().SetIsUsingJet();
-                        //何も持っていない状態にする
-                        m_obtainItemType = EnItemType.enNothing;
                         break;
                     case EnItemType.enTrain:
                         this.GetComponent<AvatarController>().SetIsUsingKiller();
-                        //何も持っていない状態にする
-                        m_obtainItemType = EnItemType.enNothing;
                         break;
                     case EnItemType.enStar:
                         this.GetComponent<AvatarController>().SetIsUsingStar();
-                        //何も持っていない状態にする
-                        m_obtainItemType = EnItemType.enNothing;
                         break;
                     case EnItemType.enSnapperCannon:
                         //タイのポップ位置を自機の前にする
@@ -115,13 +123,13 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                         var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
                         //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
                         snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
-                        //何も持っていない状態にする
-                        m_obtainItemType = EnItemType.enNothing;
                         break;
                     default:
                         return;
                 }
-			}
+                //何も持っていない状態にする
+                m_obtainItemType = EnItemType.enNothing;
+            }
         }
     }
 }

@@ -13,6 +13,16 @@ public class LapChange : MonoBehaviour
     //ラップ数
     [SerializeField]int m_lapNo = 1;
 
+    public void SetLapNum(int num)
+	{
+        m_lapNo = num;
+	}
+
+    public int GetLapNum()
+	{
+        return m_lapNo;
+	}
+
     //アップデート関数
     void Update()
     {

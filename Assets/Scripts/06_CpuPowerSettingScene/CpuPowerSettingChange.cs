@@ -135,19 +135,19 @@ public class CpuPowerSettingChange : MonoBehaviour
     //電車の移動に合わせて選択しているデータを合わせるカウンター
     void Count()
     {
-        //選択移動状態じゃないときは処理をしない。
-        if (!m_selectMove) return;
+		////選択移動状態じゃないときは処理をしない。
+		//if (!m_selectMove) return;
 
-        //カウント計測
-        m_selectMoveCount++;
+		////カウント計測
+		//m_selectMoveCount++;
 
-        //カウントが指定した数値より大きくなったら、
-        if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime)
-        {
-            //選択移動していない状態に戻す
-            m_selectMove = false;
-            //カウントの初期化
-            m_selectMoveCount = 0;
-        }
-    }
+		////カウントが指定した数値より大きくなったら、
+		//if (m_selectMoveCount > m_circleCenterRotateAround.GetCountTime)
+		//{
+		//	//選択移動していない状態に戻す
+		//	m_selectMove = false;
+		//	//カウントの初期化
+		//	m_selectMoveCount = 0;
+		//}
+	}
 }
