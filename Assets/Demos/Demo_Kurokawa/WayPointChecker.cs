@@ -23,6 +23,15 @@ public class WayPointChecker : MonoBehaviour
             //次のウェイポイントの座標を取得
             m_nextWayPointPos = nextWayPoint.transform.position;
         }
+
+        //Playerタグ(AI)だったら
+        if (this.gameObject.tag == "Player")
+        {
+            //最初はウェイポイント1を目指す。
+            GameObject nextWayPoint = GameObject.Find("WayPoint0");
+            //次のウェイポイントの座標を取得
+            m_nextWayPointPos = nextWayPoint.transform.position;
+        }
     }
 
     //他のクラス（主にプレイヤー）から直接現在直近で通過したウェイポイントの座標と番号を設定
