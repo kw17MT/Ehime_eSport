@@ -118,7 +118,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7519939043479899258}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64179f3720bbfe947b7724caa67b7c1d, type: 3}
   m_Name: 
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MAX_CHECKPOINT_NUM: 3
-  MAX_RAP_NUM: 3
+  MAX_LAP_NUM: 3
 --- !u!114 &-8559476411398457238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,13 +157,13 @@ MonoBehaviour:
   MOVE_POWER_USING_STAR: 35
   MOVE_POWER_USING_JET: 40
   MOVE_POWER_USING_KILLER: 50
-  ROT_POWER: 100
+  ROT_POWER: 200
   MAX_STAR_REMAIN_TIME: 3
   MAX_KILLER_REMAIN_TIME: 2
   MAX_DASH_TIME: 1
   MAX_STIFFIN_TIME: 2
   KILLER_HANDLING_RATE: 5
-  SPIN_AMOUNT: 0.5
+  SPIN_AMOUNT: 5
 --- !u!114 &-7257786847198530558
 MonoBehaviour:
   m_ObjectHideFlags: 0

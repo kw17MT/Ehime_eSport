@@ -34,7 +34,7 @@ public class LimitTime : MonoBehaviour
         else
         {
             //ゲームシーンに遷移
-            SceneManager.LoadScene("08_GameScene");
+            //SceneManager.LoadScene("08_GameScene");
         }
 
         //制限時間の背景画像のゲージを減少させていく
@@ -48,6 +48,6 @@ public class LimitTime : MonoBehaviour
         }
 
         //制限時間ラベルを更新
-        limitTimeLabel.text = "" + (int)limitTimeValue;
+        //limitTimeLabel.text = "" + (int)limitTimeValue;
     }
 }
