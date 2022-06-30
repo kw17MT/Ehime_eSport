@@ -13,6 +13,9 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
     bool m_isLotteryFinish = false;
     bool m_isUseItem = false;
 
+    const float SPACE_BETWEEN_PLAYER_FRONT = 4.0f;
+    const float SPACE_BETWEEN_PLAYER_BACK = -2.0f;
+
     //アイテムの種類
     enum EnItemType
 	{
@@ -77,7 +80,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                 {
                     case EnItemType.enOrangePeel:
                         //オレンジの皮のポップ位置を自機の後ろにする
-                        Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * -2.0f);
+                        Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_BACK);
                         //オレンジの皮をネットワークオブジェクトとしてインスタンス化
                         var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
                         break;
@@ -92,11 +95,15 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                         break;
                     case EnItemType.enSnapperCannon:
                         //タイのポップ位置を自機の前にする
-                        Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 3.0f);
+                        Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_FRONT);
                         //ローカルでオレンジの皮を指定された座標に生成
                         var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
                         //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
                         snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
+                        // Player1 とか
+                        string idStr = PhotonNetwork.NickName;
+                        int id = int.Parse(idStr[6].ToString());
+                        snapper.GetComponent<SnapperController>().SetOwnerID(id);
                         break;
                     default:
                         return;
@@ -119,7 +126,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
             if (Input.GetKeyDown(KeyCode.K))
             {
                 //オレンジの皮のポップ位置を自機の後ろにする
-                Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * -2.0f);
+                Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_BACK);
                 //オレンジの皮をネットワークオブジェクトとしてインスタンス化
                 var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
             }
@@ -137,12 +144,16 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
             if (Input.GetKeyDown(KeyCode.I))
             {
                 //タイのポップ位置を自機の前にする
-                Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * 3.0f);
+                Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_FRONT);
                 //ローカルでオレンジの皮を指定された座標に生成
                 var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
                 //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
                 Debug.Log(this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
                 snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
+                // Player1 とか
+                string idStr = PhotonNetwork.NickName;
+                int id = int.Parse(idStr[6].ToString());
+                snapper.GetComponent<SnapperController>().SetOwnerID(id);
             }
             //テストでボタンを押したらキラー使用状態にする。
             if (Input.GetKeyDown(KeyCode.P))
@@ -154,12 +165,11 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 
     void Update()
     {
-        if (m_isUseItem)
-        {
-            //デバッグ用-------------------------終わったら消すこと-------------------------
-            //DebugUseItem();
+        //デバッグ用-------------------------終わったら消すこと-------------------------
+        DebugUseItem();
 
-            UseItem();
-        }
+
+
+        UseItem();
     }
 }
