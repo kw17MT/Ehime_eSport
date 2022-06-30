@@ -88,8 +88,8 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                 //ローカルでオレンジの皮を指定された座標に生成
                 var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
                 //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
-                Debug.Log(this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
-                snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
+                Debug.Log(this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
+                snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(this.gameObject.transform, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
             }
 			//テストでボタンを押したらキラー使用状態にする。
 			if (Input.GetKeyDown(KeyCode.P))
@@ -122,7 +122,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                         //ローカルでオレンジの皮を指定された座標に生成
                         var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
                         //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
-                        snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetCurrentWayPointNumber());
+                        snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(this.gameObject.transform, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
                         break;
                     default:
                         return;

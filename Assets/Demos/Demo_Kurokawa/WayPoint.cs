@@ -32,6 +32,6 @@ public class WayPoint : MonoBehaviour
     private void OnTriggerEnter(Collider col)
 	{
         //©•ª‚ÌÀ•W‚Æ”Ô†‚ğ’m‚ç‚¹‚é
-        col.gameObject.GetComponent<WayPointChecker>().SetNextWayPoint(col.gameObject.transform.position, m_myNumber);
+        col.gameObject.GetComponent<WayPointChecker>().SetNextWayPoint(col.gameObject.transform, m_myNumber);
 	}
 }
