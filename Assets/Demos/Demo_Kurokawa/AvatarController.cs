@@ -34,7 +34,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private bool m_hittedWall = false;                  //壁に当たっているか
     private bool m_isInvincible = false;
     private Quaternion m_prevTrasnform;                 //前回の回転の度合い
-    
+
 
     public float MOVE_POWER = 25.0f;                  　//リジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_STAR = 35.0f;         //スター使用時のリジッドボディにかける移動の倍率
@@ -371,7 +371,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         //入力による回転処理をさせない
         if (!m_isAttacked)
-        { 
+        {
             //現在入力している回転を適用したTransformを適宜
             Transform appliedTrasnform = this.transform;
             appliedTrasnform.Rotate(m_rot);
@@ -409,7 +409,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
             if(m_spinedAngle < 360.0f)
 			{
-                this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // 回転角度を設定            
+                this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // 回転角度を設定
             }
         }
     }
@@ -498,7 +498,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_moveSpeed = m_alongWallDir * MOVE_POWER;
                 Debug.Log("moveSpeed : " + m_moveSpeed + " m_alongWallDir : " + m_alongWallDir);
                 //前方へ加速
-                
+
                 m_hittedWall = false;
             }
             //そうでないなら通常通り移動
