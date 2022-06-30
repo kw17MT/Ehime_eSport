@@ -47,8 +47,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MAX_DASH_TIME = 1.0f;                  //ダッシュの最大継続時間
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
     public float KILLER_HANDLING_RATE = 5.0f;           //キラーを使用した際のカメラの追従速度
-    public float SPIN_AMOUNT = 1.5f;                    //被弾時の回転率
-    private float ROTATE_ACCELERATION_RATE = 0.01f;    //回転の加速度
+    public float SPIN_AMOUNT = 6.0f;                    //被弾時の回転率
+    private float ROTATE_ACCELERATION_RATE = 0.01f;     //回転の加速度
+
+    private float m_frameCounter = 0.0f;                //ゲームタイムを用いてどのくらい時間がたったかを記録する変数
+    private float UPDATE_DISTANCE_TIMING = 0.5f;        //次のウェイポイントとの距離を更新するタイミング
 
     private AlongWall m_alongWall = null;               //壁ずり時の移動方向を更新するインスタンス
 
@@ -212,17 +215,25 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //何かが衝突したら
     private void OnCollisionEnter(Collision col)
 	{
+
+
+
         if(col.gameObject.name == "Snapper(Clone)")
 		{
-            //自分のゲーム内のタイインスタンスの削除
-            Destroy(col.gameObject);
-            //キラーもスターも使っていなければ
-            if (!m_isInvincible)
+            string idStr = PhotonNetwork.NickName;
+            int id = int.Parse(idStr[6].ToString());
+            if (col.gameObject.GetComponent<SnapperController>().GetOwnerID() != id)
             {
-                //攻撃された
-                m_isAttacked = true;
+                //自分のゲーム内のタイインスタンスの削除
+                Destroy(col.gameObject);
+                //キラーもスターも使っていなければ
+                if (!m_isInvincible)
+                {
+                    //攻撃された
+                    m_isAttacked = true;
+                }
+                Debug.Log("Attacked By Snapper(Clone)");
             }
-            Debug.Log("Attacked By Snapper(Clone)");
 		}
         if (col.gameObject.name == "OrangePeel(Clone)")
         {
@@ -293,7 +304,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
                 Vector3 dir = Vector3.zero;
 
-                switch(m_orepation.GetComponent<Operation>().GetTouchedScreenDirection())
+                switch(m_orepation.GetComponent<Operation>().GetNowOperation())
 				{
                     case "right":
                         m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
@@ -310,7 +321,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                         m_rot = Vector3.zero;
                         break;
                 }
-                dir += this.transform.forward;/* * (Input.GetAxis("Vertical"))*/;//this.transform.forward;
+                dir += this.transform.forward * Input.GetAxis("Vertical");//this.transform.forward;
                 m_moveDir = dir;
 
 
@@ -411,15 +422,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
         //    }
         //}
 
-        if(m_isAttacked)
-		{
-            m_spinedAngle += SPIN_AMOUNT;
 
-            if(m_spinedAngle < 360.0f)
-			{
-                this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // 回転角度を設定            
-            }
-        }
+
     }
 
     private void MoveByUsingKiller()
@@ -531,6 +535,16 @@ public class AvatarController : MonoBehaviourPunCallbacks
             }
         }
 
+        if (m_isAttacked)
+        {
+            m_spinedAngle += SPIN_AMOUNT;
+
+            if (m_spinedAngle <= 360.0f)
+            {
+                this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // 回転角度を設定            
+            }
+        }
+
 
         if (!m_isAttacked)
 		{
@@ -594,17 +608,27 @@ public class AvatarController : MonoBehaviourPunCallbacks
             }
 		}
 
+        //インゲームならば
         if (SceneManager.GetActiveScene().name == "08_GameScene")
         {
-            //次のウェイポイントへの距離
-            Vector3 distanceToNextWayPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
-            //自分も持っておく
-            m_distanceToNextWayPoint = distanceToNextWayPoint;
+            //経過時間を計測する
+            m_frameCounter += Time.deltaTime;
+            //ゲームない時間が一定時間たったら
+            if (m_frameCounter >= UPDATE_DISTANCE_TIMING)
+            {
+                //次のウェイポイントへの距離
+                Vector3 distanceToNextWayPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
+                //自分も持っておく
+                m_distanceToNextWayPoint = distanceToNextWayPoint;
 
-            //オンラインで取得できるようにカスタムプロパティを更新
-            var playerHashtable = new ExitGames.Client.Photon.Hashtable();
-            playerHashtable["Distance"] = distanceToNextWayPoint;
-            PhotonNetwork.LocalPlayer.SetCustomProperties(playerHashtable);
+                //オンラインで取得できるようにカスタムプロパティを更新
+                var playerHashtable = new ExitGames.Client.Photon.Hashtable();
+                playerHashtable["Distance"] = distanceToNextWayPoint;
+                PhotonNetwork.LocalPlayer.SetCustomProperties(playerHashtable);
+
+                //リセット
+                m_frameCounter = 0.0f;
+            }
         }
     }
 }
