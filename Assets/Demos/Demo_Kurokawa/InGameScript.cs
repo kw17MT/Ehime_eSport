@@ -149,7 +149,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
 			}
         }
 
-        GameObject.Find("Ranking").GetComponent<NowRankingChange>().SetRanking(currentPlace);
+        GameObject.Find("Ranking").GetComponent<NowRankingChange>().ChangeRanking(currentPlace);
         //©•ª‚Ì‡ˆÊ‚ğ•Û‘¶
         m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
     }

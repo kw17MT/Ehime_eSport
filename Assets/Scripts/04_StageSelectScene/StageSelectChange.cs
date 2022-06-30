@@ -121,15 +121,15 @@ public class StageSelectChange : MonoBehaviour
     void StageSceneDataUpdate()
     {
         //難易度の星画像を更新
-        for (int i = 0; i < 3; i++)
+        for (int starArrayNum = 0; starArrayNum < 3; starArrayNum++)
         {
-            if (m_stageDifficluty[(int)m_nowSelectStage] > i)
+            if (m_stageDifficluty[(int)m_nowSelectStage] > starArrayNum)
             {
-                m_difficlutyStarImage[i].enabled = true;
+                m_difficlutyStarImage[starArrayNum].enabled = true;
             }
             else
             {
-                m_difficlutyStarImage[i].enabled = false;
+                m_difficlutyStarImage[starArrayNum].enabled = false;
             }
         }
         //ステージ名ラベルを更新
