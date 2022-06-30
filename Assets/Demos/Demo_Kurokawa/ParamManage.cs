@@ -51,4 +51,9 @@ public class ParamManage : MonoBehaviour
     {
         return m_place;
     }
+
+    public void  TouchItemUI()
+	{
+        GameObject.Find("OwnPlayer").GetComponent<ObtainItemController>().SetUseItem();
+	}
 }

@@ -14,6 +14,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     Vector3 m_rot = Vector3.zero;                       //どちらに回転するかの向き
     Vector3 m_corseDir = Vector3.zero;                  //現在走っているコースの大まかな方向
     Vector3 m_alongWallDir = Vector3.zero;
+    Vector3 m_distanceToNextWayPoint = Vector3.zero;    //次のウェイポイントへの距離
     private GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
     private GameObject m_orepation = null;
     private bool m_canMove = false;                     //移動が制限されていないか
@@ -47,7 +48,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
     public float KILLER_HANDLING_RATE = 5.0f;           //キラーを使用した際のカメラの追従速度
     public float SPIN_AMOUNT = 1.5f;                    //被弾時の回転率
-    private float ROTATE_ACCELERATION_RATE = 0.001f;    //回転の加速度
+    private float ROTATE_ACCELERATION_RATE = 0.01f;    //回転の加速度
 
     private AlongWall m_alongWall = null;               //壁ずり時の移動方向を更新するインスタンス
 
@@ -86,9 +87,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
 
         //1秒間に何回通信するか
-        PhotonNetwork.SendRate = 15;
+        PhotonNetwork.SendRate = 5;
         //1秒間に何回同期を行うか
-        PhotonNetwork.SerializationRate = 15;
+        PhotonNetwork.SerializationRate = 5;
     }
 
     //ルームプロパティの何かが更新された時の関数
@@ -182,6 +183,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public bool GetIsAttacked()
 	{
         return m_isAttacked;
+	}
+
+    public Vector3 GetDistanceToNextWayPoint()
+	{
+        return m_distanceToNextWayPoint;
 	}
 
     //ホストへクリアタイムを送る
@@ -304,7 +310,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                         m_rot = Vector3.zero;
                         break;
                 }
-                dir += this.transform.forward * (Input.GetAxis("Vertical"));//this.transform.forward;
+                dir += this.transform.forward;/* * (Input.GetAxis("Vertical"))*/;//this.transform.forward;
                 m_moveDir = dir;
 
 
@@ -349,14 +355,16 @@ public class AvatarController : MonoBehaviourPunCallbacks
 			{
 				this.transform.position = new Vector3(0.0f, 2.0f, 0.0f);
 			}
-		}
+
+
+        }
     }
 
 	private void LateUpdate()
 	{
         if (m_isUsingKiller)
         {
-            //回転について、FixedUpdateでやると呼び出し回数が少なすぎてガクつくためここで更新
+            //回転について、FixedUpdateでやるとガクつくためここで更新
             Quaternion rot;
             //自分の前方向からコースの向きへの回転を計算
             Vector3 newForward = (this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position) - this.transform.forward;
@@ -369,39 +377,39 @@ public class AvatarController : MonoBehaviourPunCallbacks
             return;
         }
 
-        //入力による回転処理をさせない
-        if (!m_isAttacked)
-        { 
-            //現在入力している回転を適用したTransformを適宜
-            Transform appliedTrasnform = this.transform;
-            appliedTrasnform.Rotate(m_rot);
+        ////入力による回転処理をさせない
+        //if (!m_isAttacked)
+        //{ 
+        //    //現在入力している回転を適用したTransformを適宜
+        //    Transform appliedTrasnform = this.transform;
+        //    appliedTrasnform.Rotate(m_rot);
 
-            //コースの向きとプレイヤーの前方向が45度以内であれば
-            if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
-            {
-                //回転を実際に適用する
-                transform.Rotate(m_rot);
-                //適切な回転を保存
-                m_prevTrasnform = this.transform.rotation;
-            }
-            //横に向きすぎているならば
-            else
-            {
-                //前回適用した、適切な回転で補正
-                this.transform.rotation = m_prevTrasnform;
+        //    //コースの向きとプレイヤーの前方向が45度以内であれば
+        //    if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
+        //    {
+        //        //回転を実際に適用する
+        //        transform.Rotate(m_rot);
+        //        //適切な回転を保存
+        //        m_prevTrasnform = this.transform.rotation;
+        //    }
+        //    //横に向きすぎているならば
+        //    else
+        //    {
+        //        //前回適用した、適切な回転で補正
+        //        this.transform.rotation = m_prevTrasnform;
 
-                //よこに向きすぎている
-                if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
-                {
-                    Quaternion rot;
-                    //コースの向きに戻すような回転を計算して適用する
-                    rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
-                    transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
+        //        //よこに向きすぎている
+        //        if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
+        //        {
+        //            Quaternion rot;
+        //            //コースの向きに戻すような回転を計算して適用する
+        //            rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
+        //            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
 
-                    m_prevTrasnform = this.transform.rotation;
-                }
-            }
-        }
+        //            m_prevTrasnform = this.transform.rotation;
+        //        }
+        //    }
+        //}
 
         if(m_isAttacked)
 		{
@@ -489,6 +497,40 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         BreakIvincible();
 
+        //入力による回転処理をさせない
+        if (!m_isAttacked)
+        {
+            //現在入力している回転を適用したTransformを適宜
+            Transform appliedTrasnform = this.transform;
+            appliedTrasnform.Rotate(m_rot);
+
+            //コースの向きとプレイヤーの前方向が45度以内であれば
+            if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
+            {
+                //回転を実際に適用する
+                transform.Rotate(m_rot);
+                //適切な回転を保存
+                m_prevTrasnform = this.transform.rotation;
+            }
+            //横に向きすぎているならば
+            else
+            {
+                //前回適用した、適切な回転で補正
+                this.transform.rotation = m_prevTrasnform;
+
+                //よこに向きすぎている
+                if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
+                {
+                    Quaternion rot;
+                    //コースの向きに戻すような回転を計算して適用する
+                    rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
+
+                    m_prevTrasnform = this.transform.rotation;
+                }
+            }
+        }
+
 
         if (!m_isAttacked)
 		{
@@ -551,5 +593,18 @@ public class AvatarController : MonoBehaviourPunCallbacks
 				PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
             }
 		}
-	}
+
+        if (SceneManager.GetActiveScene().name == "08_GameScene")
+        {
+            //次のウェイポイントへの距離
+            Vector3 distanceToNextWayPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
+            //自分も持っておく
+            m_distanceToNextWayPoint = distanceToNextWayPoint;
+
+            //オンラインで取得できるようにカスタムプロパティを更新
+            var playerHashtable = new ExitGames.Client.Photon.Hashtable();
+            playerHashtable["Distance"] = distanceToNextWayPoint;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(playerHashtable);
+        }
+    }
 }
