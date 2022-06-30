@@ -13,12 +13,10 @@ public class StageSelectChange : MonoBehaviour
     [SerializeField] string[] m_stageName = null;
     //ステージ名ラベル
     [SerializeField] Text m_stageNameLabel = null;
-    //難易度スプライト
-    [SerializeField] Sprite[] m_difficlutySprite = null;
-    //難易度イメージ
-    [SerializeField] Image m_difficlutyImage = null;
-    //ステージごとの難易度(0,簡単。1,普通。2,難しい)
-    [SerializeField]int[] m_stageDifficluty = { 0, 1, 2 };
+    //難易度の星画像
+    [SerializeField] Image[] m_difficlutyStarImage = null;
+    //ステージごとの難易度(１：星一、２：星二、３：星三)
+    [SerializeField] int[] m_stageDifficluty = { 1 };
     //ステージ説明文
     [SerializeField] string[] m_stageExplanationSentence = null;
     //ステージ説明文ラベル
@@ -122,8 +120,18 @@ public class StageSelectChange : MonoBehaviour
     //ステージ選択シーンのテキストなどのデータを更新させる関数
     void StageSceneDataUpdate()
     {
-        //難易度画像を更新
-        m_difficlutyImage.sprite = m_difficlutySprite[m_stageDifficluty[(int)m_nowSelectStage]];
+        //難易度の星画像を更新
+        for (int i = 0; i < 3; i++)
+        {
+            if (m_stageDifficluty[(int)m_nowSelectStage] > i)
+            {
+                m_difficlutyStarImage[i].enabled = true;
+            }
+            else
+            {
+                m_difficlutyStarImage[i].enabled = false;
+            }
+        }
         //ステージ名ラベルを更新
         m_stageNameLabel.text = m_stageName[(int)m_nowSelectStage];
         //ステージ説明文を更新
