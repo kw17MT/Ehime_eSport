@@ -13,8 +13,12 @@ public class RaceAIScript : MonoBehaviour
     private const float m_kMaxSpeed = 25.0f;                                    //最高速度
     private Vector3 m_rightSteeringVector = new Vector3(0.0f, 5.0f, 0.0f);      //右方向への回転用ベクトル
     private Vector3 m_leftSteeringVector = new Vector3(0.0f, -5.0f, 0.0f);      //左方向への回転用ベクトル
+    private float m_shiftLength = 0.0f;
     private Vector3 m_targetOffset = new Vector3(0.0f,0.0f,0.0f);               //現在の目標のウェイポイントからずらす幅
     private int m_targetNumber = -1;                                            //現在目標にしているウェイポイントの番号
+    
+    
+    RaycastHit m_rayCastHit;
 
 
     //ウェイポイントから目標地点をずらす幅(コースによって幅が違うためウェイポイント側への実装も検討)
@@ -71,14 +75,29 @@ public class RaceAIScript : MonoBehaviour
         m_targetNumber = nextNumber;
 
         //ウェイポイントの座標からずらす幅を乱数で決定
-        float shiftLength = Random.Range(-m_innerShiftMaxLength, m_outerShiftMaxLength);
+        m_shiftLength = Random.Range(-m_innerShiftMaxLength, m_outerShiftMaxLength);
 
         //目指す位置をローカル座標系で左右にずらすベクトルを計算
-        m_targetOffset = this.GetComponent<WayPointChecker>().GetNextWayPointRight() * shiftLength;
+        m_targetOffset = this.GetComponent<WayPointChecker>().GetNextWayPointRight() * m_shiftLength;
     }
 
     private void HandlingDecision()
     {
+        //障害物アイテムを避ける処理
+        if (Physics.SphereCast(transform.position, 1.0f, transform.forward, out m_rayCastHit, 20.0f) && m_rayCastHit.collider.gameObject.name.Contains("TestObstacle"))
+        {
+            if (m_shiftLength > 0.0f)
+            {
+                RightHandling();
+            }
+            else
+            {
+                LeftHandling();
+            }
+
+            return;
+        }
+
         //現在目指している位置へのベクトルを計算
         Vector3 toNextPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() + m_targetOffset - this.transform.position;
 
@@ -105,14 +124,20 @@ public class RaceAIScript : MonoBehaviour
             if (steeringAngle > 0.0f)
             {
                 //右にハンドルを切る(回転させる)
-                transform.Rotate(m_rightSteeringVector);
+                RightHandling();
             }
             else
             {
                 //左にハンドルを切る(回転させる)
-                transform.Rotate(m_leftSteeringVector);
+                LeftHandling();
             }
         }
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawRay(transform.position, transform.forward * m_rayCastHit.distance);
+        Gizmos.DrawWireSphere(transform.position + transform.forward * m_rayCastHit.distance, 1.0f);
     }
 
     private void OnCollisionStay(Collision collision)
@@ -133,13 +158,22 @@ public class RaceAIScript : MonoBehaviour
         if (angle > m_kContactAngle)
         {
             //右にいるので左にハンドルを切る
-            transform.Rotate(m_leftSteeringVector);
+            LeftHandling();
         }
         else if(angle < -m_kContactAngle)
         {
             //左にいるので右にハンドルを切る
-            transform.Rotate(m_rightSteeringVector);
+            RightHandling();
         }
     }
 
+    private void RightHandling()
+    {
+        transform.Rotate(m_rightSteeringVector);
+    }
+
+    private void LeftHandling()
+    {
+        transform.Rotate(m_leftSteeringVector);
+    }
 }
