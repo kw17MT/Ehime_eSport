@@ -4,13 +4,7 @@ using UnityEngine;
 
 public class ItemGetPoint : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-	private void OnTriggerEnter(Collider col)
+	void OnTriggerEnter(Collider col)
 	{
 		//Ž©•ª‚È‚ç‚Î
 	    if(col.gameObject.tag == "OwnPlayer")
@@ -19,10 +13,4 @@ public class ItemGetPoint : MonoBehaviour
 			col.gameObject.GetComponent<ObtainItemController>().GetRandomItem();
 		}
 	}
-
-	// Update is called once per frame
-	void Update()
-    {
-        
-    }
 }

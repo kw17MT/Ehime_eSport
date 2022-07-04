@@ -10,24 +10,24 @@ using System.Collections.Generic;
 // MonoBehaviourPunCallbacksを継承して、PUNのコールバックを受け取れるようにする
 public class InGameScript : MonoBehaviourPunCallbacks
 {
-    private GameObject m_countDownText = null;                                          //カウントダウンを表示するテキストインスタンス
-    private GameObject m_paramManager = null;                                           //ゲーム中に使用するパラメータ保存インスタンス
-    private int m_goaledPlayerNum = 0;                                                  //ゴールしたプレイヤーの数
-    private int m_playerReadyNum = 0;                                                   //走行の準備ができているプレイヤーの数
-    private int m_prevCountDownNum = 0;                                                 //カウントダウンしている時、前の数値の整数値
-    private float m_countDownNum = 4.0f;                                                //カウントダウンする際の開始数値
-    private bool m_isInstantiateAI = false;                                             //プレイヤーの不足分をAIで補ったかどうか
-    private bool isShownResult = false;                                                 //リザルトを出しているか
-    private bool m_shouldCountDown = true;                                              //カウントダウンの数字を出すか
+    CountDownSpriteChange m_countDownImage = null;                                          //カウントダウンを表示するテキストインスタンス
+    GameObject m_paramManager = null;                                           //ゲーム中に使用するパラメータ保存インスタンス
+    int m_goaledPlayerNum = 0;                                                  //ゴールしたプレイヤーの数
+    int m_playerReadyNum = 0;                                                   //走行の準備ができているプレイヤーの数
+    int m_prevCountDownNum = 0;                                                 //カウントダウンしている時、前の数値の整数値
+    float m_countDownNum = 4.0f;                                                //カウントダウンする際の開始数値
+    bool m_isInstantiateAI = false;                                             //プレイヤーの不足分をAIで補ったかどうか
+    bool isShownResult = false;                                                 //リザルトを出しているか
+    bool m_shouldCountDown = true;                                              //カウントダウンの数字を出すか
     Dictionary<string, float> m_scoreBoard = new Dictionary<string, float>();           //ゴールしたプレイヤーの名前とタイム一覧
 
-    private const int PLAYER_ONE = 1;                                                   //シングルプレイヤーだった時に設定するプレイヤーID
-    private const int AI_NUM_IN_SINGLE_PLAY = 3;                                        //シングルプレイヤーだった時のAIの数
+    const int PLAYER_ONE = 1;                                                   //シングルプレイヤーだった時に設定するプレイヤーID
+    const int AI_NUM_IN_SINGLE_PLAY = 3;                                        //シングルプレイヤーだった時のAIの数
 
-    private GameObject m_userSetting = null;
+    GameObject m_userSetting = null;
     public GameObject m_resultBoard;
 
-    private void Start()
+    void Start()
     {
         //ゲーム中のパラメータ保存インスタンスを取得する
         m_paramManager = GameObject.Find("ParamManager");
@@ -84,7 +84,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
 
         //カウントダウンを表示するテキストインスタンスを取得
-        m_countDownText = GameObject.Find("CountDown");
+        m_countDownImage = GameObject.Find("CountDownImage").GetComponent<CountDownSpriteChange>();
 
         //秒数の整数部分の変化を見るために保存する。
         m_prevCountDownNum = (int)m_countDownNum;
@@ -149,7 +149,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
 			}
         }
 
-        GameObject.Find("Ranking").GetComponent<NowRankingChange>().ChangeRanking(currentPlace);
+        //順位の表示を変更
+        GameObject.Find("NowRankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace-1);
         //自分の順位を保存
         m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
     }
@@ -174,7 +175,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     }
 
     //スポーンしていないポイントを見つけ、そこにAIをスポーンさせる（オンラインモード時に使用）
-    private void FindEmptySpawnPointAndPopAI()
+    void FindEmptySpawnPointAndPopAI()
 	{
         //AIを生成していなければ
         if (!m_isInstantiateAI)
@@ -250,24 +251,24 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
     //カウントダウンの数値を共有する通信関数（ホストが送信）
     [PunRPC]
-    private void SetCountDownTime(int countDownTime)
+    void SetCountDownTime(int countDownTime)
 	{
-        m_countDownText.GetComponent<Text>().text = countDownTime.ToString();
+        m_countDownImage.ChangeCountDownSprite(countDownTime);
     }
 
     //全てのプレイヤーに移動を許可する通信関数
     [PunRPC]
-    private void SetPlayerMovable()
+    void SetPlayerMovable()
 	{
         //自分のプレイヤーインスタンスを移動可能にする
         GameObject.Find("OwnPlayer").GetComponent<AvatarController>().SetMovable();
         //カウントダウンのテキストを破棄
-        Destroy(m_countDownText.gameObject);
+        Destroy(m_countDownImage.gameObject);
     }
 
     //各プレイヤーから送られてきたタイムを映し出す
     [PunRPC]
-    private void ShowResult(Dictionary<string, float> scoreBoard)
+    void ShowResult(Dictionary<string, float> scoreBoard)
     {
         m_resultBoard.SetActive(true);
         //ここから下にＡＩのことを書いていく
