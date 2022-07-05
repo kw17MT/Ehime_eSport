@@ -14,9 +14,9 @@
         _Shadow1Color("Shadow1Color", Color) = (0.5,0.5,0.5,1.0)
         _Shadow2Color("Shadow2Color", Color) = (0.5,0.5,0.5,1.0)
 
-        [Header(OutLine)]
-        _EdgeColor("EdgeColor", Color) = (0.0,0.0,0.0,1.0)
-        _EdgeWidth("EdgeWidth", Range(0.0,0.01)) = 0.00001
+        //[Header(OutLine)]
+        //_EdgeColor("EdgeColor", Color) = (0.0,0.0,0.0,1.0)
+        //_EdgeWidth("EdgeWidth", Range(0.0,0.01)) = 0.00001
 
         [Space(10)]
         _Sphericalize("Sphericalize(X,Y,Z,Blend)",Vector) = (0,0,0,0)
@@ -55,8 +55,8 @@
                 float4 _NormalLightColor;
                 float4 _Shadow1Color;
                 float4 _Shadow2Color;
-                float4 _EdgeColor;
-                float _EdgeWidth;
+                //float4 _EdgeColor;
+                //float _EdgeWidth;
                 float4 _Sphericalize;
                 float4 _RimColor;
                 float _RimPower;
@@ -280,60 +280,60 @@
                 }
 
                 // アウトライン描画用パス
-                Pass
-                {
-                    Name "OutLine"
+                //Pass
+                //{
+                //    Name "OutLine"
 
-                    Tags
-                    {
-                        "RenderType" = "Transparent"
-                        "Queue" = "Transparent"
-                        "IgnoreProjector" = "True"
-                    }
+                //    Tags
+                //    {
+                //        "RenderType" = "Transparent"
+                //        "Queue" = "Transparent"
+                //        "IgnoreProjector" = "True"
+                //    }
 
-                    Cull front
-                    ZTest Less
+                //    Cull front
+                //    ZTest Less
 
-                    HLSLPROGRAM
-                    #pragma vertex vert
-                    #pragma fragment frag
+                //    HLSLPROGRAM
+                //    #pragma vertex vert
+                //    #pragma fragment frag
 
-                    #pragma multi_compile_instancing
+                //    #pragma multi_compile_instancing
 
-                    struct appdata
-                    {
-                        float4 vertex : POSITION;
-                        float3 normal : NORMAL;
-                        // 頂点カラーのrでエッジ調整
-                        float4 color : COLOR;
-                    };
-                    struct v2f
-                    {
-                        float4 vertex : SV_POSITION;
-                    };
+                //    struct appdata
+                //    {
+                //        float4 vertex : POSITION;
+                //        float3 normal : NORMAL;
+                //        // 頂点カラーのrでエッジ調整
+                //        float4 color : COLOR;
+                //    };
+                //    struct v2f
+                //    {
+                //        float4 vertex : SV_POSITION;
+                //    };
 
 
-                    v2f vert(appdata v)
-                    {
-                        v2f o;
-                        o.vertex = TransformObjectToHClip(v.vertex.xyz);
-                        float3 normal = TransformObjectToWorldNormal(v.normal);
-                        // 距離に応じてアウトラインを調整。
-                        // 距離が遠くなるほど線が太くなる。
-                        float dist = length(mul(unity_WorldToObject, float4(_WorldSpaceCameraPos, 1)).xyz);
-                        // 頂点カラーのrで線の太さを調整。
-                        o.vertex += float4(normal * _EdgeWidth * v.color.r * dist, 0.0f);
+                //    v2f vert(appdata v)
+                //    {
+                //        v2f o;
+                //        o.vertex = TransformObjectToHClip(v.vertex.xyz);
+                //        float3 normal = TransformObjectToWorldNormal(v.normal);
+                //        // 距離に応じてアウトラインを調整。
+                //        // 距離が遠くなるほど線が太くなる。
+                //        float dist = length(mul(unity_WorldToObject, float4(_WorldSpaceCameraPos, 1)).xyz);
+                //        // 頂点カラーのrで線の太さを調整。
+                //        o.vertex += float4(normal * _EdgeWidth * v.color.r * dist, 0.0f);
 
-                        return o;
-                    }
+                //        return o;
+                //    }
 
-                    float4 frag(v2f i) : SV_Target
-                    {
-                        return _EdgeColor;
-                    }
+                //    float4 frag(v2f i) : SV_Target
+                //    {
+                //        return _EdgeColor;
+                //    }
 
-                    ENDHLSL
-                }
+                //    ENDHLSL
+                //}
 
                         // シャドウキャスター用パス
                         Pass
