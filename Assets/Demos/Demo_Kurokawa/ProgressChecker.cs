@@ -1,9 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using System;
-using System.Collections.Generic;
 using Photon.Pun;
 
 //このスクリプトが割り当てられたインスタンスのチェックポイント管理インスタンス

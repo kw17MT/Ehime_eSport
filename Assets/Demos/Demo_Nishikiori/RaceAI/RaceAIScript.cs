@@ -30,6 +30,8 @@ public class RaceAIScript : MonoBehaviour
     private const float m_kMinSteeringAngle = 0.1f;     //ハンドルを切る判断をする角度の幅の最小
     private const float m_kContactAngle = 0.3f;         //接触と判断する角度
 
+    private bool m_canMove = false;
+
     private void Awake()
     {
         //剛体を取得
@@ -39,19 +41,28 @@ public class RaceAIScript : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        //ウェイポイントが変更されたかを調べる
-        CheckWayPointChange();
+        if(m_canMove)
+		{
+            //ウェイポイントが変更されたかを調べる
+            CheckWayPointChange();
 
-        //ハンドルを切る向きを決定
-        HandlingDecision();
+            //ハンドルを切る向きを決定
+            HandlingDecision();
 
-        //剛体に力を加える
-        m_rigidbody.AddForce(transform.forward * m_kMaxSpeed - m_rigidbody.velocity);
+            //剛体に力を加える
+            m_rigidbody.AddForce(transform.forward * m_kMaxSpeed - m_rigidbody.velocity);
+        }
 
 #if UNITY_EDITOR
         //AIの目標地点を出力
         Debug.DrawRay(this.GetComponent<WayPointChecker>().GetNextWayPoint() + m_targetOffset, Vector3.up * 100.0f, Color.red);
 #endif
+    }
+
+    public void SetCanMove(bool canMove)
+	{
+        m_canMove = canMove;
+        this.GetComponent<AICommunicator>().SetMoving(canMove);
     }
 
     private void CheckWayPointChange()
@@ -69,6 +80,8 @@ public class RaceAIScript : MonoBehaviour
 
         //目指すウェイポイントの番号を更新
         m_targetNumber = nextNumber;
+
+        this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
 
         //ウェイポイントの座標からずらす幅を乱数で決定
         float shiftLength = Random.Range(-m_innerShiftMaxLength, m_outerShiftMaxLength);

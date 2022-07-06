@@ -21,5 +21,10 @@ public class GoalScript : MonoBehaviourPunCallbacks
                 col.gameObject.GetComponent<AvatarController>().SetGoaled();
             }
         }
+
+        if(col.gameObject.tag == "Player")
+		{
+            col.gameObject.GetComponent<AIProgressChecker>().CheckCanGoal();
+		}
     }
 }
