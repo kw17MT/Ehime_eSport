@@ -14,7 +14,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
 
     int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
-    float m_matchingWaitTime = 500.0f;                      //残り待機時間
+    float m_matchingWaitTime = 30.0f;                      //残り待機時間
     bool m_isInstantiateAI = false;                         //AIインスタンスを生成したか
 
     void Start()
@@ -25,6 +25,10 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
         //マッチング待機時間を表示するインスタンスを取得
         m_waitTimeText = GameObject.Find("LimitTimeLabel");
+        if(m_waitTimeText != null)
+		{
+            Debug.Log("NULL WAIT TIME");
+		}
         //シーン間で保持するパラメータインスタンス
         m_paramManager = GameObject.Find("ParamManager");
         //シーンの遷移はホストクライアントに依存する
@@ -123,8 +127,11 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     //残り待機時間を表示する
     void SetWaitTime(int currentTime)
 	{
-        //テキストの中身を残り待機時間に書き換える。数値はホストクライアント側で計測
-        m_waitTimeText.GetComponent<Text>().text = currentTime.ToString();
+        if (m_waitTimeText != null)
+		{
+            //テキストの中身を残り待機時間に書き換える。数値はホストクライアント側で計測
+            m_waitTimeText.GetComponent<Text>().text = currentTime.ToString();
+        }
     }
 
     //待機時間が終了した時、一度だけAIを不足プレイヤー分生成する。

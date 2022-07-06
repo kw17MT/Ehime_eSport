@@ -11,6 +11,18 @@ public class SnapperController : MonoBehaviour
     private bool m_isChasePlayer = false;                       //プレイヤーを見つけて追跡しているか
     private bool m_shouldCheckNextWayPoint = false;             //次のウェイポイントが更新すべきかどうか
 
+    private int m_ownerID = 0;
+
+    public void SetOwnerID(int id)
+    {
+        m_ownerID = id;
+    }
+
+    public int GetOwnerID()
+    {
+        return m_ownerID;
+    }
+
     //次の目標地点を更新するように命令する
     public void SetCheckNextWayPoint()
 	{

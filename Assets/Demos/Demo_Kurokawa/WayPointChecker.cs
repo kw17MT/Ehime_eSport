@@ -11,6 +11,7 @@ public class WayPointChecker : MonoBehaviour
     private Vector3 m_currentWayPointPos = Vector3.zero;        //現在通過済みのウェイポイントの座標
     private Vector3 m_nextWayPointPos = Vector3.zero;           //次のウェイポイントの座標
     private int m_nextWayPointNumber = 0;                       //次のウェイポイントの番号
+    private Transform m_nextWayPointTransform = null;
 
     // Start is called before the first frame update
     void Start()
@@ -22,20 +23,31 @@ public class WayPointChecker : MonoBehaviour
             GameObject nextWayPoint = GameObject.Find("WayPoint1");
             //次のウェイポイントの座標を取得
             m_nextWayPointPos = nextWayPoint.transform.position;
+            m_nextWayPointTransform = nextWayPoint.transform;
+        }
+
+        //Playerタグ(AI)だったら
+        if (this.gameObject.tag == "Player")
+        {
+            //最初はウェイポイント1を目指す。
+            GameObject nextWayPoint = GameObject.Find("WayPoint0");
+            //次のウェイポイントの座標を取得
+            m_nextWayPointPos = nextWayPoint.transform.position;
+            m_nextWayPointTransform = nextWayPoint.transform;
         }
     }
 
     //他のクラス（主にプレイヤー）から直接現在直近で通過したウェイポイントの座標と番号を設定
-    public void SetCurrentWayPointDirectly(Vector3 pos, int wayPointNumber)
+    public void SetCurrentWayPointDirectly(Transform transform, int wayPointNumber)
 	{
         //下関数で次のウェイポイントを更新するため1つ前のポイントで初期化
         m_nextWayPointNumber = wayPointNumber;
         //次の目的地を更新する。
-        SetNextWayPoint(pos, wayPointNumber);
+        SetNextWayPoint(transform, wayPointNumber);
     }
 
     //次のウェイポイントに向かうため、変数を更新する
-    public void SetNextWayPoint(Vector3 currentPos, int throughNumber)
+    public void SetNextWayPoint(Transform currentTransform, int throughNumber)
     {
         //既に通過済みのポイントと再度接触して不要な更新が行われないようにする。
         if (m_nextWayPointNumber != throughNumber)
@@ -44,7 +56,7 @@ public class WayPointChecker : MonoBehaviour
         }
 
         //通過済みポイントの座標を保存
-        m_currentWayPointPos = currentPos;
+        m_currentWayPointPos = currentTransform.position;
         //次のポイントへインクリメント
         m_nextWayPointNumber++;
         //次のポイントの名前を定義
@@ -60,7 +72,10 @@ public class WayPointChecker : MonoBehaviour
         //新しいポイントの座標を取得
         m_nextWayPointPos = nextWayPoint.transform.position;
 
-        if(this.gameObject.tag == "OwnPlayer")
+        //新しいポイントのトランスフォームを取得
+        m_nextWayPointTransform = nextWayPoint.transform;
+
+        if (this.gameObject.tag == "OwnPlayer")
 		{
             //次のウェイポイントの番号をルームプロパティに保存
             var hashtable = new ExitGames.Client.Photon.Hashtable();
@@ -93,9 +108,15 @@ public class WayPointChecker : MonoBehaviour
         return m_currentWayPointPos;
     }
 
-    //直近で通過したウェイポイント番号を返す
-    public int GetCurrentWayPointNumber()
+    //次のウェイポイントの番号を返す
+    public int GetNextWayPointNumber()
     {
         return m_nextWayPointNumber;
+    }
+
+    //次のウェイポイントの右方向を返す
+    public Vector3 GetNextWayPointRight()
+    {
+        return m_nextWayPointTransform.right;
     }
 }

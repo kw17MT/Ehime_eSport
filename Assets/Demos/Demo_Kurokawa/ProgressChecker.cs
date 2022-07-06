@@ -9,12 +9,11 @@ using Photon.Pun;
 //このスクリプトが割り当てられたインスタンスのチェックポイント管理インスタンス
 public class ProgressChecker : MonoBehaviour
 {
-    private GameObject m_rapCountText = null;               //周回回数を提示するテキストインスタンス
-    private int m_rapCount = 0;                             //ゲーム中の周回回数
+    private int m_lapCount = 0;                             //ゲーム中の周回回数
     private List<bool> m_checkPoint = new List<bool>();     //通過したチェックポイントの保存配列
 
     public int MAX_CHECKPOINT_NUM = 3;                      //ステージに配置されるチェックポイントの数
-    public int MAX_RAP_NUM = 3;                             //何周するか
+    public int MAX_LAP_NUM = 3;                             //何周するか
 
     void Start()
     {
@@ -25,7 +24,7 @@ public class ProgressChecker : MonoBehaviour
             m_checkPoint.Add(false);
 		}
 
-        GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_rapCount);
+        GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_lapCount);
     }
 
     //どの地点を通過したかを文字列で確認
@@ -61,16 +60,16 @@ public class ProgressChecker : MonoBehaviour
 			}
 		}
         //完走したラップ数を増やす
-        m_rapCount++;
+        m_lapCount++;
 
-        GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_rapCount);
+        GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_lapCount);
 
         //次のウェイポイントの番号をルームプロパティに保存
         var hashtable = new ExitGames.Client.Photon.Hashtable();
-        //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
-        string name = PhotonNetwork.NickName + "RapCount";
+        //プレイヤー名＋LapCountという名前を作成 ex.)Player2LapCount
+        string name = PhotonNetwork.NickName + "LapCount";
         //ウェイポイント番号を設定
-        hashtable[name] = m_rapCount;
+        hashtable[name] = m_lapCount;
         //ルームプロパティの更新
         PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
@@ -88,7 +87,7 @@ public class ProgressChecker : MonoBehaviour
     public bool IsFinishRacing()
 	{
         //最大ラップ数を超えていたら
-        if(m_rapCount >= MAX_RAP_NUM)
+        if(m_lapCount >= MAX_LAP_NUM)
 		{
             //終える
             return true;

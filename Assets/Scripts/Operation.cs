@@ -37,6 +37,7 @@ public class Operation : MonoBehaviour
        　    //タッチしているとき、一番初めのタップ一から現在のタップ位置でフリック方向を決定する
        　   if (m_isTouching)
             {
+                NowOperation();
        　        //フリック方向またはタップの情報を渡せる状態にする
                 m_canDataThrow = true;
             }
