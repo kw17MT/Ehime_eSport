@@ -14,7 +14,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     Vector3 m_rot = Vector3.zero;                       //どちらに回転するかの向き
     Vector3 m_corseDir = Vector3.zero;                  //現在走っているコースの大まかな方向
     Vector3 m_alongWallDir = Vector3.zero;
-    Vector3 m_distanceToNextWayPoint = Vector3.zero;    //次のウェイポイントへの距離
+    float m_distanceToNextWayPoint = 0.0f;    //次のウェイポイントへの距離
     private GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
     private GameObject m_orepation = null;
     private bool m_canMove = false;                     //移動が制限されていないか
@@ -51,7 +51,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private float ROTATE_ACCELERATION_RATE = 0.01f;     //回転の加速度
 
     private float m_frameCounter = 0.0f;                //ゲームタイムを用いてどのくらい時間がたったかを記録する変数
-    private float UPDATE_DISTANCE_TIMING = 0.5f;        //次のウェイポイントとの距離を更新するタイミング
+    private float UPDATE_DISTANCE_TIMING = 0.1f;        //次のウェイポイントとの距離を更新するタイミング
 
 
 
@@ -190,7 +190,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
         return m_isAttacked;
 	}
 
-    public Vector3 GetDistanceToNextWayPoint()
+    public float GetDistanceToNextWayPoint()
 	{
         return m_distanceToNextWayPoint;
 	}
@@ -323,7 +323,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                         m_rot = Vector3.zero;
                         break;
                 }
-                dir += this.transform.forward;// * Input.GetAxis("Vertical");//this.transform.forward;
+                dir += this.transform.forward;// * Input.GetAxis("Vertical");
                 m_moveDir = dir;
 
 
@@ -368,8 +368,6 @@ public class AvatarController : MonoBehaviourPunCallbacks
 			{
 				this.transform.position = new Vector3(0.0f, 2.0f, 0.0f);
 			}
-
-
         }
     }
 
@@ -621,7 +619,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 //次のウェイポイントへの距離
                 Vector3 distanceToNextWayPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
                 //自分も持っておく
-                m_distanceToNextWayPoint = distanceToNextWayPoint;
+                m_distanceToNextWayPoint = distanceToNextWayPoint.magnitude;
 
                 string key = PhotonNetwork.NickName + "Distance";
 

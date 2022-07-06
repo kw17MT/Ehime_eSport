@@ -168,7 +168,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             int otherPlayerWayPointNumber = (PhotonNetwork.CurrentRoom.CustomProperties[otherPlayerWayPointName] is int point) ? point : 0;
             //他のプレイヤーの方が自分より進んでいれば且つ自分or相手の次のナンバーが0（ゴール最寄り位置）でないなら
             if (otherPlayerWayPointNumber > nextMyWayPoint
-                /*&& nextMyWayPoint != 0*/ && otherPlayerWayPointNumber != 0)
+				&& nextMyWayPoint != 0 /*&& otherPlayerWayPointNumber != 0*/)
 			{
                 currentPlace += 1;
 
@@ -186,12 +186,15 @@ public class InGameScript : MonoBehaviourPunCallbacks
                         //そのプレイヤーのカスタムプロパティの中の次のウェイポイントへの距離を取得
                         var hashtable = new ExitGames.Client.Photon.Hashtable();
                         string key = "Player" + i + "Distance";
-                        Vector3 otherPlayerDistance = (Vector3)hashtable[key];
 
-                        Vector3 myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+                        float otherPlayerDistance = (PhotonNetwork.CurrentRoom.CustomProperties[key] is float distance) ? distance : 0;
+
+                        float myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+
+                        Debug.Log("myDistance " + myDistance + " / OtherDistance " + otherPlayerDistance);
 
                         //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
-                        if(otherPlayerDistance.magnitude < myDistance.magnitude)
+                        if(otherPlayerDistance < myDistance)
 						{
                             //自分の順位を1落とす
                             currentPlace += 1;
@@ -207,12 +210,18 @@ public class InGameScript : MonoBehaviourPunCallbacks
                         //そのプレイヤーのカスタムプロパティの中の次のウェイポイントへの距離を取得
                         var hashtable = new ExitGames.Client.Photon.Hashtable();
                         string key = "Player" + i + "Distance";
-                        Vector3 otherPlayerDistance = (Vector3)hashtable[key];
+                        float otherPlayerDistance = (PhotonNetwork.CurrentRoom.CustomProperties[key] is float distance) ? distance : 0;
 
-                        Vector3 myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+                        float myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+
+                        if(photonView.IsMine)
+						{
+                            Debug.Log("Other : " + otherPlayerDistance + "My : " + myDistance);
+                        }
+
 
                         //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
-                        if (otherPlayerDistance.magnitude < myDistance.magnitude)
+                        if (ai.GetComponent<AICommunicator>().GetDistanceToNextWayPoint()/*otherPlayerDistance*/ < myDistance)
                         {
                             //自分の順位を1落とす
                             currentPlace += 1;
