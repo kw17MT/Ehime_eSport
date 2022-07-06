@@ -323,7 +323,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                         m_rot = Vector3.zero;
                         break;
                 }
-                dir += this.transform.forward * Input.GetAxis("Vertical");//this.transform.forward;
+                dir += this.transform.forward;// * Input.GetAxis("Vertical");//this.transform.forward;
                 m_moveDir = dir;
 
 
