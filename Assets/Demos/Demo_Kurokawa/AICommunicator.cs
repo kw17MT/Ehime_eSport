@@ -12,13 +12,20 @@ public class AICommunicator : MonoBehaviourPunCallbacks
     private bool m_isToldRecord = false;
     private bool m_isMoving = false;
     private float m_frameCounter = 0.0f;
-    private float UPDATE_DISTANCE_TIMING = 0.5f;        //次のウェイポイントとの距離を更新するタイミング
+    private float UPDATE_DISTANCE_TIMING = 0.1f;        //次のウェイポイントとの距離を更新するタイミング
+
+    private float m_distanceToNextWayPoint = 0.0f;
 
     // Start is called before the first frame update
     void Start()
     {
         
     }
+
+    public float GetDistanceToNextWayPoint()
+	{
+        return m_distanceToNextWayPoint;
+	}
 
     public void SetGoaled()
 	{
@@ -78,9 +85,20 @@ public class AICommunicator : MonoBehaviourPunCallbacks
                 string key = m_aiName + "Distance";
                 //オンラインで取得できるようにカスタムプロパティを更新
                 var hashtable = new ExitGames.Client.Photon.Hashtable();
+
+
+                Vector3 distance = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
+
+                m_distanceToNextWayPoint = distance.magnitude;
+
                 //次のウェイポイントへの距離をプレイヤーのカスタムプロパティに保存
-                hashtable[key] = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
+                hashtable[key] = distance.magnitude;
                 PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+
+                //Vector3 a = (Vector3)hashtable[key];
+                //Debug.Log("SuccessSetDistance : " + hashtable[key] + "    " + a.magnitude);
+
+
 
                 //リセット
                 m_frameCounter = 0.0f;
