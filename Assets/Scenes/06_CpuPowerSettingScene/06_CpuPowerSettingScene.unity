@@ -320,6 +320,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: SceneNameLabel
       objectReference: {fileID: 0}
+    - target: {fileID: 8035213762632638522, guid: d7fd1559a4af4ec4bb1f1c4807dc8bde, type: 3}
+      propertyPath: m_EffectDistance.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8035213762632638522, guid: d7fd1559a4af4ec4bb1f1c4807dc8bde, type: 3}
+      propertyPath: m_EffectDistance.y
+      value: -5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7fd1559a4af4ec4bb1f1c4807dc8bde, type: 3}
 --- !u!224 &386614406 stripped

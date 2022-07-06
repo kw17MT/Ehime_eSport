@@ -8,7 +8,8 @@ using UnityEngine.SceneManagement;
 // MonoBehaviourPunCallbacksを継承して、PUNのコールバックを受け取れるようにする
 public class InGameScript : MonoBehaviourPunCallbacks
 {
-    private GameObject m_countDownText = null;                                          //カウントダウンを表示するテキストインスタンス
+    [SerializeField] Sprite[] m_countDownSprite = {null};
+    private GameObject m_countDownComponent = null;                                          //カウントダウンを表示するテキストインスタンス
     private GameObject m_paramManager = null;                                           //ゲーム中に使用するパラメータ保存インスタンス
     private GameObject m_operation = null;
     private int m_goaledPlayerNum = 0;                                                  //ゴールしたプレイヤーの数
@@ -93,7 +94,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
 
         //カウントダウンを表示するテキストインスタンスを取得
-        m_countDownText = GameObject.Find("CountDown");
+        m_countDownComponent = GameObject.Find("CountDownImage");
 
         //秒数の整数部分の変化を見るために保存する。
         m_prevCountDownNum = (int)m_countDownNum;
@@ -233,7 +234,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
 
         Debug.Log(currentPlace);
-        GameObject.Find("Ranking").GetComponent<NowRankingChange>().SetRanking(currentPlace);
+        //順位を変化させる
+        GameObject.Find("RankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace-1);
         //自分の順位を保存
         m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
     }
@@ -344,7 +346,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetCountDownTime(int countDownTime)
 	{
-        m_countDownText.GetComponent<Text>().text = countDownTime.ToString();
+        m_countDownComponent.GetComponent<Image>().sprite = m_countDownSprite[countDownTime];
     }
 
     //全てのプレイヤーに移動を許可する通信関数
@@ -358,7 +360,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             m_ai[i].GetComponent<RaceAIScript>().SetCanMove(true);
         }
         //カウントダウンのテキストを破棄
-        Destroy(m_countDownText.gameObject);
+        Destroy(m_countDownComponent.gameObject);
     }
 
     //各プレイヤーから送られてきたタイムを映し出す
