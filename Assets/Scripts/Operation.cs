@@ -154,7 +154,16 @@ public class Operation : MonoBehaviour
     {
         get
         {
-            return m_isLongTouch;
+            if (m_isLongTouch)
+            {
+                //シーン遷移の際、長押しし続けるとシーンがスキップされてしまうためリセット
+                m_isLongTouch = false;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 

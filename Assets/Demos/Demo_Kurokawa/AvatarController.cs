@@ -53,6 +53,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private float m_frameCounter = 0.0f;                //ゲームタイムを用いてどのくらい時間がたったかを記録する変数
     private float UPDATE_DISTANCE_TIMING = 0.5f;        //次のウェイポイントとの距離を更新するタイミング
 
+
+
     private AlongWall m_alongWall = null;               //壁ずり時の移動方向を更新するインスタンス
 
     void Start()
@@ -195,7 +197,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
     //ホストへクリアタイムを送る
     [PunRPC]
-    void TellRecordTime(string name, float time)
+    public void TellRecordTime(string name, float time)
     {
         GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNameAndRecordTime(name, time);
     }
@@ -621,10 +623,12 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 //自分も持っておく
                 m_distanceToNextWayPoint = distanceToNextWayPoint;
 
+                string key = PhotonNetwork.NickName + "Distance";
+
                 //オンラインで取得できるようにカスタムプロパティを更新
-                var playerHashtable = new ExitGames.Client.Photon.Hashtable();
-                playerHashtable["Distance"] = distanceToNextWayPoint;
-                PhotonNetwork.LocalPlayer.SetCustomProperties(playerHashtable);
+                var hashtable = new ExitGames.Client.Photon.Hashtable();
+                hashtable[key] = distanceToNextWayPoint;
+                PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
                 //リセット
                 m_frameCounter = 0.0f;
