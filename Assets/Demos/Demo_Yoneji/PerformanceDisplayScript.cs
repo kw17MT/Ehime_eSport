@@ -64,16 +64,22 @@ public class PerformanceDisplayScript : MonoBehaviour
             );
 
         // fps表示
-        string text = string.Format("FPS = {0:F2}", m_fps);
-        GUILayout.Label(text, style);
+        {
+            string fps = string.Format("FPS = {0:F2}", m_fps);
+            GUILayout.Label(fps, style);
+        }
 
         // GPUのデバイス名表示
-        string useAPIName = string.Format("API = {0}", SystemInfo.graphicsDeviceType.ToString());
-        GUILayout.Label(useAPIName, style);
+        {
+            string useAPIName = string.Format("API = {0}", SystemInfo.graphicsDeviceType.ToString());
+            GUILayout.Label(useAPIName, style);
+        }
 
         // pipelineAssetの名前表示
-        string pipelineAssetName = "PipelineAssetName = " + GraphicsSettings.renderPipelineAsset.name;
-        GUILayout.Label(pipelineAssetName, style);
+        {
+            string pipelineAssetName = "PipelineAsset = " + GraphicsSettings.currentRenderPipeline.name;
+            GUILayout.Label(pipelineAssetName, style);
+        }
 
         GUILayout.EndArea();
 
