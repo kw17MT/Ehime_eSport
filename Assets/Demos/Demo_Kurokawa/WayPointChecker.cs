@@ -75,7 +75,8 @@ public class WayPointChecker : MonoBehaviour
         //新しいポイントのトランスフォームを取得
         m_nextWayPointTransform = nextWayPoint.transform;
 
-        if (this.gameObject.tag == "OwnPlayer")
+        if (this.gameObject.tag == "OwnPlayer"
+            && !PhotonNetwork.OfflineMode)
 		{
             //次のウェイポイントの番号をルームプロパティに保存
             var hashtable = new ExitGames.Client.Photon.Hashtable();

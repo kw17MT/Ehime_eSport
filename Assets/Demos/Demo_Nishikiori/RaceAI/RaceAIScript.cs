@@ -96,6 +96,11 @@ public class RaceAIScript : MonoBehaviour
         this.GetComponent<AICommunicator>().SetMoving(canMove);
     }
 
+    public int GetNextWayPoint()
+	{
+        return m_targetNumber;
+	}
+
     private void CheckWayPointChange()
     {
         //次のウェイポイントを取得

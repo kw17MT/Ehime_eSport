@@ -48,14 +48,17 @@ public class AICommunicator : MonoBehaviourPunCallbacks
 
     public void SetNextWayPoint(int number)
 	{
-        //次のウェイポイントの番号をルームプロパティに保存
-        var hashtable = new ExitGames.Client.Photon.Hashtable();
-        //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
-        string name = m_aiName + "WayPointNumber";
-        //ウェイポイント番号を設定
-        hashtable[name] = number;
-        //ルームプロパティの更新
-        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        if (!PhotonNetwork.OfflineMode)
+        {
+            //次のウェイポイントの番号をルームプロパティに保存
+            var hashtable = new ExitGames.Client.Photon.Hashtable();
+            //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
+            string name = m_aiName + "WayPointNumber";
+            //ウェイポイント番号を設定
+            hashtable[name] = number;
+            //ルームプロパティの更新
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        }
     }
 
     // Update is called once per frame
@@ -76,32 +79,39 @@ public class AICommunicator : MonoBehaviourPunCallbacks
         //インゲームならば
         if (SceneManager.GetActiveScene().name == "08_GameScene")
         {
-            //経過時間を計測する
-            m_frameCounter += Time.deltaTime;
-            //ゲームない時間が一定時間たったら
-            if (m_frameCounter >= UPDATE_DISTANCE_TIMING)
+            //オフラインモードならば、毎フレーム次のウェイポイントまでの位置を記録する
+            if (PhotonNetwork.OfflineMode)
             {
-                //プロパティの名前
-                string key = m_aiName + "Distance";
-                //オンラインで取得できるようにカスタムプロパティを更新
-                var hashtable = new ExitGames.Client.Photon.Hashtable();
-
-
                 Vector3 distance = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
-
                 m_distanceToNextWayPoint = distance.magnitude;
+            }
+            else
+            {
+                //経過時間を計測する
+                m_frameCounter += Time.deltaTime;
+                //ゲームない時間が一定時間たったら
+                if (m_frameCounter >= UPDATE_DISTANCE_TIMING)
+                {
+                    //プロパティの名前
+                    string key = m_aiName + "Distance";
+                    //オンラインで取得できるようにカスタムプロパティを更新
+                    var hashtable = new ExitGames.Client.Photon.Hashtable();
 
-                //次のウェイポイントへの距離をプレイヤーのカスタムプロパティに保存
-                hashtable[key] = distance.magnitude;
-                PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
-                //Vector3 a = (Vector3)hashtable[key];
-                //Debug.Log("SuccessSetDistance : " + hashtable[key] + "    " + a.magnitude);
+                    Vector3 distance = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
 
+                    m_distanceToNextWayPoint = distance.magnitude;
 
+                    //次のウェイポイントへの距離をプレイヤーのカスタムプロパティに保存
+                    hashtable[key] = distance.magnitude;
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
-                //リセット
-                m_frameCounter = 0.0f;
+                    //Vector3 a = (Vector3)hashtable[key];
+                    //Debug.Log("SuccessSetDistance : " + hashtable[key] + "    " + a.magnitude);
+
+                    //リセット
+                    m_frameCounter = 0.0f;
+                }
             }
         }
     }
