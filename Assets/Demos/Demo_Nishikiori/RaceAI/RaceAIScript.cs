@@ -67,7 +67,7 @@ public class RaceAIScript : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(m_canMove || true)
+        if(m_canMove)
 		{
             //ウェイポイントが変更されたかを調べる
             CheckWayPointChange();
