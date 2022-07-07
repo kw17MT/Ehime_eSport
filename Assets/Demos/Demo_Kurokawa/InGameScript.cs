@@ -1,25 +1,28 @@
 using Photon.Pun;
 using Photon.Realtime;
-using ExitGames.Client.Photon;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using System.Collections.Generic;
-
+using UnityEngine.SceneManagement;
 
 // MonoBehaviourPunCallbacksを継承して、PUNのコールバックを受け取れるようにする
 public class InGameScript : MonoBehaviourPunCallbacks
 {
-    private GameObject m_countDownText = null;                                          //カウントダウンを表示するテキストインスタンス
+    [SerializeField] Sprite[] m_countDownSprite = {null};
+    private GameObject m_countDownComponent = null;                                          //カウントダウンを表示するテキストインスタンス
     private GameObject m_paramManager = null;                                           //ゲーム中に使用するパラメータ保存インスタンス
+    private GameObject m_operation = null;
     private int m_goaledPlayerNum = 0;                                                  //ゴールしたプレイヤーの数
     private int m_playerReadyNum = 0;                                                   //走行の準備ができているプレイヤーの数
     private int m_prevCountDownNum = 0;                                                 //カウントダウンしている時、前の数値の整数値
     private float m_countDownNum = 4.0f;                                                //カウントダウンする際の開始数値
     private bool m_isInstantiateAI = false;                                             //プレイヤーの不足分をAIで補ったかどうか
-    private bool isShownResult = false;                                                 //リザルトを出しているか
+    private bool m_isShownResult = false;                                                 //リザルトを出しているか
     private bool m_shouldCountDown = true;                                              //カウントダウンの数字を出すか
+    private bool m_canReturnModeSelection = false;
     Dictionary<string, float> m_scoreBoard = new Dictionary<string, float>();           //ゴールしたプレイヤーの名前とタイム一覧
+
+    private List<GameObject> m_ai = new List<GameObject>();
 
     private const int PLAYER_ONE = 1;                                                   //シングルプレイヤーだった時に設定するプレイヤーID
     private const int AI_NUM_IN_SINGLE_PLAY = 3;                                        //シングルプレイヤーだった時のAIの数
@@ -31,7 +34,9 @@ public class InGameScript : MonoBehaviourPunCallbacks
     {
         //ゲーム中のパラメータ保存インスタンスを取得する
         m_paramManager = GameObject.Find("ParamManager");
-
+        //操作インスタンスを取得
+        m_operation = GameObject.Find("OperationSystem");
+        //ユーザーが選択してきたものを記録したインスタンスを取得
         m_userSetting = GameObject.Find("UserSettingDataStorageSystem");
 
         //ゲームがオフラインで開始されたら
@@ -80,11 +85,16 @@ public class InGameScript : MonoBehaviourPunCallbacks
             hashtable.Add("Player2LapCount", 0);
             hashtable.Add("Player3LapCount", 0);
             hashtable.Add("Player4LapCount", 0);
+
+            hashtable.Add("Player1Distance", 0);
+            hashtable.Add("Player2Distance", 0);
+            hashtable.Add("Player3Distance", 0);
+            hashtable.Add("Player4Distance", 0);
             PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
         }
 
         //カウントダウンを表示するテキストインスタンスを取得
-        m_countDownText = GameObject.Find("CountDown");
+        m_countDownComponent = GameObject.Find("CountDownImage");
 
         //秒数の整数部分の変化を見るために保存する。
         m_prevCountDownNum = (int)m_countDownNum;
@@ -159,11 +169,11 @@ public class InGameScript : MonoBehaviourPunCallbacks
             int otherPlayerWayPointNumber = (PhotonNetwork.CurrentRoom.CustomProperties[otherPlayerWayPointName] is int point) ? point : 0;
             //他のプレイヤーの方が自分より進んでいれば且つ自分or相手の次のナンバーが0（ゴール最寄り位置）でないなら
             if (otherPlayerWayPointNumber > nextMyWayPoint
-                && nextMyWayPoint != 0 && otherPlayerWayPointNumber != 0)
+				&& nextMyWayPoint != 0 /*&& otherPlayerWayPointNumber != 0*/)
 			{
                 currentPlace += 1;
 
-                Debug.Log("myName = " + myLapCountKey + "→" + currentMyLapCount + "// pl2 = " + lapCountKey + "→" + otherPlayerLapCount);
+                //Debug.Log("myName = " + myLapCountKey + "→" + currentMyLapCount + "// pl2 = " + lapCountKey + "→" + otherPlayerLapCount);
 			}
             //同一ウェイポイントを通過している場合
             else if(otherPlayerWayPointNumber == nextMyWayPoint)
@@ -175,13 +185,17 @@ public class InGameScript : MonoBehaviourPunCallbacks
                     if(pl.NickName == "Player" + i)
 					{
                         //そのプレイヤーのカスタムプロパティの中の次のウェイポイントへの距離を取得
-                        var hashtable = pl.CustomProperties;
-                        Vector3 otherPlayerDistance = (Vector3)hashtable["Distance"];
+                        var hashtable = new ExitGames.Client.Photon.Hashtable();
+                        string key = "Player" + i + "Distance";
 
-                        Vector3 myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+                        float otherPlayerDistance = (PhotonNetwork.CurrentRoom.CustomProperties[key] is float distance) ? distance : 0;
+
+                        float myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+
+                        Debug.Log("myDistance " + myDistance + " / OtherDistance " + otherPlayerDistance);
 
                         //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
-                        if(otherPlayerDistance.magnitude < myDistance.magnitude)
+                        if(otherPlayerDistance < myDistance)
 						{
                             //自分の順位を1落とす
                             currentPlace += 1;
@@ -189,11 +203,39 @@ public class InGameScript : MonoBehaviourPunCallbacks
                         break;
                     }
                 }
+                //該当プレイヤーがいない場合AIも検索
+                foreach(GameObject ai in m_ai)
+				{
+                    if(ai.gameObject.GetComponent<AICommunicator>().GetAIName() == "Player" + i)
+					{
+                        //そのプレイヤーのカスタムプロパティの中の次のウェイポイントへの距離を取得
+                        var hashtable = new ExitGames.Client.Photon.Hashtable();
+                        string key = "Player" + i + "Distance";
+                        float otherPlayerDistance = (PhotonNetwork.CurrentRoom.CustomProperties[key] is float distance) ? distance : 0;
+
+                        float myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+
+                        if(photonView.IsMine)
+						{
+                            Debug.Log("Other : " + otherPlayerDistance + "My : " + myDistance);
+                        }
+
+
+                        //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
+                        if (ai.GetComponent<AICommunicator>().GetDistanceToNextWayPoint()/*otherPlayerDistance*/ < myDistance)
+                        {
+                            //自分の順位を1落とす
+                            currentPlace += 1;
+                        }
+                        break;
+                    }
+				}
 			}
         }
 
         Debug.Log(currentPlace);
-        GameObject.Find("Ranking").GetComponent<NowRankingChange>().SetRanking(currentPlace);
+        //順位を変化させる
+        GameObject.Find("RankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace-1);
         //自分の順位を保存
         m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
     }
@@ -244,33 +286,41 @@ public class InGameScript : MonoBehaviourPunCallbacks
 					//PrefabからAIをルームオブジェクトとして生成
 					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
+                    ai.GetComponent<AICommunicator>().SetAIName("Player1");
 					cantUsePosition.Add("Player1");
-				}
+                    m_ai.Add(ai);
+                }
 				else if (!cantUsePosition.Contains("Player2"))
 				{
 					AISpawnPoint = GameObject.Find("PlayerSpawnPoint1");
 					//PrefabからAIをルームオブジェクトとして生成
 					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
-					cantUsePosition.Add("Player2");
-				}
+                    ai.GetComponent<AICommunicator>().SetAIName("Player2");
+                    cantUsePosition.Add("Player2");
+                    m_ai.Add(ai);
+                }
 				else if (!cantUsePosition.Contains("Player3"))
 				{
 					AISpawnPoint = GameObject.Find("PlayerSpawnPoint2");
 					//PrefabからAIをルームオブジェクトとして生成
 					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
-					cantUsePosition.Add("Player3");
-				}
+                    ai.GetComponent<AICommunicator>().SetAIName("Player3");
+                    cantUsePosition.Add("Player3");
+                    m_ai.Add(ai);
+                }
 				else if (!cantUsePosition.Contains("Player4"))
 				{
 					AISpawnPoint = GameObject.Find("PlayerSpawnPoint3");
 					//PrefabからAIをルームオブジェクトとして生成
 					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
-					cantUsePosition.Add("Player4");
-				}
-			}
+                    ai.GetComponent<AICommunicator>().SetAIName("Player4");
+                    cantUsePosition.Add("Player4");
+                    m_ai.Add(ai);
+                }
+            }
 
 			//AIを生成した。
 			m_isInstantiateAI = true;
@@ -296,7 +346,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SetCountDownTime(int countDownTime)
 	{
-        m_countDownText.GetComponent<Text>().text = countDownTime.ToString();
+        m_countDownComponent.GetComponent<Image>().sprite = m_countDownSprite[countDownTime];
     }
 
     //全てのプレイヤーに移動を許可する通信関数
@@ -305,15 +355,22 @@ public class InGameScript : MonoBehaviourPunCallbacks
 	{
         //自分のプレイヤーインスタンスを移動可能にする
         GameObject.Find("OwnPlayer").GetComponent<AvatarController>().SetMovable();
+        for(int i = 0; i < m_ai.Count; i++)
+		{
+            m_ai[i].GetComponent<RaceAIScript>().SetCanMove(true);
+        }
         //カウントダウンのテキストを破棄
-        Destroy(m_countDownText.gameObject);
+        Destroy(m_countDownComponent.gameObject);
     }
 
     //各プレイヤーから送られてきたタイムを映し出す
     [PunRPC]
     private void ShowResult(Dictionary<string, float> scoreBoard)
     {
+        //スコアボードを出す
         m_resultBoard.SetActive(true);
+        //モード選択画面に戻れるようにする
+        m_canReturnModeSelection = true;
         //ここから下にＡＩのことを書いていく
     }
 
@@ -349,13 +406,24 @@ public class InGameScript : MonoBehaviourPunCallbacks
             }
 
             //ゴールしたプレイヤーの数がルーム内のプレイヤーの数と一致したら
-            if (m_goaledPlayerNum == PhotonNetwork.PlayerList.Length && !isShownResult)
+            if (m_goaledPlayerNum == PhotonNetwork.PlayerList.Length && !m_isShownResult)
             {
                 //完走タイムを表示するように全員に通知
                 photonView.RPC(nameof(ShowResult), RpcTarget.All, m_scoreBoard);
                 //完走通知を行った
-                isShownResult = true;
+                m_isShownResult = true;
             }
+        }
+
+        //ゲームが終了していて、長押ししたら
+        if(m_canReturnModeSelection && m_operation.GetComponent<Operation>().GetIsLongTouch)
+		{
+            //ルームから出る
+            PhotonNetwork.LeaveRoom();
+            //サーバーから出る
+            PhotonNetwork.Disconnect();
+            //モード選択シーンに遷移する
+            SceneManager.LoadScene("02_ModeSelectScene");
         }
 
         //Escが押された時

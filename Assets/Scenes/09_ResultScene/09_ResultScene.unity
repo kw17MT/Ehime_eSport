@@ -203,6 +203,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -229,6 +230,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
@@ -250,6 +252,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7849690914811227979, guid: 1b26ee71699f2cf458a17f6fa05ab1b0, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 8387c8ebbf60e114494bc8dd351d1965, type: 3}
     - target: {fileID: 8968063132894387188, guid: 1b26ee71699f2cf458a17f6fa05ab1b0, type: 3}
       propertyPath: m_Name
       value: Panel2
@@ -399,6 +405,7 @@ GameObject:
   m_Component:
   - component: {fileID: 719038847}
   - component: {fileID: 719038846}
+  - component: {fileID: 719038848}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -478,10 +485,31 @@ Transform:
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &719038848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 719038845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 1
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
 --- !u!1 &950062362
 GameObject:
   m_ObjectHideFlags: 0
@@ -510,6 +538,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1949076681}
   - {fileID: 421650966}
@@ -589,6 +618,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1269908458}
   m_RootOrder: 0
@@ -663,6 +693,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1051547281}
   - {fileID: 1456041696}
@@ -677,7 +708,7 @@ RectTransform:
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1269908459
 Animator:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -690,6 +721,7 @@ Animator:
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -784,6 +816,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1269908458}
   m_Father: {fileID: 0}
@@ -893,6 +926,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: SceneNameLabel
       objectReference: {fileID: 0}
+    - target: {fileID: 8035213762632638522, guid: d7fd1559a4af4ec4bb1f1c4807dc8bde, type: 3}
+      propertyPath: m_EffectDistance.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8035213762632638522, guid: d7fd1559a4af4ec4bb1f1c4807dc8bde, type: 3}
+      propertyPath: m_EffectDistance.y
+      value: -5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7fd1559a4af4ec4bb1f1c4807dc8bde, type: 3}
 --- !u!224 &1456041696 stripped
@@ -911,6 +952,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7849690914811227979, guid: 1b26ee71699f2cf458a17f6fa05ab1b0, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 892e06d09af7c944096e0a74deb373f0, type: 3}
     - target: {fileID: 8968063132894387188, guid: 1b26ee71699f2cf458a17f6fa05ab1b0, type: 3}
       propertyPath: m_Name
       value: Panel4
@@ -1063,6 +1108,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7849690914811227979, guid: 1b26ee71699f2cf458a17f6fa05ab1b0, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: cb913785371c43a4389cbb89d96e00de, type: 3}
     - target: {fileID: 8968063132894387188, guid: 1b26ee71699f2cf458a17f6fa05ab1b0, type: 3}
       propertyPath: m_Name
       value: Panel3
@@ -1271,6 +1320,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -1282,6 +1332,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 950062363}
     m_Modifications:
+    - target: {fileID: 7849690914811227979, guid: 1b26ee71699f2cf458a17f6fa05ab1b0, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c79a1296084b7e44b94255258719d99f, type: 3}
     - target: {fileID: 8968063132894387188, guid: 1b26ee71699f2cf458a17f6fa05ab1b0, type: 3}
       propertyPath: m_Name
       value: Panel1
