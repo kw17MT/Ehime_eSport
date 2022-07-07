@@ -23,7 +23,7 @@
 
         [Header(RimLight)]
         _RimColor("RimColor", Color) = (1.0, 1.0, 0.0,1.0)
-        [PowerSlider(3.0)]_RimPower("RimPower", Range(0.3, 8.0)) = 3.0
+        _RimPower("RimPower", Range(1.0, 10.0)) = 5.0
         [PowerSlider(3.0)]_DirectionRimPower("DirectionRimPower", Range(0.0,8.0)) = 2.0
     }
 
@@ -210,7 +210,7 @@
                     v2f o;
                     o.vertex = TransformObjectToHClip(v.vertex.xyz);
                     o.posWS = TransformObjectToWorld(v.vertex.xyz);
-                    o.viewDir = GetWorldSpaceViewDir(o.posWS);
+                    o.viewDir = normalize(GetWorldSpaceViewDir(o.posWS));
                     o.fogFactor = ComputeFogFactor(o.vertex.z);
 
                     o.uv = TRANSFORM_TEX(v.uv, _MainTex);
