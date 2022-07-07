@@ -223,9 +223,6 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //何かが衝突したら
     private void OnCollisionEnter(Collision col)
 	{
-
-
-
         if(col.gameObject.name == "Snapper(Clone)")
 		{
             string idStr = PhotonNetwork.NickName;
@@ -296,6 +293,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
 	{
         //コースの向きを現在のウェイポイント通過状況から調べる
         m_corseDir = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.GetComponent<WayPointChecker>().GetCurrentWayPoint();
+
+        Debug.Log("NextWayPoint" + this.GetComponent<WayPointChecker>().GetNextWayPoint() + "Current " + this.GetComponent<WayPointChecker>().GetCurrentWayPoint() + "Corse Dir " + m_corseDir);
+
         //正規化
         m_corseDir.Normalize();
         //高さの方向はいらない

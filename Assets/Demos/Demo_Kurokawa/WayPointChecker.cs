@@ -55,8 +55,17 @@ public class WayPointChecker : MonoBehaviour
             return;
         }
 
-        //通過済みポイントの座標を保存
-        m_currentWayPointPos = m_nextWayPointPos;
+        if(throughNumber == 0)
+		{
+            //通過済みポイントの座標を保存
+            m_currentWayPointPos = currentTransform.position;
+        }
+		else
+		{
+            //通過済みポイントの座標を保存
+            m_currentWayPointPos = m_nextWayPointPos;
+        }
+
         //次のポイントへインクリメント
         m_nextWayPointNumber++;
         //次のポイントの名前を定義
