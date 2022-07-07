@@ -294,7 +294,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
         //コースの向きを現在のウェイポイント通過状況から調べる
         m_corseDir = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.GetComponent<WayPointChecker>().GetCurrentWayPoint();
 
-        Debug.Log("NextWayPoint" + this.GetComponent<WayPointChecker>().GetNextWayPoint() + "Current " + this.GetComponent<WayPointChecker>().GetCurrentWayPoint() + "Corse Dir " + m_corseDir);
+        //Debug.Log("NextWayPoint" + this.GetComponent<WayPointChecker>().GetNextWayPoint() + "Current " + this.GetComponent<WayPointChecker>().GetCurrentWayPoint() + "Corse Dir " + m_corseDir);
 
         //正規化
         m_corseDir.Normalize();
