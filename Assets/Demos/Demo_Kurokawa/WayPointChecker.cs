@@ -55,8 +55,17 @@ public class WayPointChecker : MonoBehaviour
             return;
         }
 
-        //通過済みポイントの座標を保存
-        m_currentWayPointPos = m_nextWayPointPos;
+        if(throughNumber == 0)
+		{
+            //通過済みポイントの座標を保存
+            m_currentWayPointPos = currentTransform.position;
+        }
+		else
+		{
+            //通過済みポイントの座標を保存
+            m_currentWayPointPos = m_nextWayPointPos;
+        }
+
         //次のポイントへインクリメント
         m_nextWayPointNumber++;
         //次のポイントの名前を定義
@@ -75,7 +84,8 @@ public class WayPointChecker : MonoBehaviour
         //新しいポイントのトランスフォームを取得
         m_nextWayPointTransform = nextWayPoint.transform;
 
-        if (this.gameObject.tag == "OwnPlayer")
+        if (this.gameObject.tag == "OwnPlayer"
+            && !PhotonNetwork.OfflineMode)
 		{
             //次のウェイポイントの番号をルームプロパティに保存
             var hashtable = new ExitGames.Client.Photon.Hashtable();

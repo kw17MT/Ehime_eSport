@@ -12,6 +12,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private GameObject m_countDownComponent = null;                                          //カウントダウンを表示するテキストインスタンス
     private GameObject m_paramManager = null;                                           //ゲーム中に使用するパラメータ保存インスタンス
     private GameObject m_operation = null;
+    private GameObject m_player = null;
     private int m_goaledPlayerNum = 0;                                                  //ゴールしたプレイヤーの数
     private int m_playerReadyNum = 0;                                                   //走行の準備ができているプレイヤーの数
     private int m_prevCountDownNum = 0;                                                 //カウントダウンしている時、前の数値の整数値
@@ -63,9 +64,9 @@ public class InGameScript : MonoBehaviourPunCallbacks
         //取得したスポーンポイントの座標を取得
         var position = GameObject.Find(spawnPointName).transform.position;
         //自分のプレイヤーをスポーンポイントの位置へ生成
-        PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+        m_player = PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
         //ホストのみ実行する部分（オフラインモードでも呼ばれる）
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        if (PhotonNetwork.LocalPlayer.IsMasterClient && !PhotonNetwork.OfflineMode)
         {
             //何もポップさせていないスポーンポイントを探し、AIを生成する
             FindEmptySpawnPointAndPopAI();
@@ -233,7 +234,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
 			}
         }
 
-        Debug.Log(currentPlace);
+        //Debug.Log(currentPlace);
         //順位を変化させる
         GameObject.Find("RankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace-1);
         //自分の順位を保存
@@ -256,6 +257,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
             GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", popPos, Quaternion.identity);
             //Playerとタグ付けする
             ai.gameObject.tag = "Player";
+            ai.gameObject.name = "Player" + (i + 2);
+            m_ai.Add(ai);
         }
     }
 
@@ -436,5 +439,54 @@ public class InGameScript : MonoBehaviourPunCallbacks
             Application.Quit();//ゲームプレイ終了
 #endif
         }
-    }
+
+		//シングルプレイモードの時
+		if (PhotonNetwork.OfflineMode)
+		{
+			//現在の順位
+			int currentPlace = 1;
+			//すべてのAIと比較する
+			foreach (GameObject ai in m_ai)
+			{
+				//AIの方が自分より周回していたら
+				if (ai.GetComponent<AIProgressChecker>().GetLapCount() > m_player.GetComponent<ProgressChecker>().GetLapCount())
+				{
+					//順位を１下げる
+					currentPlace += 1;
+					continue;
+				}
+				//プレイヤーの方が周回していたら
+				if (ai.GetComponent<AIProgressChecker>().GetLapCount() < m_player.GetComponent<ProgressChecker>().GetLapCount())
+				{
+					//以下の処理をスキップ
+					continue;
+				}
+
+
+				//AIの方がよりウェイポイントを進んでいたら
+				if (ai.GetComponent<RaceAIScript>().GetNextWayPoint() > m_player.GetComponent<WayPointChecker>().GetNextWayPointNumber()
+					&& m_player.GetComponent<WayPointChecker>().GetNextWayPointNumber() != 0)
+				{
+					//順位を１下げる
+					currentPlace += 1;
+					continue;
+				}
+				//AIと同じ位置を目指しているならば
+				else if (ai.GetComponent<RaceAIScript>().GetNextWayPoint() == m_player.GetComponent<WayPointChecker>().GetNextWayPointNumber())
+				{
+					//ウェイポイントとの距離がAIのほうが短ければ
+					if (ai.GetComponent<AICommunicator>().GetDistanceToNextWayPoint() < m_player.GetComponent<AvatarController>().GetDistanceToNextWayPoint())
+					{
+						//順位を１下げる
+						currentPlace += 1;
+					}
+				}
+			}
+
+			//順位を変化させる
+			GameObject.Find("RankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace - 1);
+			//自分の順位を保存
+			m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
+		}
+	}
 }

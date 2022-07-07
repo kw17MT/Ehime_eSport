@@ -23,6 +23,11 @@ public class ProgressChecker : MonoBehaviour
         GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_lapCount);
     }
 
+    public int GetLapCount()
+	{
+        return m_lapCount;
+	}
+
     //どの地点を通過したかを文字列で確認
     public void SetThroughPointName(string name)
 	{
@@ -60,14 +65,17 @@ public class ProgressChecker : MonoBehaviour
 
         GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_lapCount);
 
-        //次のウェイポイントの番号をルームプロパティに保存
-        var hashtable = new ExitGames.Client.Photon.Hashtable();
-        //プレイヤー名＋LapCountという名前を作成 ex.)Player2LapCount
-        string name = PhotonNetwork.NickName + "LapCount";
-        //ウェイポイント番号を設定
-        hashtable[name] = m_lapCount;
-        //ルームプロパティの更新
-        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        if (!PhotonNetwork.OfflineMode)
+        {
+            //次のウェイポイントの番号をルームプロパティに保存
+            var hashtable = new ExitGames.Client.Photon.Hashtable();
+            //プレイヤー名＋LapCountという名前を作成 ex.)Player2LapCount
+            string name = PhotonNetwork.NickName + "LapCount";
+            //ウェイポイント番号を設定
+            hashtable[name] = m_lapCount;
+            //ルームプロパティの更新
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        }
 
         //フラグを元に戻す
         for (int i = 0; i < MAX_CHECKPOINT_NUM; i++)

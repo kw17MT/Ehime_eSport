@@ -96,6 +96,11 @@ public class RaceAIScript : MonoBehaviour
         this.GetComponent<AICommunicator>().SetMoving(canMove);
     }
 
+    public int GetNextWayPoint()
+	{
+        return m_targetNumber;
+	}
+
     private void CheckWayPointChange()
     {
         //次のウェイポイントを取得
@@ -112,7 +117,7 @@ public class RaceAIScript : MonoBehaviour
         //目指すウェイポイントの番号を更新
         m_targetNumber = nextNumber;
 
-        //this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
+        this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
 
         //ウェイポイントの座標からずらす幅を乱数で決定
         m_shiftLength = Random.Range(-m_innerShiftMaxLength, m_outerShiftMaxLength);
