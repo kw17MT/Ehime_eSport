@@ -21,7 +21,7 @@ public class DrawOutLineFeature : ScriptableRendererFeature
     [SerializeField]
     float m_outlineThick = 1.0f;
     [SerializeField]
-    float m_outlineThreshold = 1.0f;
+    float m_outlineThreshold = 0.0001f;
     [SerializeField]
     EnHowToDrawOutline m_howToDrawOutline = EnHowToDrawOutline.enDepthAndNormal;
 

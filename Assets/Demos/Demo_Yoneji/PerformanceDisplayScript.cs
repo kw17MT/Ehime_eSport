@@ -1,12 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-public class FpsDisplayScript : MonoBehaviour
+public class PerformanceDisplayScript : MonoBehaviour
 {
     // SerializeField
     [SerializeField]
     int m_fontSize = 25;
+    [SerializeField]
+    float m_GUIAreaRectX = 50.0f;
+    [SerializeField]
+    float m_GUIAreaRectY = 50.0f;
+    [SerializeField]
+    float m_GUIAreaRectWidth = 500.0f;
+    [SerializeField]
+    float m_GUIAreaRectHeight = 150.0f;
 
     // Field
     int m_frameCount = 0;
@@ -23,13 +32,13 @@ public class FpsDisplayScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Application.targetFrameRate = 60;
+        //Application.targetFrameRate = 60;
     }
 
     // Update is called once per frame
     void Update()
     {
-        FpsDisplay();
+        UpdateFps();
 
         return;
     }
@@ -45,13 +54,26 @@ public class FpsDisplayScript : MonoBehaviour
 
 
 
-        GUILayout.BeginArea(new Rect(50, 50, 400, 150));
+        GUILayout.BeginArea(
+            new Rect(
+                m_GUIAreaRectX,
+                m_GUIAreaRectY,
+                m_GUIAreaRectWidth,
+                m_GUIAreaRectHeight
+                )
+            );
 
+        // fps表示
         string text = string.Format("FPS = {0:F2}", m_fps);
         GUILayout.Label(text, style);
 
+        // GPUのデバイス名表示
         string useAPIName = string.Format("API = {0}", SystemInfo.graphicsDeviceType.ToString());
         GUILayout.Label(useAPIName, style);
+
+        // pipelineAssetの名前表示
+        string pipelineAssetName = "PipelineAssetName = " + GraphicsSettings.renderPipelineAsset.name;
+        GUILayout.Label(pipelineAssetName, style);
 
         GUILayout.EndArea();
 
@@ -60,7 +82,7 @@ public class FpsDisplayScript : MonoBehaviour
 
 
     // Function
-    void FpsDisplay()
+    void UpdateFps()
     {
         m_frameCount++;
 

@@ -248,8 +248,8 @@
         #ifdef _SHADINGMODE_TOON
                         // よりトゥーン調になる。
                         // ライトの結果全てをトゥーン用に階調化。
-                        float3 rampLig = CalcToonShading((diffuse + specular + _AmbientLight.x) * shadow);
-                        col.xyz = baseColor.xyz * mainLight.color * rampLig;
+                        //float3 rampLig = CalcToonShading((diffuse + specular + _AmbientLight.x) * shadow);
+                        col.xyz = baseColor.xyz * mainLight.color/* * rampLig*/;
         #elif _SHADINGMODE_REALANDTOON
                         // リアルよりの方
                         // トゥーンのカラーを後から乗算する。上よりリアルっぽくなる。
