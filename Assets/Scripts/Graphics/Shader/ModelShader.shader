@@ -19,7 +19,7 @@
 
         [Header(RimLight)]
         _RimColor("RimColor", Color) = (1.0, 1.0, 0.0,1.0)
-        _RimPower("RimPower", Range(1.0, 10.0)) = 5.0
+        _RimPower("RimPower", Range(1.0, 10.0)) = 4.0
         [PowerSlider(3.0)]_DirectionRimPower("DirectionRimPower", Range(0.0,8.0)) = 2.0
     }
 
@@ -152,7 +152,7 @@
                 // よりトゥーン調になる。
                 // ライトの結果全てをトゥーン用に階調化。
                 float3 rampLig = CalcToonShading((diffuse + specular + _AmbientLight.x) * shadow);
-                col.xyz = baseColor.xyz * mainLight.color/* * rampLig*/;
+                col.xyz = baseColor.xyz * mainLight.color * rampLig;
 #elif _SHADINGMODE_REALANDTOON
                 // リアルよりの方
                 // トゥーンのカラーを後から乗算する。上よりリアルっぽくなる。
