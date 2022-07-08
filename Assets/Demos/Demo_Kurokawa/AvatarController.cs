@@ -283,7 +283,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
 			else
 			{
                 //あたったプレイヤーが無敵状態かを取得
-                bool isInvinciblePlayer = GameObject.Find(col.gameObject.name);
+                bool isInvinciblePlayer = GameObject.Find(col.gameObject.name).GetComponent<AICommunicator>().GetIsInvincible();
+
                 //無敵プレイヤーならば
                 if(isInvinciblePlayer)
 				{

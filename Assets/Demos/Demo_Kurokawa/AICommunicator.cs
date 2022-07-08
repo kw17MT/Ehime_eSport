@@ -16,11 +16,23 @@ public class AICommunicator : MonoBehaviourPunCallbacks
 
     private float m_distanceToNextWayPoint = 0.0f;
 
+    private bool m_isInvincible = false;
+
     // Start is called before the first frame update
     void Start()
     {
         
     }
+
+    public void SetIsInvincible(bool isInvicible)
+	{
+        m_isInvincible = isInvicible;
+	}
+
+    public bool GetIsInvincible()
+	{
+        return m_isInvincible;
+	}
 
     public float GetDistanceToNextWayPoint()
 	{
