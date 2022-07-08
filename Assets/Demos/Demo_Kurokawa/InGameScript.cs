@@ -193,7 +193,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
                         float myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
 
-                        Debug.Log("myDistance " + myDistance + " / OtherDistance " + otherPlayerDistance);
+                        //Debug.Log("myDistance " + myDistance + " / OtherDistance " + otherPlayerDistance);
 
                         //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
                         if(otherPlayerDistance < myDistance)
@@ -218,7 +218,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
                         if(photonView.IsMine)
 						{
-                            Debug.Log("Other : " + otherPlayerDistance + "My : " + myDistance);
+                            //Debug.Log("Other : " + otherPlayerDistance + "My : " + myDistance);
                         }
 
 

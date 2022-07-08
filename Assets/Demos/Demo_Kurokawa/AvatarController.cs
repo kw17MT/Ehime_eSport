@@ -33,7 +33,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private bool m_isUsingJet = false;                  //現在、ジェットを使用しているか
     private bool m_isAttacked = false;                  //攻撃されたか
     private bool m_hittedWall = false;                  //壁に当たっているか
-    private bool m_isInvincible = false;
+    private bool m_isInvincible = false;                //自分のプレイヤーは無敵化
     private Quaternion m_prevTrasnform;                 //前回の回転の度合い
     
 
@@ -209,6 +209,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public bool GetIsAttacked()
 	{
         return m_isAttacked;
+	}
+
+    public bool GetIsInvincible()
+	{
+        return m_isInvincible;
 	}
 
     public float GetDistanceToNextWayPoint()
