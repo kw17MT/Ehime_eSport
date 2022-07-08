@@ -106,10 +106,16 @@ Shader "MyShader/DrawOutLineShader"
 
             bool IsDepthOutlineBy8Texel(float2 uv)
             {
+                float currentDepth = MyLinearDepth(SampleSceneDepth(uv));
+                //float depthThreshold = 10.0f / _ProjectionParams.z;
+                //if (currentDepth >= depthThreshold)
+                //{
+                //    return false;
+                //}
+
                 float diffX = _CameraDepthTexture_TexelSize.x * _OutlineThick;
                 float diffY = _CameraDepthTexture_TexelSize.y * _OutlineThick;
 
-                float currentDepth = MyLinearDepth(SampleSceneDepth(uv));
 
                 float nearDepth = 0.0f;
                 nearDepth += MyLinearDepth(SampleSceneDepth(uv + half2(0.0f, diffY)));

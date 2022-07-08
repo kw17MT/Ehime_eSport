@@ -95,7 +95,8 @@ public class CameraMover : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             //(移動開始座標 - マウスの現在座標) / 解像度 で正規化
-            float x = (_startMousePos.x - Input.mousePosition.x) / Screen.width;
+            //float x = (_startMousePos.x - Input.mousePosition.x) / Screen.width;
+            float x = (Input.mousePosition.x - _startMousePos.x) / Screen.width;
             float y = (_startMousePos.y - Input.mousePosition.y) / Screen.height;
 
             //回転開始角度 ＋ マウスの変化量 * マウス感度
