@@ -53,7 +53,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private float m_frameCounter = 0.0f;                //ゲームタイムを用いてどのくらい時間がたったかを記録する変数
     private float UPDATE_DISTANCE_TIMING = 0.1f;        //次のウェイポイントとの距離を更新するタイミング
 
-
+    private RaceAIScript m_aiScript = null;
+    private AvatarController m_avaCon = null;
 
     private AlongWall m_alongWall = null;               //壁ずり時の移動方向を更新するインスタンス
 
@@ -95,6 +96,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
         PhotonNetwork.SendRate = 5;
         //1秒間に何回同期を行うか
         PhotonNetwork.SerializationRate = 5;
+
+        m_aiScript = this.GetComponent<RaceAIScript>();
+        m_avaCon = this.GetComponent<AvatarController>();
     }
 
     //ルームプロパティの何かが更新された時の関数
@@ -152,6 +156,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 	{
         //スターを使用している状態
         m_isUsingStar = true;
+        m_isInvincible = true;
         if (!PhotonNetwork.OfflineMode)
         {
             //ルームプロパティの自分の無敵状態を名前を使って検索、変更を行う
@@ -167,7 +172,17 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public void SetIsUsingJet()
 	{
         m_isUsingJet = true;
-	}
+        m_isInvincible = true;
+        if (!PhotonNetwork.OfflineMode)
+        {
+            //ルームプロパティの自分の無敵状態を名前を使って検索、変更を行う
+            var hashtable = new ExitGames.Client.Photon.Hashtable();
+            string name = PhotonNetwork.NickName + "Invincible";
+            hashtable[name] = 1;
+            //ルームプロパティを更新
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        }
+    }
 
     //キラーを使用している状態にする
     public void SetIsUsingKiller()
@@ -248,21 +263,34 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
         //衝突対象が他のプレイヤーならば
         if (col.gameObject.tag == "Player")
-        {
-            //コリジョンの持ち主のPhotonNetworkに関する変数を取得
-            Player pl = col.gameObject.GetComponent<PhotonView>().Owner;
-            //そのプレイヤーの無敵状態をルームプロパティから持ってくる
-            string plName = pl.NickName + "Invincible";
-            int stat = (PhotonNetwork.CurrentRoom.CustomProperties[plName] is int value) ? value : 0;
-
-            //攻撃を受けたか
-            bool isCrash = false;
-            //そのプレイヤーが無敵で、自分がスターもキラーも使っていなけば
-            if (stat == 1 && !m_isInvincible)
+        {   
+            //オンラインモードならば
+            if(!PhotonNetwork.OfflineMode)
 			{
-                //自分のプレイヤーは攻撃を受けた
-                m_isAttacked = true;
+                //コリジョンの持ち主のPhotonNetworkに関する変数を取得
+                Player pl = col.gameObject.GetComponent<PhotonView>().Owner;
+                //そのプレイヤーの無敵状態をルームプロパティから持ってくる
+                string plName = pl.NickName + "Invincible";
+                int stat = (PhotonNetwork.CurrentRoom.CustomProperties[plName] is int value) ? value : 0;
+                //そのプレイヤーが無敵で、自分がスターもキラーも使っていなけば
+                if (stat == 1 && !m_isInvincible)
+                {
+                    //自分のプレイヤーは攻撃を受けた
+                    m_isAttacked = true;
+                }
             }
+			//オフラインプレイならば
+			else
+			{
+                //あたったプレイヤーが無敵状態かを取得
+                bool isInvinciblePlayer = GameObject.Find(col.gameObject.name);
+                //無敵プレイヤーならば
+                if(isInvinciblePlayer)
+				{
+                    //攻撃された
+                    m_isAttacked = true;
+				}
+			}
 		}
 
         //衝突先が壁の時
@@ -469,6 +497,17 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //環境に依存されない、一定期間のUpdate関数（移動はここにかくこと）
     private void FixedUpdate()
     {
+        if(m_isGoaled && !m_aiScript.enabled)
+		{
+            m_aiScript.enabled = true;
+            m_aiScript.SetCanMove(true);
+            
+		}
+        if(m_aiScript.enabled)
+		{
+            this.GetComponent<AvatarController>().enabled = false;
+        }
+
         //キラー使用時の移動。キラー使用時はこの関数以降の処理は行わない
         MoveByUsingKiller();
 
