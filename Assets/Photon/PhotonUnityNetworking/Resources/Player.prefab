@@ -141,7 +141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MAX_CHECKPOINT_NUM: 3
-  MAX_LAP_NUM: 1
+  MAX_LAP_NUM: 3
 --- !u!114 &-8559476411398457238
 MonoBehaviour:
   m_ObjectHideFlags: 0

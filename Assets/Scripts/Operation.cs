@@ -19,9 +19,20 @@ public class Operation : MonoBehaviour
     //フリック方向またはタップの情報を渡せる状態かどうか
     bool m_canDataThrow = false;
 
-    void Start()
+	public struct InputInfo
+	{
+        public string dir;
+        public float power;
+	};
+
+    private InputInfo m_iputInfo;
+
+	void Start()
     {
-        //シーン遷移してもこの操作オブジェクトは削除しない
+        m_iputInfo.dir = "";
+        m_iputInfo.power = 0.0f;
+
+    //シーン遷移してもこの操作オブジェクトは削除しない
         DontDestroyOnLoad(this);
     }
 
@@ -58,6 +69,9 @@ public class Operation : MonoBehaviour
 
        　       //フリック方向またはタップの情報を渡せる状態にする
                 m_canDataThrow = true;
+                //入力方向と回転の量をリセット
+                m_iputInfo.dir = "";
+                m_iputInfo.power = 0.0f;
             }
            else
            {
@@ -71,6 +85,10 @@ public class Operation : MonoBehaviour
         {
             //タッチのフラグや数値を初期化する
             TachDataInit();
+
+            //入力方向と回転の量をリセット
+            m_iputInfo.dir = "";
+            m_iputInfo.power = 0.0f;
         }
 
         //長押し関数
@@ -148,6 +166,32 @@ public class Operation : MonoBehaviour
 
         return NowOperation();
     }
+    
+    public InputInfo GetNowOperationAndPower()
+	{
+        if (!m_canDataThrow)
+        {
+            m_iputInfo.dir = "";
+            m_iputInfo.power = 0.0f;
+            return m_iputInfo;
+        }
+
+        m_iputInfo.dir = NowOperation();
+
+        if(m_iputInfo.dir == "right"
+            || m_iputInfo.dir == "left")
+		{
+            float directionX = m_touchEndPos.x - m_touchStartPos.x;
+            float power = directionX / (Screen.width / 2.0f);
+            m_iputInfo.power = power;
+        }
+		else
+		{
+            m_iputInfo.power = 0.0f;
+		}
+
+        return m_iputInfo;
+	}
 
     //長押し中かどうかを取得するプロパティ
     public bool GetIsLongTouch

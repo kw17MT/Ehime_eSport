@@ -6,8 +6,11 @@ using Photon.Realtime;
 
 public class AIReaction : MonoBehaviourPunCallbacks
 {
-    // Start is called before the first frame update
-    void Start()
+	private float SPIN_AMOUNT = 6.0f;                    //”í’eŽž‚Ì‰ñ“]—¦
+	private float m_spinedAngle = 0.0f;
+
+	// Start is called before the first frame update
+	void Start()
     {
         
     }
@@ -137,8 +140,16 @@ public class AIReaction : MonoBehaviourPunCallbacks
 	}
 
 	// Update is called once per frame
-	void Update()
+	void FixedUpdate()
     {
-        
-    }
+		if (this.gameObject.GetComponent<AICommunicator>().GetIsAttacked())
+		{
+			m_spinedAngle += SPIN_AMOUNT;
+
+			if (m_spinedAngle <= 360.0f)
+			{
+				this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // ‰ñ“]Šp“x‚ðÝ’è            
+			}
+		}
+	}
 }

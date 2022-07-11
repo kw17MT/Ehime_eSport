@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3082cc06d19f32543a5ec33c6fccafdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MAX_LAP_NUM: 1
+  MAX_LAP_NUM: 3
 --- !u!114 &-3972773437731997615
 MonoBehaviour:
   m_ObjectHideFlags: 0
