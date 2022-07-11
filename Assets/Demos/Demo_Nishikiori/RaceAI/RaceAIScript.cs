@@ -68,16 +68,19 @@ public class RaceAIScript : MonoBehaviour
     void FixedUpdate()
     {
         //カウントダウンが終了して動ける状態で、攻撃されていなければ
-        if(m_canMove && !this.gameObject.GetComponent<AICommunicator>().GetIsAttacked())
+        if(m_canMove)
 		{
-            //ウェイポイントが変更されたかを調べる
-            CheckWayPointChange();
+            if(this.gameObject.tag == "OwnPlayer" || !this.gameObject.GetComponent<AICommunicator>().GetIsAttacked())
+			{
+                //ウェイポイントが変更されたかを調べる
+                CheckWayPointChange();
 
-            //ハンドルを切る向きを決定
-            HandlingDecision();
+                //ハンドルを切る向きを決定
+                HandlingDecision();
 
-            //剛体に力を加える
-            m_rigidbody.AddForce(transform.forward * m_maxSpeed - m_rigidbody.velocity);
+                //剛体に力を加える
+                m_rigidbody.AddForce(transform.forward * m_maxSpeed - m_rigidbody.velocity);
+            }
 
 #if UNITY_EDITOR
             //デバッグ用　AIの目標地点を出力
@@ -94,7 +97,10 @@ public class RaceAIScript : MonoBehaviour
     public void SetCanMove(bool canMove)
 	{
         m_canMove = canMove;
-        this.GetComponent<AICommunicator>().SetMoving(canMove);
+        if(this.gameObject.tag == "Player")
+		{
+            this.GetComponent<AICommunicator>().SetMoving(canMove);
+        }
     }
 
     public int GetNextWayPoint()
@@ -118,7 +124,12 @@ public class RaceAIScript : MonoBehaviour
         //目指すウェイポイントの番号を更新
         m_targetNumber = nextNumber;
 
-        this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
+        //このスクリプトをもつオブジェクトがAIだったら
+        if(this.gameObject.tag == "Player")
+		{
+            //次のウェイポイントをAIの情報を別オブジェクトに通信するスクリプトに保存
+            this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
+        }
 
         //ウェイポイントの座標からずらす幅を乱数で決定
         m_shiftLength = Random.Range(-m_innerShiftMaxLength, m_outerShiftMaxLength);

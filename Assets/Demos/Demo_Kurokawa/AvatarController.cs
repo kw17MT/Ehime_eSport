@@ -225,7 +225,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     [PunRPC]
     public void TellRecordTime(string name, float time)
     {
-        GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNameAndRecordTime(name, time);
+        GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNameAndRecordTime(name, time, true);
     }
 
     //自身がレースの参加の用意ができたかホストに送る
@@ -505,12 +505,16 @@ public class AvatarController : MonoBehaviourPunCallbacks
     {
         if(m_isGoaled && !m_aiScript.enabled)
 		{
+            //AIスクリプトをONにする
             m_aiScript.enabled = true;
+            //AIで動けるようにする
             m_aiScript.SetCanMove(true);
             
 		}
+        //AIモードがONであれば
         if(m_aiScript.enabled)
 		{
+            //プレイヤーの操作スクリプトをOFFにする
             this.GetComponent<AvatarController>().enabled = false;
         }
 

@@ -87,6 +87,15 @@ public class AICommunicator : MonoBehaviourPunCallbacks
         }
     }
 
+    [PunRPC]
+    private void TellRecordTime(string name, float time, bool isPlayer)
+	{
+        if(name != "")
+		{
+            GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNameAndRecordTime(name, time, isPlayer);
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -110,7 +119,11 @@ public class AICommunicator : MonoBehaviourPunCallbacks
         if (m_isGoaled && !m_isToldRecord)
 		{
             m_isToldRecord = true;
-            photonView.RPC(nameof(AvatarController.TellRecordTime), RpcTarget.MasterClient, m_aiName, m_runningTime);
+            if(m_aiName != "")
+			{
+                photonView.RPC(nameof(TellRecordTime), RpcTarget.MasterClient, m_aiName, m_runningTime, false);
+            }
+
             Debug.Log("AI : " + m_aiName + " Clear : Time " + m_runningTime);
         }
 

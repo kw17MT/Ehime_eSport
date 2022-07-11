@@ -31,6 +31,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private GameObject m_userSetting = null;
     public GameObject m_resultBoard;
 
+    public GameObject[] m_youLabels;
+
     private void Start()
     {
         //ゲーム中のパラメータ保存インスタンスを取得する
@@ -258,6 +260,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             //Playerとタグ付けする
             ai.gameObject.tag = "Player";
             ai.gameObject.name = "Player" + (i + 2);
+            ai.GetComponent<AICommunicator>().SetAIName(ai.gameObject.name);
             m_ai.Add(ai);
         }
     }
@@ -337,12 +340,16 @@ public class InGameScript : MonoBehaviourPunCallbacks
     }
 
     //ゴールしたプレイヤー名とタイムをホストに記録
-    public void AddGoaledPlayerNameAndRecordTime(string playerName, float time)
+    public void AddGoaledPlayerNameAndRecordTime(string playerName, float time, bool isPlayer)
     {
         //プレイヤー名をキーに、クリアタイムをバリューに
         m_scoreBoard.Add(playerName, time);
-        //ゴールしたプレイヤーの総数をインクリメント
-        this.m_goaledPlayerNum++;
+        Debug.Log(playerName + "    " + time);
+        if (isPlayer)
+        {
+            //ゴールしたプレイヤーの総数をインクリメント
+            m_goaledPlayerNum++;
+        }
     }
 
     //カウントダウンの数値を共有する通信関数（ホストが送信）
@@ -374,7 +381,54 @@ public class InGameScript : MonoBehaviourPunCallbacks
         m_resultBoard.SetActive(true);
         //モード選択画面に戻れるようにする
         m_canReturnModeSelection = true;
-        //ここから下にＡＩのことを書いていく
+
+        int labelNumber = 1;
+        foreach(KeyValuePair<string, float> scores in scoreBoard)
+		{
+            string labelName = "Panel" + labelNumber + "/CharaNameLabel";
+            GameObject.Find(labelName).GetComponent<Text>().text = scores.Key;
+            labelName = "Panel" + labelNumber + "/TimeLabel";
+            float time = scores.Value;
+            int minute = (int)(time / 60);
+            int second = (int)(time - (60 * minute));
+            GameObject.Find(labelName).GetComponent<Text>().text = minute.ToString() + " : " + second.ToString();
+
+            if(PhotonNetwork.NickName == scores.Key)
+			{
+                m_youLabels[labelNumber - 1].SetActive(true);
+            }
+
+            labelNumber++;
+        }
+
+        for(int i = labelNumber; i < 5; i++)
+		{
+            string labelName = "Panel" + i + "/CharaNameLabel";
+            Text nameLabelText = GameObject.Find(labelName).GetComponent<Text>();
+            if (!scoreBoard.ContainsKey("Player1"))
+            {
+                nameLabelText.text = "Player1";
+                scoreBoard.Add("Player1", 0.0f);
+            }
+            else if (!scoreBoard.ContainsKey("Player2"))
+            {
+                nameLabelText.text = "Player2";
+                scoreBoard.Add("Player2", 0.0f);
+            }
+            else if (!scoreBoard.ContainsKey("Player3"))
+            {
+                nameLabelText.text = "Player3";
+                scoreBoard.Add("Player3", 0.0f);
+            }
+			else
+			{
+                nameLabelText.text = "Player4";
+                scoreBoard.Add("Player4", 0.0f);
+            }
+
+            labelName = "Panel" + i + "/TimeLabel";
+            GameObject.Find(labelName).GetComponent<Text>().text = "";
+        }
     }
 
     void Update()
