@@ -19,6 +19,9 @@ public class AICommunicator : MonoBehaviourPunCallbacks
     private bool m_isAttacked = false;
     private bool m_isInvincible = false;
 
+    private float m_stiffinTime = 0.0f;
+    public float MAX_STIFFIN_TIME = 1.5f;               //UŒ‚‚ª“–‚½‚Á‚½Žž‚ÌÅ‘åd’¼ŽžŠÔ
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,12 +30,12 @@ public class AICommunicator : MonoBehaviourPunCallbacks
 
     public bool GetIsAttacked()
 	{
-        return m_isInvincible;
+        return m_isAttacked;
 	}
 
     public void SetIsAttacked(bool isAttacked)
 	{
-        m_isInvincible = isAttacked;
+        m_isAttacked = isAttacked;
 	}
 
     public void SetIsInvincible(bool isInvicible)
@@ -87,6 +90,18 @@ public class AICommunicator : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
+        if (m_isAttacked)
+		{
+            m_stiffinTime += Time.deltaTime;
+            if(m_stiffinTime > MAX_STIFFIN_TIME)
+			{
+                m_isAttacked = false;
+
+                m_stiffinTime = 0.0f;
+			}
+		}
+
+
         if (m_isMoving && !m_isGoaled)
         {
             m_runningTime += Time.deltaTime;

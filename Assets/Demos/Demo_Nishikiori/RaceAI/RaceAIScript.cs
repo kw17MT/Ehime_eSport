@@ -67,7 +67,8 @@ public class RaceAIScript : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(m_canMove)
+        //カウントダウンが終了して動ける状態で、攻撃されていなければ
+        if(m_canMove && !this.gameObject.GetComponent<AICommunicator>().GetIsAttacked())
 		{
             //ウェイポイントが変更されたかを調べる
             CheckWayPointChange();

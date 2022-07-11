@@ -13,7 +13,14 @@ public class OrangePeel : MonoBehaviourPunCallbacks
             //当たったプレイヤーを攻撃された判定にする。
             col.gameObject.GetComponent<AvatarController>().SetIsAttacked();
 		}
+        if(col.gameObject.tag == "Player")
+		{
+            //当たったAIを攻撃された判定にする。
+            col.gameObject.GetComponent<AICommunicator>().SetIsAttacked(true);
+        }
         //オレンジを消す
         Destroy(this.gameObject);
+
+
     }
 }

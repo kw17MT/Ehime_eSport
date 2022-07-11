@@ -37,11 +37,8 @@ public class AlongWall
 
         //Debug.Log("Normal " + normal);
 
-        if (Vector3.Dot(velocity, normal) > 0.0f)
-        {
-
-
-
+        //if (Vector3.Dot(velocity, normal) <= 0.0f)
+        //{
             //壁に沿って動くベクトルを計算し、移動方向として格納
             moveDirection = velocity - (Vector3.Dot(velocity, normal) * normal);
             //Debug.Log(moveDirection);
@@ -49,8 +46,7 @@ public class AlongWall
 
             //当たった時の向きをリセットし、スピードをセット
             //rigidbody.velocity = m_alongWallSpeed * moveDirection;
-
-        }
+       // }
 
 #if UNITY_EDITOR
         //当たった壁の法線を可視化(Debug)

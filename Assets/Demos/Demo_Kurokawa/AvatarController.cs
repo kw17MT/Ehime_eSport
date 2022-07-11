@@ -257,13 +257,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
                     //攻撃された
                     m_isAttacked = true;
                 }
-                Debug.Log("Attacked By Snapper(Clone)");
+                //Debug.Log("Attacked By Snapper(Clone)");
             }
 		}
         if (col.gameObject.name == "OrangePeel(Clone)")
         {
             Destroy(col.gameObject);
-            Debug.Log("OrangePeel(Clone)");
+            //Debug.Log("OrangePeel(Clone)");
         }
 
         //衝突対象が他のプレイヤーならば
