@@ -2,11 +2,15 @@
 {
     Properties
     {
+        [Header(Basic)]
         _MainTex("Texture", 2D) = "white" {}
         [KeywordEnum(Toon, RealAndToon)]_ShadingMode("ShadingMode", int) = 0
         _AmbientLight("AmbientLight", Color) = (0.5,0.5,0.5,1.0)
         _SpecularPow("SpecularPow", float) = 5.0
+
+        [Header(Shadow)]
         [Toggle(IS_SHADOW_RECEIVER)]_IsShadowReceiver("IsShadowReceiver", int) = 1
+        [Toggle(IS_SHADOW_CASTER)]_IsShadowCaster("IsShadowCaster", int) = 1
 
         [Header(RampColor)]
         _HighLightColor("HighLightColor", Color) = (1.0,1.0,1.0,1.0)
@@ -18,6 +22,7 @@
         _Sphericalize("Sphericalize(X,Y,Z,Blend)",Vector) = (0,0,0,0)
 
         [Header(RimLight)]
+        [Toggle(IS_RIMLIGHT)]_IsRimLight("IsRimLight", int) = 1
         _RimColor("RimColor", Color) = (1.0, 1.0, 0.0,1.0)
         _RimPower("RimPower", Range(1.0, 10.0)) = 4.0
         [PowerSlider(3.0)]_DirectionRimPower("DirectionRimPower", Range(0.0,8.0)) = 2.0
@@ -47,11 +52,13 @@
             float4 _AmbientLight;
             float _SpecularPow;
             int _IsShadowReceiver;
+            int _IsShadowCaster;
             float4 _HighLightColor;
             float4 _NormalLightColor;
             float4 _Shadow1Color;
             float4 _Shadow2Color;
             float4 _Sphericalize;
+            int _IsRimLight;
             float4 _RimColor;
             float _RimPower;
             float _DirectionRimPower;
@@ -80,10 +87,14 @@
             #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile _ _SHADOWS_SOFT
 
-            // シャドウ用のトグルのシェーダーキーワード
-            #pragma shader_feature IS_SHADOW_RECEIVER
             // シェーディング方法選択のKeywordEnumのシェーダーキーワード
             #pragma multi_compile _SHADINGMODE_TOON _SHADINGMODE_REALANDTOON
+            // シャドウ用のトグルのシェーダーキーワード
+            #pragma shader_feature IS_SHADOW_RECEIVER
+            #pragma shader_feature IS_SHADOW_CASTER
+            // リムライトを行うかのトグルのシェーダーキーワード
+            #pragma shader_feature IS_RIMLIGHT
+
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
@@ -163,6 +174,7 @@
                 // 環境光の計算
                 col.xyz += CalcAmbientLight(_AmbientLight.xyz, baseColor.xyz);
 
+#ifdef IS_RIMLIGHT
                 // リムライトの計算
                 col.xyz += CalcrRimLight(
                     i.normal,
@@ -172,6 +184,7 @@
                     mainLight.direction,
                     _DirectionRimPower
                 );
+#endif
 
                 // フォグの計算
                 col.rgb = MixFog(col.rgb, i.fogFactor);
@@ -182,8 +195,10 @@
             ENDHLSL
         }
 
+//#ifdef IS_SHADOW_CASTER
         // シャドウキャスター用パス
         UsePass "MyShader/ShadowCasterShader/ShadowCaster"
+//#endif
 
         // DepthNormals使用時の深度バッファ用パス
         UsePass "MyShader/DepthNormalsShader/DepthNormalsPass"

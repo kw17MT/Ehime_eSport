@@ -7,9 +7,11 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MyShader_ModelShader
+  m_Name: M_Mikanmaru
   m_Shader: {fileID: 4800000, guid: 7c1f305b9849d314a83a10bbe8dff51f, type: 3}
   m_ValidKeywords:
+  - IS_RIMLIGHT
+  - IS_SHADOW_CASTER
   - IS_SHADOW_RECEIVER
   - _SHADINGMODE_TOON
   m_InvalidKeywords: []
@@ -30,6 +32,8 @@ Material:
     m_Floats:
     - _DirectionRimPower: 2
     - _EdgeWidth: 0
+    - _IsRimLight: 1
+    - _IsShadowCaster: 1
     - _IsShadowReceiver: 1
     - _RimPower: 4
     - _ShadingMode: 0
