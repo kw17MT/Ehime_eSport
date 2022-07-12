@@ -652,5 +652,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 }
             }
         }
+
+        if(this.gameObject.transform.position.y <= -2.0f)
+		{
+            Vector3 pos = this.gameObject.transform.position;
+            pos.y = 2.0f;
+            this.gameObject.transform.position = pos;
+
+        }
     }
 }

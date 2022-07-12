@@ -171,12 +171,10 @@ public class InGameScript : MonoBehaviourPunCallbacks
             //プレイヤーＮの次のウェイポイント番号を取得
             int otherPlayerWayPointNumber = (PhotonNetwork.CurrentRoom.CustomProperties[otherPlayerWayPointName] is int point) ? point : 0;
             //他のプレイヤーの方が自分より進んでいれば且つ自分or相手の次のナンバーが0（ゴール最寄り位置）でないなら
-            if (otherPlayerWayPointNumber > nextMyWayPoint
-				&& nextMyWayPoint != 0 /*&& otherPlayerWayPointNumber != 0*/)
+            if ((otherPlayerWayPointNumber > nextMyWayPoint && nextMyWayPoint != 0) 
+                || otherPlayerWayPointNumber == 0)
 			{
                 currentPlace += 1;
-
-                //Debug.Log("myName = " + myLapCountKey + "→" + currentMyLapCount + "// pl2 = " + lapCountKey + "→" + otherPlayerLapCount);
 			}
             //同一ウェイポイントを通過している場合
             else if(otherPlayerWayPointNumber == nextMyWayPoint)
@@ -510,7 +508,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
 					continue;
 				}
 				//プレイヤーの方が周回していたら
-				if (ai.GetComponent<AIProgressChecker>().GetLapCount() < m_player.GetComponent<ProgressChecker>().GetLapCount())
+				else if (ai.GetComponent<AIProgressChecker>().GetLapCount() < m_player.GetComponent<ProgressChecker>().GetLapCount())
 				{
 					//以下の処理をスキップ
 					continue;
@@ -518,8 +516,9 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
 
 				//AIの方がよりウェイポイントを進んでいたら
-				if (ai.GetComponent<RaceAIScript>().GetNextWayPoint() > m_player.GetComponent<WayPointChecker>().GetNextWayPointNumber()
+				if ((ai.GetComponent<RaceAIScript>().GetNextWayPoint() > m_player.GetComponent<WayPointChecker>().GetNextWayPointNumber()
 					&& m_player.GetComponent<WayPointChecker>().GetNextWayPointNumber() != 0)
+                    || ai.GetComponent<RaceAIScript>().GetNextWayPoint() == 0)
 				{
 					//順位を１下げる
 					currentPlace += 1;
