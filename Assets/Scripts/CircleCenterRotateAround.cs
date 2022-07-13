@@ -51,6 +51,14 @@ public class CircleCenterRotateAround : MonoBehaviour
             m_aroundMoveOn = true;
             //時計回り
             m_reverse = 1;
+
+            /////////////////////////////////////////////////////
+            //フリックSEの再生
+            nsSound.SoundSource swipeSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+            swipeSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+            swipeSS.Be3DSound();
+            swipeSS.PlayStart(nsSound.SENames.m_swipeAndTableTurns);
+            /////////////////////////////////////////////////////
         }
         //画面が左フリックされたら、
         if (m_operation.GetNowOperation() == "left")
@@ -59,6 +67,14 @@ public class CircleCenterRotateAround : MonoBehaviour
             m_aroundMoveOn = true;
             //時計回り
             m_reverse = -1;
+
+            /////////////////////////////////////////////////////
+            //フリックSEの再生
+            nsSound.SoundSource swipeSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+            swipeSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+            swipeSS.Be3DSound();
+            swipeSS.PlayStart(nsSound.SENames.m_swipeAndTableTurns);
+            /////////////////////////////////////////////////////
         }
     }
 

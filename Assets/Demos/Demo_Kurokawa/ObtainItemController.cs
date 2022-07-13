@@ -52,7 +52,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
             int type = (int)Random.Range((float)EnItemType.enOrangePeel, (float)EnItemType.enItemTypeNum);
             m_obtainItemType = (EnItemType)type;
 
-            Debug.Log("取得したアイテム番号　＝　" + m_obtainItemType);
+            Debug.Log("取得したアイテム番号　＝　" + m_obtainItemType);          
         }
     }
 
@@ -67,6 +67,14 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
     {
         m_isLotteryFinish = isLotteryFinish;
     }
+
+    ///////////////////////////////////////////////////////////////
+    //抽選演出が終了したかどうかのフラグを取得
+    public bool GetLotteryFinish()
+    {
+        return m_isLotteryFinish;
+    }
+    ///////////////////////////////////////////////////////////////
 
     public void UseItem()
 	{
@@ -83,9 +91,24 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                         Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_BACK);
                         //オレンジの皮をネットワークオブジェクトとしてインスタンス化
                         var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
+
+                        ////////////////////////////////////////////////
+                        //皮を落とす音の再生
+                        nsSound.SoundSource dropOrangePeelSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                        dropOrangePeelSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                        dropOrangePeelSS.Be3DSound();
+                        dropOrangePeelSS.PlayStart(nsSound.SENames.m_dropOrangePeel);
+                        ////////////////////////////////////////////////
                         break;
                     case EnItemType.enOrangeJet:
                         this.GetComponent<AvatarController>().SetIsUsingJet();
+                        ////////////////////////////////////////////////
+                        //ダッシュSEの再生
+                        nsSound.SoundSource dashSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                        dashSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                        dashSS.Be3DSound();
+                        dashSS.PlayStart(nsSound.SENames.m_dash);
+                        ////////////////////////////////////////////////
                         break;
                     case EnItemType.enTrain:
                         this.GetComponent<AvatarController>().SetIsUsingKiller();

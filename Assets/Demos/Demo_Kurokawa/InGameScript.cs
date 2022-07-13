@@ -99,6 +99,12 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
         //秒数の整数部分の変化を見るために保存する。
         m_prevCountDownNum = (int)m_countDownNum;
+
+        ////////////////////////////////////////////////////////////////////////////
+        //BGMを停止
+        nsSound.BGM.Instance.FadeOutStart();
+        ////////////////////////////////////////////////////////////////////////////
+
     }
 
     //オフラインモードの時に使用する
@@ -396,6 +402,10 @@ public class InGameScript : MonoBehaviourPunCallbacks
                     //game開始フラグを立てるように通信を送る
                     photonView.RPC(nameof(SetPlayerMovable), RpcTarget.All);
 
+                    /////////////////////////////////////////////////////////////////////////////////////
+                    //BGM再生開始
+                    nsSound.BGM.Instance.SetPlayBGM(nsSound.BGMNames.m_race1);
+                    /////////////////////////////////////////////////////////////////////////////////////
                 }
                 //待機時間の秒数が変わったらそれを同期する
                 if (m_prevCountDownNum != (int)m_countDownNum)

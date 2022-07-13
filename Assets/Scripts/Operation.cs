@@ -167,6 +167,14 @@ public class Operation : MonoBehaviour
         }
     }
 
+    /////////////////////////////////////////////////////////////////////////////////
+    //長押し中かどうかを設定するプロパティ
+    public void SetIsLongTouch(bool isLongTouch)
+    {       
+        m_isLongTouch = isLongTouch;  
+    }
+    /////////////////////////////////////////////////////////////////////////////////
+
     //タッチのフラグや数値を初期化する関数
     public void TachDataInit()
     {

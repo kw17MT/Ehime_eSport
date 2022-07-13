@@ -9,6 +9,7 @@ public class ItemDecide : MonoBehaviour
     [SerializeField] Sprite[] itemSprite = null;
     //アイテム画像
     [SerializeField]Image itemImage = null;
+
     //ステート
     enum EnItemState
     {
@@ -16,6 +17,7 @@ public class ItemDecide : MonoBehaviour
         enLotteryState,  //抽選状態
         enBlinkingState  //抽選終了した後の点滅状態
     }
+
     EnItemState itemState = EnItemState.enNothingState;
     //点滅の回数
     [SerializeField] int blinkingNumberOfTimes = 0;
