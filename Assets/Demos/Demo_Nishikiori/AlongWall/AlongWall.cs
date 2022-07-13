@@ -30,27 +30,25 @@ public class AlongWall
         //剛体の移動方向を取得
         Vector3 velocity = rigidbody.velocity;
         velocity.Normalize();
-        Debug.Log("Velocity " + velocity);
-
         //接触した当たり判定の法線を取得
         Vector3 normal = collision.contacts[0].normal;
 
-        Debug.Log("Normal " + normal);
 
-        if (Vector3.Dot(velocity, normal) > 0.0f)
-        {
+        //
+        //if (Vector3.Dot(playerForward, velocity - (Vector3.Dot(velocity, normal) * normal)) >= 0.0f)
+        //{
 
-
-
+        //if (Vector3.Dot(normal, velocity) <= 0.0f)
+        //{
             //壁に沿って動くベクトルを計算し、移動方向として格納
             moveDirection = velocity - (Vector3.Dot(velocity, normal) * normal);
-            Debug.Log(moveDirection);
-            //moveDirection.Normalize();
 
+            //moveDirection.Normalize();
             //当たった時の向きをリセットし、スピードをセット
             //rigidbody.velocity = m_alongWallSpeed * moveDirection;
+            //}
+        //}
 
-        }
 
 #if UNITY_EDITOR
         //当たった壁の法線を可視化(Debug)

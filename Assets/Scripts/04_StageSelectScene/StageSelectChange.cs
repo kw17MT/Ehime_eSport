@@ -13,10 +13,8 @@ public class StageSelectChange : MonoBehaviour
     [SerializeField] string[] m_stageName = null;
     //ステージ名ラベル
     [SerializeField] Text m_stageNameLabel = null;
-    //難易度スプライト
-    [SerializeField] Sprite[] m_difficlutySprite = null;
-    //難易度イメージ
-    [SerializeField] Image m_difficlutyImage = null;
+    //難易度スターゲームオブジェクト
+    [SerializeField] GameObject[] m_difficlutyStar = null;
     //ステージごとの難易度(0,簡単。1,普通。2,難しい)
     [SerializeField]int[] m_stageDifficluty = { 0, 1, 2 };
     //ステージ説明文
@@ -123,7 +121,19 @@ public class StageSelectChange : MonoBehaviour
     void StageSceneDataUpdate()
     {
         //難易度画像を更新
-        m_difficlutyImage.sprite = m_difficlutySprite[m_stageDifficluty[(int)m_nowSelectStage]];
+        for (int starNum = 0; starNum < m_stageDifficluty.Length; starNum++)
+        {
+            if (starNum <= m_stageDifficluty[(int)m_nowSelectStage])
+            {
+                //表示
+                m_difficlutyStar[starNum].GetComponent<Image>().enabled = true;
+            }
+            else
+            {
+                //非表示
+                m_difficlutyStar[starNum].GetComponent<Image>().enabled = false;
+            }
+        }
         //ステージ名ラベルを更新
         m_stageNameLabel.text = m_stageName[(int)m_nowSelectStage];
         //ステージ説明文を更新

@@ -13,10 +13,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
     Vector3 m_moveSpeed = Vector3.zero;                 //移動スピード
     Vector3 m_rot = Vector3.zero;                       //どちらに回転するかの向き
     Vector3 m_corseDir = Vector3.zero;                  //現在走っているコースの大まかな方向
-    Vector3 m_alongWallDir = Vector3.zero;
-    Vector3 m_distanceToNextWayPoint = Vector3.zero;    //次のウェイポイントへの距離
+    Vector3 m_alongWallDir = Vector3.zero;              //壁ずりした時の修正済み移動方向          
+    float m_distanceToNextWayPoint = 0.0f;              //次のウェイポイントへの距離
     private GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
-    private GameObject m_orepation = null;
+    private GameObject m_orepation = null;              //プレイヤーの操作状態をもつインスタンス
+    private RaceAIScript m_aiScript = null;             //プレイヤーにつけているAIScript（ゴールした時にキャラの操作をAIに移管する用）
+    private AvatarController m_avaCon = null;           //操作をAIに移管した時にプレイヤーの操作をOFFにするためのインスタンス（このスクリプト）
+    private AlongWall m_alongWall = null;               //壁ずり時の移動方向を更新するインスタンス
     private bool m_canMove = false;                     //移動が制限されていないか
     private float m_runningTime = 0.0f;                 //走行時間
     private float m_stiffenTime = 0.0f;                 //攻撃された時の硬直している時間
@@ -24,7 +27,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private float m_dashTime = 0.0f;                    //キノコを使ってダッシュしている時間
     private float m_killerTime = 0.0f;                  //キラーを使用している時間
     private float m_spinedAngle = 0.0f;                 //被弾して回転した総量
-    private float m_rotateAcceleration = 0.0f;
+    private float m_frameCounter = 0.0f;                //ゲームタイムを用いてどのくらい時間がたったかを記録する変数
     private bool m_isGoaled = false;                    //自分はゴールしたか
     private bool m_isToldRecord = false;                //自分の走破レコードをホストクライアントに送ったかどうかのフラグ
     private bool m_isToldReady = false;                 //ルームに参加して準備ができたことを一度だけ通信するためのフラグ
@@ -33,10 +36,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private bool m_isUsingJet = false;                  //現在、ジェットを使用しているか
     private bool m_isAttacked = false;                  //攻撃されたか
     private bool m_hittedWall = false;                  //壁に当たっているか
-    private bool m_isInvincible = false;
+    private bool m_isInvincible = false;                //自分のプレイヤーは無敵化
     private Quaternion m_prevTrasnform;                 //前回の回転の度合い
     
-
     public float MOVE_POWER = 25.0f;                  　//リジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_STAR = 35.0f;         //スター使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_JET = 50.0f;          //ジェット使用時のリジッドボディにかける移動の倍率
@@ -48,14 +50,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
     public float KILLER_HANDLING_RATE = 5.0f;           //キラーを使用した際のカメラの追従速度
     public float SPIN_AMOUNT = 6.0f;                    //被弾時の回転率
-    private float ROTATE_ACCELERATION_RATE = 0.01f;     //回転の加速度
-
-    private float m_frameCounter = 0.0f;                //ゲームタイムを用いてどのくらい時間がたったかを記録する変数
-    private float UPDATE_DISTANCE_TIMING = 0.5f;        //次のウェイポイントとの距離を更新するタイミング
-
-
-
-    private AlongWall m_alongWall = null;               //壁ずり時の移動方向を更新するインスタンス
+    private float FIX_MOVESPEED_POWER_AFTER_KILLER = 10.0f; //キラー終了時に通常スピードに戻すための変数          
+    private float UPDATE_DISTANCE_TIMING = 0.1f;        //次のウェイポイントとの距離を更新するタイミング
 
     void Start()
     {
@@ -95,12 +91,17 @@ public class AvatarController : MonoBehaviourPunCallbacks
         PhotonNetwork.SendRate = 5;
         //1秒間に何回同期を行うか
         PhotonNetwork.SerializationRate = 5;
+
+        //プレイヤーについているスクリプトの取得
+        m_aiScript = this.GetComponent<RaceAIScript>();
+        //プレイヤーについているスクリプトの取得
+        m_avaCon = this.GetComponent<AvatarController>();
     }
 
     //ルームプロパティの何かが更新された時の関数
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
-        //更新されたルームのカスタムプロパティのペアをコンソールに出力する
+        //更新されたルームのカスタムプロパティのペアを取得していく
         foreach (var prop in propertiesThatChanged)
         {
             //各プレイヤーの無敵状態を示すキー部分を作成
@@ -120,7 +121,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 				}
                 m_isInvincible = isPlayerInvincible;
             }
-            Debug.Log($"{prop.Key}: {prop.Value}");
+            //Debug.Log($"{prop.Key}: {prop.Value}");
         }
     }
 
@@ -152,31 +153,40 @@ public class AvatarController : MonoBehaviourPunCallbacks
 	{
         //スターを使用している状態
         m_isUsingStar = true;
-        //ルームプロパティの自分の無敵状態を名前を使って検索、変更を行う
-        var hashtable = new ExitGames.Client.Photon.Hashtable();
-        string name = PhotonNetwork.NickName + "Invincible";
-        hashtable[name] = 1;
-        //ルームプロパティを更新
-        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        m_isInvincible = true;
+        //オンラインモードならば
+        if (!PhotonNetwork.OfflineMode)
+        {
+            //ルームプロパティの自分の無敵状態を名前を使って検索、変更を行う
+            var hashtable = new ExitGames.Client.Photon.Hashtable();
+            string name = PhotonNetwork.NickName + "Invincible";
+            hashtable[name] = 1;
+            //ルームプロパティを更新
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        }
     }
 
     //ジェットを使用している状態にする
     public void SetIsUsingJet()
 	{
         m_isUsingJet = true;
-	}
+    }
 
     //キラーを使用している状態にする
     public void SetIsUsingKiller()
 	{
         //キラーを使用している
         m_isUsingKiller = true;
-        //ルームプロパティの自分の無敵状態を名前を使って検索、変更を行う
-        var hashtable = new ExitGames.Client.Photon.Hashtable();
-        string name = PhotonNetwork.NickName + "Invincible";
-        hashtable[name] = 1;
-        //ルームプロパティを更新
-        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        m_isInvincible = true;
+        if (!PhotonNetwork.OfflineMode)
+        {
+            //ルームプロパティの自分の無敵状態を名前を使って検索、変更を行う
+            var hashtable = new ExitGames.Client.Photon.Hashtable();
+            string name = PhotonNetwork.NickName + "Invincible";
+            hashtable[name] = 1;
+            //ルームプロパティを更新
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        }
     }
 
     //スターを使用しているかを取得する
@@ -185,21 +195,29 @@ public class AvatarController : MonoBehaviourPunCallbacks
         return m_isUsingStar;
 	}
 
+    //プレイヤーは攻撃されているかを取得する
     public bool GetIsAttacked()
 	{
         return m_isAttacked;
 	}
 
-    public Vector3 GetDistanceToNextWayPoint()
+    //プレイヤーは無敵状態化を取得する
+    public bool GetIsInvincible()
+	{
+        return m_isInvincible;
+	}
+
+    //次のウェイポイントへの距離を取得する
+    public float GetDistanceToNextWayPoint()
 	{
         return m_distanceToNextWayPoint;
 	}
 
-    //ホストへクリアタイムを送る
+    //ホストへ自分の名前とクリアタイムを送る
     [PunRPC]
     public void TellRecordTime(string name, float time)
     {
-        GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNameAndRecordTime(name, time);
+        GameObject.Find("SceneDirector").GetComponent<InGameScript>().AddGoaledPlayerNameAndRecordTime(name, time, true);
     }
 
     //自身がレースの参加の用意ができたかホストに送る
@@ -217,13 +235,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //何かが衝突したら
     private void OnCollisionEnter(Collision col)
 	{
-
-
-
+        //タイと当たったら
         if(col.gameObject.name == "Snapper(Clone)")
 		{
+            //自分のニックネームの番号部分だけを取得
             string idStr = PhotonNetwork.NickName;
             int id = int.Parse(idStr[6].ToString());
+            //タイを発射した人と自分が違うならば
             if (col.gameObject.GetComponent<SnapperController>().GetOwnerID() != id)
             {
                 //自分のゲーム内のタイインスタンスの削除
@@ -234,32 +252,48 @@ public class AvatarController : MonoBehaviourPunCallbacks
                     //攻撃された
                     m_isAttacked = true;
                 }
-                Debug.Log("Attacked By Snapper(Clone)");
+                //Debug.Log("Attacked By Snapper(Clone)");
             }
 		}
+        //オレンジの皮をひいたら
         if (col.gameObject.name == "OrangePeel(Clone)")
         {
+            //そのインスタンスを削除
             Destroy(col.gameObject);
-            Debug.Log("OrangePeel(Clone)");
+            //Debug.Log("OrangePeel(Clone)");
         }
 
         //衝突対象が他のプレイヤーならば
         if (col.gameObject.tag == "Player")
-        {
-            //コリジョンの持ち主のPhotonNetworkに関する変数を取得
-            Player pl = col.gameObject.GetComponent<PhotonView>().Owner;
-            //そのプレイヤーの無敵状態をルームプロパティから持ってくる
-            string plName = pl.NickName + "Invincible";
-            int stat = (PhotonNetwork.CurrentRoom.CustomProperties[plName] is int value) ? value : 0;
-
-            //攻撃を受けたか
-            bool isCrash = false;
-            //そのプレイヤーが無敵で、自分がスターもキラーも使っていなけば
-            if (stat == 1 && !m_isInvincible)
+        {   
+            //オンラインモードならば
+            if(!PhotonNetwork.OfflineMode)
 			{
-                //自分のプレイヤーは攻撃を受けた
-                m_isAttacked = true;
+                //コリジョンの持ち主のPhotonNetworkに関する変数を取得
+                Player pl = col.gameObject.GetComponent<PhotonView>().Owner;
+                //そのプレイヤーの無敵状態をルームプロパティから持ってくる
+                string plName = pl.NickName + "Invincible";
+                int stat = (PhotonNetwork.CurrentRoom.CustomProperties[plName] is int value) ? value : 0;
+                //そのプレイヤーが無敵で、自分が無敵状態でなければ
+                if (stat == 1 && !m_isInvincible)
+                {
+                    //自分のプレイヤーは攻撃を受けた
+                    m_isAttacked = true;
+                }
             }
+			//オフラインプレイならば
+			else
+			{
+                //あたったプレイヤーが無敵状態かを取得
+                bool isInvinciblePlayer = GameObject.Find(col.gameObject.name).GetComponent<AICommunicator>().GetIsInvincible();
+
+                //無敵プレイヤーならば
+                if(isInvinciblePlayer)
+				{
+                    //攻撃された
+                    m_isAttacked = true;
+				}
+			}
 		}
 
         //衝突先が壁の時
@@ -278,11 +312,14 @@ public class AvatarController : MonoBehaviourPunCallbacks
 	{
         if (col.gameObject.tag == "Wall")
         {
+            //壁に当たった
             m_hittedWall = true;
-            Debug.Log("WALL");
-            m_alongWall.CollisionEnter(col, m_rb, ref m_moveDir);
+            //壁に対して自分の前方向がめり込む方向ならば
+            if(Vector3.Dot(col.contacts[0].normal, this.transform.forward) <= 0.0f)
+			{
+                m_alongWall.CollisionEnter(col, m_rb, ref m_moveDir);
+            }
             m_alongWallDir = m_moveDir;
-            Debug.Log("AvatarController : m_moveDir = " + m_alongWallDir);
         }
     }
 
@@ -301,29 +338,24 @@ public class AvatarController : MonoBehaviourPunCallbacks
             // 自身が生成したオブジェクトだけに移動処理を行う
             if (photonView.IsMine)
             {
-                //前方向に移動
-                //m_moveDir = this.transform.forward * (Input.GetAxis("Vertical"));
-
+                //移動方向
                 Vector3 dir = Vector3.zero;
-
-                switch(m_orepation.GetComponent<Operation>().GetNowOperation())
+                //プレイヤーの操作状態を取得する
+                switch(m_orepation.GetComponent<Operation>().GetNowOperationAndPower().dir)
 				{
                     case "right":
-                        m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
                         //入力による回転量、フレームレートに回転量が依存しないようにゲームタイムを乗算
-                        m_rot = new Vector3(0.0f, ROT_POWER * m_rotateAcceleration * Time.deltaTime, 0.0f);
+                        m_rot = new Vector3(0.0f, m_orepation.GetComponent<Operation>().GetNowOperationAndPower().power * ROT_POWER * Time.deltaTime, 0.0f);
                         break;
                     case "left":
-                        m_rotateAcceleration += ROTATE_ACCELERATION_RATE;
                         //入力による回転量、フレームレートに回転量が依存しないようにゲームタイムを乗算
-                        m_rot = new Vector3(0.0f, -ROT_POWER * m_rotateAcceleration * Time.deltaTime, 0.0f) ;
+                        m_rot = new Vector3(0.0f, m_orepation.GetComponent<Operation>().GetNowOperationAndPower().power * ROT_POWER * Time.deltaTime, 0.0f) ;
                         break;
                     default:
-                        m_rotateAcceleration = 0.0f;
                         m_rot = Vector3.zero;
                         break;
                 }
-                dir += this.transform.forward;// * Input.GetAxis("Vertical");//this.transform.forward;
+                dir += this.transform.forward;// * Input.GetAxis("Vertical");
                 m_moveDir = dir;
 
 
@@ -362,19 +394,12 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 //報告済み
                 m_isToldRecord = true;
             }
-
-			//Yキル
-			if (this.transform.position.y <= -2.0f)
-			{
-				this.transform.position = new Vector3(0.0f, 2.0f, 0.0f);
-			}
-
-
         }
     }
 
 	private void LateUpdate()
 	{
+        //キラーを使用時にコースの方向を向くように回転させる
         if (m_isUsingKiller)
         {
             //回転について、FixedUpdateでやるとガクつくためここで更新
@@ -389,43 +414,6 @@ public class AvatarController : MonoBehaviourPunCallbacks
             m_prevTrasnform = this.transform.rotation;
             return;
         }
-
-        ////入力による回転処理をさせない
-        //if (!m_isAttacked)
-        //{ 
-        //    //現在入力している回転を適用したTransformを適宜
-        //    Transform appliedTrasnform = this.transform;
-        //    appliedTrasnform.Rotate(m_rot);
-
-        //    //コースの向きとプレイヤーの前方向が45度以内であれば
-        //    if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
-        //    {
-        //        //回転を実際に適用する
-        //        transform.Rotate(m_rot);
-        //        //適切な回転を保存
-        //        m_prevTrasnform = this.transform.rotation;
-        //    }
-        //    //横に向きすぎているならば
-        //    else
-        //    {
-        //        //前回適用した、適切な回転で補正
-        //        this.transform.rotation = m_prevTrasnform;
-
-        //        //よこに向きすぎている
-        //        if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
-        //        {
-        //            Quaternion rot;
-        //            //コースの向きに戻すような回転を計算して適用する
-        //            rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
-        //            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
-
-        //            m_prevTrasnform = this.transform.rotation;
-        //        }
-        //    }
-        //}
-
-
-
     }
 
     private void MoveByUsingKiller()
@@ -451,6 +439,10 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_killerTime = 0.0f;
                 //キラーを使っていない状態にする
                 m_isUsingKiller = false;
+
+                m_rb.velocity = Vector3.zero;
+                m_moveSpeed = direction * MOVE_POWER_USING_KILLER * FIX_MOVESPEED_POWER_AFTER_KILLER;
+                m_rb.AddForce(m_moveSpeed);
             }
 
             //アイテムの重ね掛けをさせないように、使用中だったアイテムの継続時間も減らしていく。
@@ -478,7 +470,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
         }
     }
 
-    private void BreakIvincible()
+    private void BreakInvincible()
 	{
         if (!m_isUsingStar && !m_isUsingKiller)
         {
@@ -486,10 +478,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
             if (m_isInvincible)
             {
                 m_isInvincible = false;
-                var hashtable = new ExitGames.Client.Photon.Hashtable();
-                string name = PhotonNetwork.NickName + "Invincible";
-                hashtable[name] = 0;
-                PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+                if (!PhotonNetwork.OfflineMode)
+                {
+                    var hashtable = new ExitGames.Client.Photon.Hashtable();
+                    string name = PhotonNetwork.NickName + "Invincible";
+                    hashtable[name] = 0;
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+                }
             }
         }
 
@@ -498,10 +493,25 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //環境に依存されない、一定期間のUpdate関数（移動はここにかくこと）
     private void FixedUpdate()
     {
+        if(m_isGoaled && !m_aiScript.enabled)
+		{
+            //AIスクリプトをONにする
+            m_aiScript.enabled = true;
+            //AIで動けるようにする
+            m_aiScript.SetCanMove(true);
+            
+		}
+        //AIモードがONであれば
+        if(m_aiScript.enabled)
+		{
+            //プレイヤーの操作スクリプトをOFFにする
+            this.GetComponent<AvatarController>().enabled = false;
+        }
+
         //キラー使用時の移動。キラー使用時はこの関数以降の処理は行わない
         MoveByUsingKiller();
 
-        BreakIvincible();
+        BreakInvincible();
 
         //入力による回転処理をさせない
         if (!m_isAttacked)
@@ -545,32 +555,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
             {
                 this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // 回転角度を設定            
             }
-        }
 
-
-        if (!m_isAttacked)
-		{
-            //壁ずり状態ならば
-            if(m_hittedWall)
-			{
-                m_moveSpeed = m_alongWallDir * MOVE_POWER;
-                Debug.Log("moveSpeed : " + m_moveSpeed + " m_alongWallDir : " + m_alongWallDir);
-                //前方へ加速
-                
-                m_hittedWall = false;
-            }
-            //そうでないなら通常通り移動
-            m_rb.AddForce(m_moveSpeed - m_rb.velocity);
-        }
-		//攻撃されていたら
-		else
-		{
             //硬直時間をゲーム時間で増やす
             m_stiffenTime += Time.deltaTime;
             //設定した最大硬直時間を超えたら
 
             if (m_stiffenTime >= MAX_STIFFIN_TIME)
-			{
+            {
                 //計測した硬直時間をリセット
                 m_stiffenTime = 0.0f;
                 //被弾時の回転リアクションの総回転量をリセット
@@ -578,7 +569,19 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 //攻撃フラグを直す
                 m_isAttacked = false;
             }
-		}
+        }
+		else
+		{
+            //壁ずり状態ならば
+            if (m_hittedWall)
+            {
+                //壁に沿う移動方向を用いてスピードを計算
+                m_moveSpeed = m_alongWallDir * MOVE_POWER;
+                m_hittedWall = false;
+            }
+            //そうでないなら通常通り移動
+            m_rb.AddForce(m_moveSpeed - m_rb.velocity);
+        }
 
         //ジェットを使用しているならば
         if(m_isUsingJet)
@@ -602,37 +605,60 @@ public class AvatarController : MonoBehaviourPunCallbacks
 				m_starTime = 0.0f;
 				m_isUsingStar = false;
 
-                //ルームプロパティの無敵状態も戻しておく
-				var hashtable = new ExitGames.Client.Photon.Hashtable();
-				string name = PhotonNetwork.NickName + "Invincible";
-				hashtable[name] = 0;
-				PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+                if (!PhotonNetwork.OfflineMode)
+                {
+                    //ルームプロパティの無敵状態も戻しておく
+                    var hashtable = new ExitGames.Client.Photon.Hashtable();
+                    string name = PhotonNetwork.NickName + "Invincible";
+                    hashtable[name] = 0;
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+                }
             }
 		}
 
         //インゲームならば
         if (SceneManager.GetActiveScene().name == "08_GameScene")
         {
-            //経過時間を計測する
-            m_frameCounter += Time.deltaTime;
-            //ゲームない時間が一定時間たったら
-            if (m_frameCounter >= UPDATE_DISTANCE_TIMING)
+            //オフラインモードならば
+            if (PhotonNetwork.OfflineMode)
             {
                 //次のウェイポイントへの距離
                 Vector3 distanceToNextWayPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
                 //自分も持っておく
-                m_distanceToNextWayPoint = distanceToNextWayPoint;
-
-                string key = PhotonNetwork.NickName + "Distance";
-
-                //オンラインで取得できるようにカスタムプロパティを更新
-                var hashtable = new ExitGames.Client.Photon.Hashtable();
-                hashtable[key] = distanceToNextWayPoint;
-                PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
-
-                //リセット
-                m_frameCounter = 0.0f;
+                m_distanceToNextWayPoint = distanceToNextWayPoint.magnitude;
             }
+            else
+            {
+                //経過時間を計測する
+                m_frameCounter += Time.deltaTime;
+                //ゲームない時間が一定時間たったら
+                if (m_frameCounter >= UPDATE_DISTANCE_TIMING)
+                {
+                    //次のウェイポイントへの距離
+                    Vector3 distanceToNextWayPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
+                    //自分も持っておく
+                    m_distanceToNextWayPoint = distanceToNextWayPoint.magnitude;
+
+
+                    string key = PhotonNetwork.NickName + "Distance";
+
+                    //オンラインで取得できるようにカスタムプロパティを更新
+                    var hashtable = new ExitGames.Client.Photon.Hashtable();
+                    hashtable[key] = distanceToNextWayPoint;
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+
+                    //リセット
+                    m_frameCounter = 0.0f;
+                }
+            }
+        }
+
+        if(this.gameObject.transform.position.y <= -2.0f)
+		{
+            Vector3 pos = this.gameObject.transform.position;
+            pos.y = 2.0f;
+            this.gameObject.transform.position = pos;
+
         }
     }
 }

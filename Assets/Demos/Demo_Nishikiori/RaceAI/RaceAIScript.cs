@@ -10,11 +10,34 @@ public class RaceAIScript : MonoBehaviour
     public string m_AITag = "Player";                                           //AIにつけられたゲームオブジェクトのタグ
     public string m_playerTag = "OwnPlayer";                                    //プレイヤーにつけられたゲームオブジェクトのタグ
     private Rigidbody m_rigidbody = null;                                       //AIキャラクターの剛体
-    private const float m_kMaxSpeed = 25.0f;                                    //最高速度
-    private Vector3 m_rightSteeringVector = new Vector3(0.0f, 5.0f, 0.0f);      //右方向への回転用ベクトル
-    private Vector3 m_leftSteeringVector = new Vector3(0.0f, -5.0f, 0.0f);      //左方向への回転用ベクトル
+    private WayPointChecker m_wayPointChecker = null;                           //AIキャラクターのウェイポイントチェッカー
+
+    //ステータス//
+    //スピード
+    private float m_maxSpeed {get;set;} = 25.0f;                                //最高速度
+
+    //操作性
+    private Vector3 m_rightSteeringVector { get; set; }
+        = new Vector3(0.0f, 5.0f, 0.0f);                                        //右方向への回転用ベクトル
+    private Vector3 m_leftSteeringVector { get; set; }
+        = new Vector3(0.0f, -5.0f, 0.0f);                                       //左方向への回転用ベクトル
+
+    //パワフル?
+
+    //運の良さ?
+
+
     private Vector3 m_targetOffset = new Vector3(0.0f,0.0f,0.0f);               //現在の目標のウェイポイントからずらす幅
     private int m_targetNumber = -1;                                            //現在目標にしているウェイポイントの番号
+
+
+    //障害物避け用変数
+    private float m_shiftLength = 0;                                            //目指す地点がウェイポイントから右方向にどれだけ離れているか
+    public LayerMask m_obstacleLayerMask;                                       //障害物のレイヤーマスク
+    RaycastHit m_sphereCastHit;                                                 //SphereCastの結果を格納する変数
+    float m_sphereCastRadius = 1.0f;                                            //SphereCastの半径
+    float m_sphereCastMaxDistance = 20.0f;                                      //SphereCastの最大距離
+    float m_onLineLength = 1.0f;                                                //障害物がライン上にあると判断する距離
 
 
     //ウェイポイントから目標地点をずらす幅(コースによって幅が違うためウェイポイント側への実装も検討)
@@ -35,40 +58,60 @@ public class RaceAIScript : MonoBehaviour
     private void Awake()
     {
         //剛体を取得
-        m_rigidbody = this.GetComponent<Rigidbody>();
+        m_rigidbody = GetComponent<Rigidbody>();
+
+        //ウェイポイントチェッカーを取得
+        m_wayPointChecker = GetComponent<WayPointChecker>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        //カウントダウンが終了して動ける状態で、攻撃されていなければ
         if(m_canMove)
 		{
-            //ウェイポイントが変更されたかを調べる
-            CheckWayPointChange();
+            if(this.gameObject.tag == "OwnPlayer" || !this.gameObject.GetComponent<AICommunicator>().GetIsAttacked())
+			{
+                //ウェイポイントが変更されたかを調べる
+                CheckWayPointChange();
 
-            //ハンドルを切る向きを決定
-            HandlingDecision();
+                //ハンドルを切る向きを決定
+                HandlingDecision();
 
-            //剛体に力を加える
-            m_rigidbody.AddForce(transform.forward * m_kMaxSpeed - m_rigidbody.velocity);
-        }
+                //剛体に力を加える
+                m_rigidbody.AddForce(transform.forward * m_maxSpeed - m_rigidbody.velocity);
+            }
 
 #if UNITY_EDITOR
-        //AIの目標地点を出力
-        Debug.DrawRay(this.GetComponent<WayPointChecker>().GetNextWayPoint() + m_targetOffset, Vector3.up * 100.0f, Color.red);
+            //デバッグ用　AIの目標地点を出力
+            Debug.DrawRay(m_wayPointChecker.GetNextWayPoint() + m_targetOffset, Vector3.up * 100.0f, Color.green);
+
+            //デバッグ用　最後に通ったウェイポイントから次のウェイポイントまでを線でつなぐ
+            Vector3 prevWayPointtoCurrentWayPoint = m_wayPointChecker.GetNextWayPoint() - m_wayPointChecker.GetCurrentWayPoint();
+            Debug.DrawRay(m_wayPointChecker.GetCurrentWayPoint(), prevWayPointtoCurrentWayPoint, Color.yellow);
 #endif
+
+        }
     }
 
     public void SetCanMove(bool canMove)
 	{
         m_canMove = canMove;
-        this.GetComponent<AICommunicator>().SetMoving(canMove);
+        if(this.gameObject.tag == "Player")
+		{
+            this.GetComponent<AICommunicator>().SetMoving(canMove);
+        }
     }
+
+    public int GetNextWayPoint()
+	{
+        return m_targetNumber;
+	}
 
     private void CheckWayPointChange()
     {
         //次のウェイポイントを取得
-        int nextNumber = this.GetComponent<WayPointChecker>().GetNextWayPointNumber();
+        int nextNumber = m_wayPointChecker.GetNextWayPointNumber();
 
         //現在目指しているウェイポイントと番号が同じなら何もしない
         if(m_targetNumber == nextNumber)
@@ -81,19 +124,87 @@ public class RaceAIScript : MonoBehaviour
         //目指すウェイポイントの番号を更新
         m_targetNumber = nextNumber;
 
-        this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
+        //このスクリプトをもつオブジェクトがAIだったら
+        if(this.gameObject.tag == "Player")
+		{
+            //次のウェイポイントをAIの情報を別オブジェクトに通信するスクリプトに保存
+            this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
+        }
 
         //ウェイポイントの座標からずらす幅を乱数で決定
-        float shiftLength = Random.Range(-m_innerShiftMaxLength, m_outerShiftMaxLength);
+        m_shiftLength = Random.Range(-m_innerShiftMaxLength, m_outerShiftMaxLength);
 
         //目指す位置をローカル座標系で左右にずらすベクトルを計算
-        m_targetOffset = this.GetComponent<WayPointChecker>().GetNextWayPointRight() * shiftLength;
+        m_targetOffset = m_wayPointChecker.GetNextWayPointRight() * m_shiftLength;
     }
 
     private void HandlingDecision()
     {
+        //障害物アイテムを避ける処理
+        if (Physics.SphereCast(transform.position, m_sphereCastRadius, transform.forward, out m_sphereCastHit, m_sphereCastMaxDistance,m_obstacleLayerMask))
+        {
+            //前に通ったウェイポイントから次のウェイポイントへのベクトルを計算
+            Vector3 currentWayPointToNextWayPoint = m_wayPointChecker.GetNextWayPoint() - m_wayPointChecker.GetCurrentWayPoint();
+
+            //そのベクトルに対する右方向を計算
+            Vector3 right = Vector3.Cross(Vector3.up, currentWayPointToNextWayPoint.normalized);
+
+            //前に通ったウェイポイントから当たった障害物へのベクトルを計算
+            Vector3 prevWayPointToHitObject = m_sphereCastHit.collider.gameObject.transform.position - m_wayPointChecker.GetCurrentWayPoint();
+
+            //障害物の位置をライン上に投影
+            float dot = Vector3.Dot(currentWayPointToNextWayPoint.normalized, prevWayPointToHitObject);
+
+            //障害物の位置から最も近いライン上の座標を求める
+            Vector3 nearestLinePos = m_wayPointChecker.GetCurrentWayPoint() + dot * currentWayPointToNextWayPoint.normalized;
+
+            //障害物の位置からライン上の位置のベクトルを求める
+            Vector3 obstacleToNearestLinePos = nearestLinePos - m_sphereCastHit.collider.gameObject.transform.position;
+
+            //ベクトルの長さが短ければ(障害物がラインに近ければ)
+            if(obstacleToNearestLinePos.magnitude < m_onLineLength)
+            {
+#if UNITY_EDITOR
+                //デバッグ用　ライン上の位置を出力
+                Debug.DrawRay(nearestLinePos, Vector3.up * 100.0f, Color.red);
+#endif
+
+                //ウェイポイントより右側を目指しているか左側を目指しているかで分岐させる
+                if (m_shiftLength < 0.0f)
+                {
+                    LeftHandling();
+                }
+                else
+                {
+                    RightHandling();
+                }
+                return;
+            }
+
+#if UNITY_EDITOR
+            //デバッグ用　ライン上の位置を出力
+            Debug.DrawRay(nearestLinePos, Vector3.up * 100, Color.blue);
+#endif
+
+            //内積を計算する
+            float angle = Vector3.Dot(right, prevWayPointToHitObject);
+
+            //内積が0より大きければ障害物はウェイポイントをつなぐ線(センターライン)より右にある
+            //＝ハンドルを左に切る
+            if (angle > 0.0f)
+            {
+                LeftHandling();
+            }
+            else
+            {
+                RightHandling();
+            }
+
+            return;
+        }
+
         //現在目指している位置へのベクトルを計算
-        Vector3 toNextPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() + m_targetOffset - this.transform.position;
+        Vector3 toNextPoint = m_wayPointChecker.GetNextWayPoint() + m_targetOffset - this.transform.position;
 
         //目指す方向を計算
         Vector3 newForward = toNextPoint;
@@ -118,14 +229,28 @@ public class RaceAIScript : MonoBehaviour
             if (steeringAngle > 0.0f)
             {
                 //右にハンドルを切る(回転させる)
-                transform.Rotate(m_rightSteeringVector);
+                RightHandling();
             }
             else
             {
                 //左にハンドルを切る(回転させる)
-                transform.Rotate(m_leftSteeringVector);
+                LeftHandling();
             }
         }
+    }
+
+    void OnDrawGizmos()
+    {
+#if UNITY_EDITOR
+        //デバッグ用　AIが障害物を検知した場合描画
+        if (m_sphereCastHit.collider != null && ((1 << m_sphereCastHit.collider.gameObject.layer) & m_obstacleLayerMask) != 0)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawRay(transform.position, transform.forward * m_sphereCastHit.distance);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position + transform.forward * m_sphereCastHit.distance, m_sphereCastRadius);
+        }
+#endif
     }
 
     private void OnCollisionStay(Collision collision)
@@ -146,13 +271,22 @@ public class RaceAIScript : MonoBehaviour
         if (angle > m_kContactAngle)
         {
             //右にいるので左にハンドルを切る
-            transform.Rotate(m_leftSteeringVector);
+            LeftHandling();
         }
         else if(angle < -m_kContactAngle)
         {
             //左にいるので右にハンドルを切る
-            transform.Rotate(m_rightSteeringVector);
+            RightHandling();
         }
     }
 
+    private void RightHandling()
+    {
+        transform.Rotate(m_rightSteeringVector);
+    }
+
+    private void LeftHandling()
+    {
+        transform.Rotate(m_leftSteeringVector);
+    }
 }
