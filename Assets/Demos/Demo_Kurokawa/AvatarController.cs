@@ -137,6 +137,14 @@ public class AvatarController : MonoBehaviourPunCallbacks
         m_isGoaled = true;
     }
 
+    ///////////////////////////////////////////////////////////////
+    //プレイヤーがゴールしたかを取得する
+    public bool GetGoaled()
+    {
+        return m_isGoaled;
+    }
+    ///////////////////////////////////////////////////////////////
+    
     //自分が攻撃されたことを設定する
     public void SetIsAttacked()
     {

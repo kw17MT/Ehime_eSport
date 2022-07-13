@@ -38,7 +38,7 @@ namespace nsSound
         // Start is called before the first frame update
         private void Awake()
         {
-
+            DontDestroyOnLoad(gameObject);
         }
 
         private void OnDestroy()
@@ -119,11 +119,11 @@ namespace nsSound
             {
                 case EnSoundTypes.enSE:
                     m_soundTypeVolume = m_soundManager.GetSEVolume();
-                    m_atomExAcb = CriAtom.GetAcb("test02");
+                    m_atomExAcb = CriAtom.GetAcb("CueSheet_SE");
                     break;
                 case EnSoundTypes.enBGM:
                     m_soundTypeVolume = m_soundManager.GetSEVolume();
-                    m_atomExAcb = CriAtom.GetAcb("test03");
+                    m_atomExAcb = CriAtom.GetAcb("CueSheet_BGM");
                     break;
                 case EnSoundTypes.enNarration:
                     m_soundTypeVolume = m_soundManager.GetSEVolume();
@@ -198,7 +198,7 @@ namespace nsSound
                 return;
             }
 
-            m_atomExPlayer.Stop();          
+            m_atomExPlayer.Stop();
             Destroy(this.gameObject.transform.root.gameObject);
         }
 
@@ -281,7 +281,7 @@ namespace nsSound
         }
 
         ////////////////////////////////////////////////////////////////////////
-        
+
         //フェードイン・フェードアウト関係。
         //これらとSetPlayStartOffset関数を利用することで、クロスフェードを行えます。
 
@@ -290,7 +290,7 @@ namespace nsSound
         public void SetFadeInTime(int ms)
         {
             m_atomExPlayer.SetFadeInTime(ms);
-        }    
+        }
         //フェードアウトの時間を設定します。引数:msに渡す値は1000で1秒
         public void SetFadeOutTime(int ms)
         {
@@ -353,6 +353,19 @@ namespace nsSound
                 return;
             }
             m_atomEx3DSource.SetPosition(x, y, z);
+            m_atomEx3DSource.Update();
+        }
+
+        //3Dサウンドが聞こえる最小距離と最大距離を設定する。
+        //最小距離は、それ以上音の大きさが大きくならない距離
+        //最大距離は、音が聞こえなくなる距離。
+        public void Set3DMinMaxDistance(float minDis, float maxDis)
+        {
+            if (Init() != true)
+            {
+                return;
+            }
+            m_atomEx3DSource.SetMinMaxDistance(minDis, maxDis);
             m_atomEx3DSource.Update();
         }
 
