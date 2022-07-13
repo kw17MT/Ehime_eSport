@@ -435,7 +435,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
     }
 
-    void Update()
+    void FixedUpdate()
 	{
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
