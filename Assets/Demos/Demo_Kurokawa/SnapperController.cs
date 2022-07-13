@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
 //鯛の基本行動クラス
-public class SnapperController : MonoBehaviour
+public class SnapperController : MonoBehaviourPunCallbacks
 {
     private GameObject m_targetPlayer = null;                   //ターゲットしたプレイヤーのオブジェクト
     private Vector3 m_targetPos = Vector3.zero;                 //次の目標地点
@@ -29,27 +31,58 @@ public class SnapperController : MonoBehaviour
         m_shouldCheckNextWayPoint = true;
 	}
 
+    [PunRPC]
+    private void DestroyItemWithName(string name)
+    {
+        GameObject.Find("SceneDirector").GetComponent<ItemStateCommunicator>().DestroyItemWithName(name);
+    }
+
     //タイと何かが衝突したら
-	private void OnCollisionEnter(Collision col)
+    private void OnCollisionEnter(Collision col)
 	{
         //それが自分ではなく、地面ではない場合
-        if(col.gameObject.tag != "OwnPlayer" && col.gameObject.tag != "Ground")
+        if (col.gameObject.tag != "OwnPlayer" && col.gameObject.tag != "Ground")
 		{
             //消す。（壁であっても消えるように）
-            Destroy(this.gameObject, 0.1f);
+            DestroyItemWithName(this.gameObject.name);
         }
-	}
+    }
 
     //鯛の感知エリアに何かが入ったら
-	private void OnTriggerEnter(Collider col)
+    private void OnTriggerEnter(Collider col)
 	{
         //それがプレイヤーであって、自分が別のプレイヤーを追跡していなけば
-        if(col.gameObject.tag == "Player" && !m_isChasePlayer)
+        if ((col.gameObject.tag == "Player" || col.gameObject.tag == "OwnPlayer") && !m_isChasePlayer)
 		{
-            //追跡対象として保存
-            m_targetPlayer = col.gameObject;
-            //自分は追跡している
-            m_isChasePlayer = true;
+            //そのオブジェクトはAIのみが所持するスクリプトを持っているか
+            AICommunicator aiCommunicator = col.gameObject.GetComponent<AICommunicator>();
+            int playerID = 0;
+            //持っていなければ
+            if (aiCommunicator == null)
+			{
+                //プレイヤーのもつオンライン上でのニックネームを取得
+                Player pl = col.gameObject.GetComponent<PhotonView>().Owner;
+                //取得できた＝プレイヤーならば
+                if (pl != null)
+                {
+                    string strID = pl.NickName;
+                    playerID = int.Parse(strID[6].ToString());
+                }
+            }
+            //接触オブジェクトがAIならば
+			else
+			{
+                string strID = aiCommunicator.GetAIName();
+                playerID = int.Parse(strID[6].ToString());
+			}
+
+            if (m_ownerID != playerID)
+            {
+                //追跡対象として保存
+                m_targetPlayer = col.gameObject;
+                //自分は追跡している
+                m_isChasePlayer = true;
+            }
         }
 	}
 

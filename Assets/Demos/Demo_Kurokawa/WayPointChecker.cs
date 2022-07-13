@@ -38,16 +38,16 @@ public class WayPointChecker : MonoBehaviour
     }
 
     //他のクラス（主にプレイヤー）から直接現在直近で通過したウェイポイントの座標と番号を設定
-    public void SetCurrentWayPointDirectly(Transform transform, int wayPointNumber)
+    public void SetCurrentWayPointDirectly(Vector3 currentPos, int wayPointNumber)
 	{
         //下関数で次のウェイポイントを更新するため1つ前のポイントで初期化
         m_nextWayPointNumber = wayPointNumber;
         //次の目的地を更新する。
-        SetNextWayPoint(transform, wayPointNumber);
+        SetNextWayPoint(currentPos, wayPointNumber);
     }
 
     //次のウェイポイントに向かうため、変数を更新する
-    public void SetNextWayPoint(Transform currentTransform, int throughNumber)
+    public void SetNextWayPoint(Vector3 currentPos, int throughNumber)
     {
         //既に通過済みのポイントと再度接触して不要な更新が行われないようにする。
         if (m_nextWayPointNumber != throughNumber)
@@ -58,7 +58,7 @@ public class WayPointChecker : MonoBehaviour
         if(throughNumber == 0)
 		{
             //通過済みポイントの座標を保存
-            m_currentWayPointPos = currentTransform.position;
+            m_currentWayPointPos = currentPos;
         }
 		else
 		{
@@ -99,7 +99,7 @@ public class WayPointChecker : MonoBehaviour
 
 
         //このインスタンスの持ち主が鯛であれば
-        if (gameObject.name == "Snapper(Clone)")
+        if (gameObject.name[0..7] == "Snapper")
         { 
             //自分の次のウェイポイントはどこか更新させるように伝える
             this.GetComponent<SnapperController>().SetCheckNextWayPoint();

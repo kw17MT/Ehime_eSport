@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ColorSupportScript : MonoBehaviour
 {
-    [SerializeField]
-    Operation m_operation = null;
+    //[SerializeField]
+    //Operation m_operation = null;
 
 
     // Start is called before the first frame update

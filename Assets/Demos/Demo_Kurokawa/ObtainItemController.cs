@@ -34,6 +34,12 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         m_paramManager = GameObject.Find("ParamManager");
 	}
 
+    [PunRPC]
+    private void InstantiateItem(string prefabName, Vector3 popPos, int wayPointNumber = -1, int playerNumber = -1)
+	{
+        GameObject.Find("SceneDirector").GetComponent<ItemStateCommunicator>().PopItem(prefabName, popPos, wayPointNumber, playerNumber);
+	}
+
     public void SetUseItem()
 	{
         if(m_isLotteryFinish)
@@ -122,7 +128,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                         //ローカルでオレンジの皮を指定された座標に生成
                         var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
                         //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
-                        snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(this.gameObject.transform, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
+                        snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(this.gameObject.transform.position, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
                         // Player1 とか
                         string idStr = PhotonNetwork.NickName;
                         int id = int.Parse(idStr[6].ToString());
@@ -151,7 +157,11 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                 //オレンジの皮のポップ位置を自機の後ろにする
                 Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_BACK);
                 //オレンジの皮をネットワークオブジェクトとしてインスタンス化
-                var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
+                //var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
+
+                //string prefabName, Transform trans, int wayPointNumber = 0, int playerNumber = 0
+                photonView.RPC(nameof(InstantiateItem), RpcTarget.All, "OrangePeel", orangePeelPos, -1, -1);
+
             }
             //テストでボタンを押したらスター使用状態にする。
             if (Input.GetKeyDown(KeyCode.J))
@@ -169,14 +179,16 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                 //タイのポップ位置を自機の前にする
                 Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_FRONT);
                 //ローカルでオレンジの皮を指定された座標に生成
-                var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
+                //var snapper = PhotonNetwork.InstantiateRoomObject("Snapper", snapperPos, Quaternion.identity);
                 //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
-                Debug.Log(this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
-                snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(this.gameObject.transform, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
+                //Debug.Log(this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
+                //snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(this.gameObject.transform, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
                 // Player1 とか
                 string idStr = PhotonNetwork.NickName;
                 int id = int.Parse(idStr[6].ToString());
-                snapper.GetComponent<SnapperController>().SetOwnerID(id);
+                //snapper.GetComponent<SnapperController>().SetOwnerID(id);
+
+                photonView.RPC(nameof(InstantiateItem), RpcTarget.All, "Snapper", snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber(), id);
             }
             //テストでボタンを押したらキラー使用状態にする。
             if (Input.GetKeyDown(KeyCode.P))

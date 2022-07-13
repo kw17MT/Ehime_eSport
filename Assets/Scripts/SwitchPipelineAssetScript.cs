@@ -50,7 +50,7 @@ public class SwitchPipelineAssetScript : MonoBehaviour
             if (GraphicsSettings.currentRenderPipeline.name == m_pipelineAsset[i].name)
             {
                 m_pipelinAssetState = (EnPipelineAsset)i;
-                Debug.Log("currentPipelineAsset" + m_pipelinAssetState);
+                // Debug.Log("currentPipelineAsset" + m_pipelinAssetState);
                 break;
             }
         }
@@ -73,8 +73,8 @@ public class SwitchPipelineAssetScript : MonoBehaviour
             }
 
             QualitySettings.renderPipeline = m_pipelineAsset[(int)m_pipelinAssetState];
-            Debug.Log("SwitchPipelineAsset" + m_pipelinAssetState);
-            Debug.Log("CurrentPipelineAsset" + GraphicsSettings.renderPipelineAsset.name);
+            // Debug.Log("SwitchPipelineAsset" + m_pipelinAssetState);
+            // Debug.Log("CurrentPipelineAsset" + GraphicsSettings.renderPipelineAsset.name);
         }
 
         return;

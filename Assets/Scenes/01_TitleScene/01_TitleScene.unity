@@ -1246,7 +1246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca86582e637ee8147bccbae840844c63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  advanceSpeed: -0.05
+  advanceSpeed: -0.5
   trainMoveRange: -7.5
   m_transitionPostEffect: {fileID: 275940278}
 --- !u!1001 &2854638853363623964
