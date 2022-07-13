@@ -21,6 +21,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private bool m_isShownResult = false;                                                 //リザルトを出しているか
     private bool m_shouldCountDown = true;                                              //カウントダウンの数字を出すか
     private bool m_canReturnModeSelection = false;
+    private bool m_isBGMStart = false;
     Dictionary<string, float> m_scoreBoard = new Dictionary<string, float>();           //ゴールしたプレイヤーの名前とタイム一覧
 
     private List<GameObject> m_ai = new List<GameObject>();
@@ -437,6 +438,15 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
     void FixedUpdate()
 	{
+        if(m_isBGMStart)
+		{
+            /////////////////////////////////////////////////////////////////////////////////////
+            //BGM再生開始
+            nsSound.BGM.Instance.SetPlayBGM(nsSound.BGMNames.m_race1);
+            /////////////////////////////////////////////////////////////////////////////////////
+            m_isBGMStart = false;
+		}
+
         //ホストのみ実行する部分
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
@@ -454,10 +464,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                     //game開始フラグを立てるように通信を送る
                     photonView.RPC(nameof(SetPlayerMovable), RpcTarget.All);
 
-                    /////////////////////////////////////////////////////////////////////////////////////
-                    //BGM再生開始
-                    nsSound.BGM.Instance.SetPlayBGM(nsSound.BGMNames.m_race1);
-                    /////////////////////////////////////////////////////////////////////////////////////
+                    m_isBGMStart = true;
                 }
                 //待機時間の秒数が変わったらそれを同期する
                 if (m_prevCountDownNum != (int)m_countDownNum)
