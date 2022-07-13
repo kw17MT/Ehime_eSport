@@ -24,7 +24,6 @@ Material:
   m_Shader: {fileID: 4800000, guid: 7c1f305b9849d314a83a10bbe8dff51f, type: 3}
   m_ValidKeywords:
   - IS_RIMLIGHT
-  - IS_SHADOW_CASTER
   - IS_SHADOW_RECEIVER
   - _SHADINGMODE_TOON
   m_InvalidKeywords: []
@@ -111,7 +110,7 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _IsRimLight: 1
-    - _IsShadowCaster: 1
+    - _IsShadowCaster: 0
     - _IsShadowReceiver: 1
     - _Metallic: 0
     - _OcclusionStrength: 1

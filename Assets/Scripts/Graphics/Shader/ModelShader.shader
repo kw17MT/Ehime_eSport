@@ -91,7 +91,6 @@
             #pragma multi_compile _SHADINGMODE_TOON _SHADINGMODE_REALANDTOON
             // シャドウ用のトグルのシェーダーキーワード
             #pragma shader_feature IS_SHADOW_RECEIVER
-            #pragma shader_feature IS_SHADOW_CASTER
             // リムライトを行うかのトグルのシェーダーキーワード
             #pragma shader_feature IS_RIMLIGHT
 
@@ -195,10 +194,8 @@
             ENDHLSL
         }
 
-//#ifdef IS_SHADOW_CASTER
         // シャドウキャスター用パス
         UsePass "MyShader/ShadowCasterShader/ShadowCaster"
-//#endif
 
         // DepthNormals使用時の深度バッファ用パス
         UsePass "MyShader/DepthNormalsShader/DepthNormalsPass"
