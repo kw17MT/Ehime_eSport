@@ -16,6 +16,7 @@ public class ScreenTap : MonoBehaviour
 
     void Start()
     {
+        Application.targetFrameRate = 30;
         //操作システムのゲームオブジェクトを検索しコンポーネントを取得
         m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
     }

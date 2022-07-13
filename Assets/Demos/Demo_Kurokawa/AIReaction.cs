@@ -15,6 +15,12 @@ public class AIReaction : MonoBehaviourPunCallbacks
         
     }
 
+	[PunRPC]
+	private void DestroyItemWithName(string name)
+	{
+		GameObject.Find("SceneDirector").GetComponent<ItemStateCommunicator>().DestroyItemWithName(name);
+	}
+
 	private void OnCollisionEnter(Collision col)
 	{
 		//オフラインモードならば
@@ -41,7 +47,7 @@ public class AIReaction : MonoBehaviourPunCallbacks
 				}
 			}
 
-			if (col.gameObject.name == "Snapper(Clone)")
+			if (col.gameObject.name.Length >= 7 && col.gameObject.name[0..7] == "Snapper")
 			{
 				//自分の名前を取得
 				string idStr = this.gameObject.name;//GetComponent<AICommunicator>().GetAIName();
@@ -50,7 +56,7 @@ public class AIReaction : MonoBehaviourPunCallbacks
 				if (col.gameObject.GetComponent<SnapperController>().GetOwnerID() != id)
 				{
 					//自分のゲーム内のタイインスタンスの削除
-					Destroy(col.gameObject);
+					photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, col.gameObject.name);
 					//無敵でなければ
 					if (!this.gameObject.GetComponent<AICommunicator>().GetIsInvincible())
 					{
@@ -60,9 +66,11 @@ public class AIReaction : MonoBehaviourPunCallbacks
 					//Debug.Log("Attacked By Snapper(Clone)");
 				}
 			}
-			if (col.gameObject.name == "OrangePeel(Clone)")
+			if (col.gameObject.name.Length >= 10 && col.gameObject.name[0..10] == "OrangePeel")
 			{
-				Destroy(col.gameObject);
+				photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, col.gameObject.name);
+
+				//Destroy(col.gameObject);
 				//Debug.Log("OrangePeel(Clone)");
 			}
 		}
@@ -114,14 +122,14 @@ public class AIReaction : MonoBehaviourPunCallbacks
 				}
 			}
 
-			if (col.gameObject.name == "Snapper(Clone)")
+			if (col.gameObject.name.Length >= 7 && col.gameObject.name[0..7] == "Snapper")
 			{
 				string idStr = this.gameObject.GetComponent<AICommunicator>().GetAIName();
 				int id = int.Parse(idStr[6].ToString());
 				if (col.gameObject.GetComponent<SnapperController>().GetOwnerID() != id)
 				{
 					//自分のゲーム内のタイインスタンスの削除
-					Destroy(col.gameObject);
+					photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, col.gameObject.name);
 					//無敵状態ならば
 					if (!this.gameObject.GetComponent<AICommunicator>().GetIsInvincible())
 					{
@@ -130,9 +138,9 @@ public class AIReaction : MonoBehaviourPunCallbacks
 					}
 					//Debug.Log("Attacked By Snapper(Clone)");
 				}
-				if (col.gameObject.name == "OrangePeel(Clone)")
+				if (col.gameObject.name.Length >= 10 && col.gameObject.name[0..10] == "OrangePeel")
 				{
-					Destroy(col.gameObject);
+					photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, col.gameObject.name);
 					//Debug.Log("OrangePeel(Clone)");
 				}
 			}

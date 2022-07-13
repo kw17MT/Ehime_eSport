@@ -43,7 +43,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MOVE_POWER_USING_STAR = 35.0f;         //スター使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_JET = 50.0f;          //ジェット使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_KILLER = 60.0f;       //キラー使用時のリジッドボディにかける移動の倍率
-    public float ROT_POWER = 100.0f;                      //ハンドリング
+    public float ROT_POWER = 50.0f;                      //ハンドリング
     public float MAX_STAR_REMAIN_TIME = 10.5f;          //スターの最大継続時間
     public float MAX_KILLER_REMAIN_TIME = 3.0f;         //キラーの最大継続時間
     public float MAX_DASH_TIME = 1.0f;                  //ダッシュの最大継続時間
@@ -232,11 +232,18 @@ public class AvatarController : MonoBehaviourPunCallbacks
         }
     }
 
+
+    [PunRPC]
+    private void DestroyItemWithName(string name)
+	{
+        GameObject.Find("SceneDirector").GetComponent<ItemStateCommunicator>().DestroyItemWithName(name);
+    }
+
     //何かが衝突したら
     private void OnCollisionEnter(Collision col)
 	{
         //タイと当たったら
-        if(col.gameObject.name == "Snapper(Clone)")
+        if(col.gameObject.name.Length >= 7 && col.gameObject.name[0..7] == "Snapper")
 		{
             //自分のニックネームの番号部分だけを取得
             string idStr = PhotonNetwork.NickName;
@@ -245,7 +252,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
             if (col.gameObject.GetComponent<SnapperController>().GetOwnerID() != id)
             {
                 //自分のゲーム内のタイインスタンスの削除
-                Destroy(col.gameObject);
+                photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, col.gameObject.name);
                 //キラーもスターも使っていなければ
                 if (!m_isInvincible)
                 {
@@ -256,10 +263,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
             }
 		}
         //オレンジの皮をひいたら
-        if (col.gameObject.name == "OrangePeel(Clone)")
+        if (col.gameObject.name.Length >= 10 && col.gameObject.name[0..10] == "OrangePeel")
         {
             //そのインスタンスを削除
-            Destroy(col.gameObject);
+            //Destroy(col.gameObject);
+            photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, col.gameObject.name);
             //Debug.Log("OrangePeel(Clone)");
         }
 
@@ -355,7 +363,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                         m_rot = Vector3.zero;
                         break;
                 }
-                dir += this.transform.forward;// * Input.GetAxis("Vertical");
+                dir += this.transform.forward * Input.GetAxis("Vertical");
                 m_moveDir = dir;
 
 
