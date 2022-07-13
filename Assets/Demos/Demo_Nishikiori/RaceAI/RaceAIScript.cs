@@ -70,7 +70,7 @@ public class RaceAIScript : MonoBehaviour
         //カウントダウンが終了して動ける状態で、攻撃されていなければ
         if(m_canMove)
 		{
-            if(this.gameObject.tag == "OwnPlayer" || !this.gameObject.GetComponent<AICommunicator>().GetIsAttacked())
+            if(this.gameObject.tag == m_playerTag || !this.gameObject.GetComponent<AICommunicator>().GetIsAttacked())
 			{
                 //ウェイポイントが変更されたかを調べる
                 CheckWayPointChange();
@@ -97,7 +97,7 @@ public class RaceAIScript : MonoBehaviour
     public void SetCanMove(bool canMove)
 	{
         m_canMove = canMove;
-        if(this.gameObject.tag == "Player")
+        if(this.gameObject.tag == m_AITag)
 		{
             this.GetComponent<AICommunicator>().SetMoving(canMove);
         }
@@ -125,7 +125,7 @@ public class RaceAIScript : MonoBehaviour
         m_targetNumber = nextNumber;
 
         //このスクリプトをもつオブジェクトがAIだったら
-        if(this.gameObject.tag == "Player")
+        if(this.gameObject.tag == m_AITag)
 		{
             //次のウェイポイントをAIの情報を別オブジェクトに通信するスクリプトに保存
             this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
