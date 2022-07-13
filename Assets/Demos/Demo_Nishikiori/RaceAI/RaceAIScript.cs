@@ -289,4 +289,14 @@ public class RaceAIScript : MonoBehaviour
     {
         transform.Rotate(m_leftSteeringVector);
     }
+
+    ////////////////////////////////////////////////////
+    public Rigidbody GetRigidBody
+    {
+        get 
+        {
+            return m_rigidbody;
+        }
+    }
+    ////////////////////////////////////////////////////
 }

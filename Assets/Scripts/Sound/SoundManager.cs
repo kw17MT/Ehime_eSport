@@ -12,10 +12,10 @@ namespace nsSound
         enNarration,    //ナレーションや実況
         enCharaVoice,   //キャラクターの声
         enNone
-    }   
+    }
 
     //サウンドマネージャークラス。シングルトン。
-    public class SoundManager : MonoBehaviour
+    public class SoundManager
     {
         //サウンドマネージャーのインスタンス
         private static SoundManager m_instance = null;
@@ -29,20 +29,6 @@ namespace nsSound
         private float m_narrationVolume = 1.0f;
         private float m_charaVoiceVolume = 1.0f;
 
-        // Start is called before the first frame update
-        void Start()
-        {
-
-        }
-        private void OnDestroy()
-        {
-        }
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
         //インスタンス
         static public SoundManager Instance
         {
@@ -50,7 +36,7 @@ namespace nsSound
             {
                 if (m_instance == null)
                 {
-                    m_instance = new GameObject("SoundManager").AddComponent<SoundManager>();
+                    m_instance = new SoundManager();
                 }
                 return m_instance;
             }
@@ -62,7 +48,7 @@ namespace nsSound
         //全体の音量を入手と設定。
         public float GetAllVolume()
         {
-            return m_allVolume;       
+            return m_allVolume;
         }
         public void SetAllVolume(float volume)
         {

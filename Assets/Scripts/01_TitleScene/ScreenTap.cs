@@ -19,6 +19,10 @@ public class ScreenTap : MonoBehaviour
         Application.targetFrameRate = 30;
         //操作システムのゲームオブジェクトを検索しコンポーネントを取得
         m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
+        ////////////////////////////////////////
+        //BGMの再生
+        nsSound.BGM.Instance.SetPlayBGM(nsSound.BGMNames.m_title);
+        ////////////////////////////////////////
     }
 
     void Update()
@@ -58,6 +62,16 @@ public class ScreenTap : MonoBehaviour
 
             //列車が前進できる判定にする
             canAdvance = true;
+
+            //////////////////////////////
+            //発進SEの再生
+            nsSound.SoundSource dashSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+            dashSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+            dashSS.Be3DSound();
+            dashSS.PlayStart(nsSound.SENames.m_dash);
+            //BGMをフェードアウト
+            nsSound.BGM.Instance.FadeOutStart();
+            //////////////////////////////
         }
     }
 

@@ -49,6 +49,11 @@ public class StageSelectChange : MonoBehaviour
         m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
         //円の中心を電車が回転する機能付きのゲームオブジェクトを検索しゲームコンポーネントを取得する
         m_circleCenterRotateAround = GameObject.Find("Train").GetComponent<CircleCenterRotateAround>();
+
+        ////////////////////////////////////////
+        //BGMの再生
+        nsSound.BGM.Instance.SetPlayBGM(nsSound.BGMNames.m_menu);
+        ////////////////////////////////////////
     }
 
     //アップデート関数
