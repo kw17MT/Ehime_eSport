@@ -414,6 +414,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 photonView.RPC(nameof(TellRecordTime), RpcTarget.MasterClient, PhotonNetwork.NickName, m_runningTime);
                 //報告済み
                 m_isToldRecord = true;
+
+                if(PhotonNetwork.OfflineMode)
+				{
+                    GameObject.Find("SceneDirector").GetComponent<InGameScript>().SetStopToTellAIRecord();
+				}
             }
         }
     }

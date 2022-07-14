@@ -73,6 +73,11 @@ public class AICommunicator : MonoBehaviourPunCallbacks
         m_isMoving = isMoving;
 	}
 
+    public void SetStopToTellRecord()
+	{
+        m_isToldRecord = true;
+	}
+
     //次のウェイポイントを設定する
     public void SetNextWayPoint(int number)
 	{

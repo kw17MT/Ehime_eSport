@@ -338,6 +338,14 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
     }
 
+    public void SetStopToTellAIRecord()
+	{
+        foreach(GameObject ai in m_ai)
+		{
+            ai.GetComponent<AICommunicator>().SetStopToTellRecord();
+		}
+	}
+
     //準備ができたプレイヤーの数をインクリメント（ホストプレイヤーが使用）
     public void AddReadyPlayerNum()
 	{
@@ -349,7 +357,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     {
         //プレイヤー名をキーに、クリアタイムをバリューに
         m_scoreBoard.Add(playerName, time);
-        Debug.Log(playerName + "    " + time);
+        //Debug.Log(playerName + "    " + time);
         if (isPlayer)
         {
             //ゴールしたプレイヤーの総数をインクリメント
