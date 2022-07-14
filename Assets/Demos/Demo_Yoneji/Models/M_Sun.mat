@@ -25,6 +25,7 @@ Material:
   m_ValidKeywords:
   - IS_RIMLIGHT
   - IS_SHADOW_RECEIVER
+  - _CASTSHADOW_OFF
   - _SHADINGMODE_TOON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -97,6 +98,7 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
+    - _CastShadow: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2

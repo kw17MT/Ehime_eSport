@@ -10,7 +10,6 @@
 
         [Header(Shadow)]
         [Toggle(IS_SHADOW_RECEIVER)]_IsShadowReceiver("IsShadowReceiver", int) = 1
-        [Toggle(IS_SHADOW_CASTER)]_IsShadowCaster("IsShadowCaster", int) = 1
 
         [Header(RampColor)]
         _HighLightColor("HighLightColor", Color) = (1.0,1.0,1.0,1.0)
@@ -52,7 +51,6 @@
             float4 _AmbientLight;
             float _SpecularPow;
             int _IsShadowReceiver;
-            int _IsShadowCaster;
             float4 _HighLightColor;
             float4 _NormalLightColor;
             float4 _Shadow1Color;

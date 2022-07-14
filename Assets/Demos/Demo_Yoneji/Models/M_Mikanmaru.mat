@@ -11,10 +11,11 @@ Material:
   m_Shader: {fileID: 4800000, guid: 7c1f305b9849d314a83a10bbe8dff51f, type: 3}
   m_ValidKeywords:
   - IS_RIMLIGHT
-  - IS_SHADOW_CASTER
   - IS_SHADOW_RECEIVER
+  - _CASTSHADOW_ON
   - _SHADINGMODE_TOON
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - IS_SHADOW_CASTER
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -30,6 +31,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _CastShadow: 1
     - _DirectionRimPower: 2
     - _EdgeWidth: 0
     - _IsRimLight: 1
