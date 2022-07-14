@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
 //このスクリプトが割り当てられたインスタンスのチェックポイント管理インスタンス
 public class ProgressChecker : MonoBehaviour
@@ -20,7 +21,10 @@ public class ProgressChecker : MonoBehaviour
             m_checkPoint.Add(false);
 		}
 
-        GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_lapCount);
+        if(SceneManager.GetActiveScene().name == "08_GameScene")
+		{
+            GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_lapCount);
+        }
     }
 
     public int GetLapCount()

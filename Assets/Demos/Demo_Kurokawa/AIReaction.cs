@@ -69,9 +69,6 @@ public class AIReaction : MonoBehaviourPunCallbacks
 			if (col.gameObject.name.Length >= 10 && col.gameObject.name[0..10] == "OrangePeel")
 			{
 				photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, col.gameObject.name);
-
-				//Destroy(col.gameObject);
-				//Debug.Log("OrangePeel(Clone)");
 			}
 		}
 		//オンラインモードならば

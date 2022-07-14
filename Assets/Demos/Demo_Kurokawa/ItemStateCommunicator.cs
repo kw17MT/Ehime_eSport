@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class ItemStateCommunicator : MonoBehaviour
+
+public class ItemStateCommunicator : MonoBehaviourPunCallbacks
 {
     public GameObject m_orangePeel;
     public GameObject m_snapper;
@@ -16,13 +18,20 @@ public class ItemStateCommunicator : MonoBehaviour
         
     }
 
+    [PunRPC]
     public void DestroyItemWithName(string name)
 	{
+        Debug.Log("in destroy fnc");
         GameObject go = GameObject.Find(name);
         if(go != null)
 		{
+            Debug.Log(go.name);
             Destroy(go);
         }
+		else
+		{
+            Debug.Log("NULL");
+		}
 	}
 
     public void PopItem(string prefabName, Vector3 popPos, int wayPointNumber, int playerNumber)
@@ -38,10 +47,6 @@ public class ItemStateCommunicator : MonoBehaviour
             m_snapperSum++;
             GameObject snapper = Instantiate(m_snapper, popPos, Quaternion.identity);
             snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(popPos, wayPointNumber);
-
-            // Player1 ‚Æ‚©
-            //string idStr = PhotonNetwork.NickName;
-            //int id = int.Parse(idStr[6].ToString());
             snapper.GetComponent<SnapperController>().SetOwnerID(playerNumber);
             snapper.name = "Snapper" + m_snapperSum;
         }

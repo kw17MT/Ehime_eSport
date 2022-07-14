@@ -63,7 +63,7 @@ namespace nsSound
         // Update is called once per frame
         void Update()
         {
-            Debug.Log(m_atomExPlayer.GetStatus());
+            //Debug.Log(m_atomExPlayer.GetStatus());
 
             //再生し終わったら、消す。
             if (m_atomExPlayer.GetStatus() == CriAtomExPlayer.Status.PlayEnd)
@@ -87,7 +87,7 @@ namespace nsSound
             if (m_cueSheetsAreLoading == false)
             {
                 // ロード済みだから初期化処理をしない
-                Debug.Log("初期化済みです。");
+                //Debug.Log("初期化済みです。");
                 return true;
             }
             else

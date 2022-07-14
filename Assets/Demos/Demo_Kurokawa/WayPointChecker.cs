@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 
 //ウェイポイント経過処理と次のウェイポイントを提示するクラス
@@ -17,7 +16,7 @@ public class WayPointChecker : MonoBehaviour
     void Start()
     {
         //このクラスを持っているのが自分のプレイヤーだったら
-        if(this.gameObject.tag == "OwnPlayer")
+        if(this.gameObject.tag == "OwnPlayer" && SceneManager.GetActiveScene().name == "08_GameScene")
 		{
             //カメラ回転抑制の都合上最初はウェイポイント1目指す。
             GameObject nextWayPoint = GameObject.Find("WayPoint1");

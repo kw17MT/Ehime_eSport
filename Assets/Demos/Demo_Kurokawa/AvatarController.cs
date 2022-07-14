@@ -414,6 +414,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 photonView.RPC(nameof(TellRecordTime), RpcTarget.MasterClient, PhotonNetwork.NickName, m_runningTime);
                 //報告済み
                 m_isToldRecord = true;
+
+                if(PhotonNetwork.OfflineMode)
+				{
+                    GameObject.Find("SceneDirector").GetComponent<InGameScript>().SetStopToTellAIRecord();
+				}
             }
         }
     }
@@ -515,175 +520,178 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //環境に依存されない、一定期間のUpdate関数（移動はここにかくこと）
     private void FixedUpdate()
     {
-        if(m_isGoaled && !m_aiScript.enabled)
-		{
-            //AIスクリプトをONにする
-            m_aiScript.enabled = true;
-            //AIで動けるようにする
-            m_aiScript.SetCanMove(true);
-
-            //Destroy(Camera.main.GetComponent<CameraMove>());
-            //Camera.main.gameObject.AddComponent<AICameraScript>();
-            
-		}
-        //AIモードがONであれば
-        if(m_aiScript.enabled)
-		{
-            //プレイヤーの操作スクリプトをOFFにする
-            this.GetComponent<AvatarController>().enabled = false;
-        }
-
-        //キラー使用時の移動。キラー使用時はこの関数以降の処理は行わない
-        MoveByUsingKiller();
-
-        BreakInvincible();
-
-        //入力による回転処理をさせない
-        if (!m_isAttacked)
-        {
-            //現在入力している回転を適用したTransformを適宜
-            Transform appliedTrasnform = this.transform;
-            appliedTrasnform.Rotate(m_rot);
-
-            //コースの向きとプレイヤーの前方向が45度以内であれば
-            if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
-            {
-                //回転を実際に適用する
-                transform.Rotate(m_rot);
-                //適切な回転を保存
-                m_prevTrasnform = this.transform.rotation;
-            }
-            //横に向きすぎているならば
-            else
-            {
-                //前回適用した、適切な回転で補正
-                this.transform.rotation = m_prevTrasnform;
-
-                //よこに向きすぎている
-                if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
-                {
-                    Quaternion rot;
-                    //コースの向きに戻すような回転を計算して適用する
-                    rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
-                    transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
-
-                    m_prevTrasnform = this.transform.rotation;
-                }
-            }
-        }
-
-        if (m_isAttacked)
-        {
-            m_spinedAngle += SPIN_AMOUNT;
-
-            if (m_spinedAngle <= 360.0f)
-            {
-                this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // 回転角度を設定            
-            }
-
-            //硬直時間をゲーム時間で増やす
-            m_stiffenTime += Time.deltaTime;
-            //設定した最大硬直時間を超えたら
-
-            if (m_stiffenTime >= MAX_STIFFIN_TIME)
-            {
-                //計測した硬直時間をリセット
-                m_stiffenTime = 0.0f;
-                //被弾時の回転リアクションの総回転量をリセット
-                m_spinedAngle = 0.0f;
-                //攻撃フラグを直す
-                m_isAttacked = false;
-            }
-        }
-		else
-		{
-            //壁ずり状態ならば
-            if (m_hittedWall)
-            {
-                //壁に沿う移動方向を用いてスピードを計算
-                m_moveSpeed = m_alongWallDir * MOVE_POWER;
-                m_hittedWall = false;
-            }
-            //そうでないなら通常通り移動
-            m_rb.AddForce(m_moveSpeed - m_rb.velocity);
-        }
-
-        //ジェットを使用しているならば
-        if(m_isUsingJet)
-		{
-            //使用時間を増やして
-            m_dashTime += Time.deltaTime;
-            //最大継続時間を超えたら
-            if(m_dashTime >= MAX_DASH_TIME)
-			{
-                //使っていないことにして
-                m_isUsingJet = false;
-                //タイムもリセット
-                m_dashTime = 0.0f;
-			}
-		}
-		if (m_isUsingStar)
-		{
-			m_starTime += Time.deltaTime;
-			if (m_starTime >= MAX_STAR_REMAIN_TIME)
-			{
-				m_starTime = 0.0f;
-				m_isUsingStar = false;
-
-                if (!PhotonNetwork.OfflineMode)
-                {
-                    //ルームプロパティの無敵状態も戻しておく
-                    var hashtable = new ExitGames.Client.Photon.Hashtable();
-                    string name = PhotonNetwork.NickName + "Invincible";
-                    hashtable[name] = 0;
-                    PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
-                }
-            }
-		}
-
-        //インゲームならば
         if (SceneManager.GetActiveScene().name == "08_GameScene")
         {
-            //オフラインモードならば
-            if (PhotonNetwork.OfflineMode)
+            if (m_isGoaled && !m_aiScript.enabled)
             {
-                //次のウェイポイントへの距離
-                Vector3 distanceToNextWayPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
-                //自分も持っておく
-                m_distanceToNextWayPoint = distanceToNextWayPoint.magnitude;
+                //AIスクリプトをONにする
+                m_aiScript.enabled = true;
+                //AIで動けるようにする
+                m_aiScript.SetCanMove(true);
+
+                //Destroy(Camera.main.GetComponent<CameraMove>());
+                //Camera.main.gameObject.AddComponent<AICameraScript>();
+
+            }
+            //AIモードがONであれば
+            if (m_aiScript.enabled)
+            {
+                //プレイヤーの操作スクリプトをOFFにする
+                this.GetComponent<AvatarController>().enabled = false;
+            }
+
+            //キラー使用時の移動。キラー使用時はこの関数以降の処理は行わない
+            MoveByUsingKiller();
+
+            BreakInvincible();
+
+            //入力による回転処理をさせない
+            if (!m_isAttacked)
+            {
+                //現在入力している回転を適用したTransformを適宜
+                Transform appliedTrasnform = this.transform;
+                appliedTrasnform.Rotate(m_rot);
+
+                //コースの向きとプレイヤーの前方向が45度以内であれば
+                if (Vector3.Dot(m_corseDir, appliedTrasnform.forward) >= 0.7f)
+                {
+                    //回転を実際に適用する
+                    transform.Rotate(m_rot);
+                    //適切な回転を保存
+                    m_prevTrasnform = this.transform.rotation;
+                }
+                //横に向きすぎているならば
+                else
+                {
+                    //前回適用した、適切な回転で補正
+                    this.transform.rotation = m_prevTrasnform;
+
+                    //よこに向きすぎている
+                    if (Vector3.Dot(m_corseDir, this.transform.forward) < 0.7f)
+                    {
+                        Quaternion rot;
+                        //コースの向きに戻すような回転を計算して適用する
+                        rot = Quaternion.LookRotation(m_corseDir - this.transform.forward);
+                        transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
+
+                        m_prevTrasnform = this.transform.rotation;
+                    }
+                }
+            }
+
+            if (m_isAttacked)
+            {
+                m_spinedAngle += SPIN_AMOUNT;
+
+                if (m_spinedAngle <= 360.0f)
+                {
+                    this.transform.Rotate(0.0f, SPIN_AMOUNT, 0.0f, Space.World); // 回転角度を設定            
+                }
+
+                //硬直時間をゲーム時間で増やす
+                m_stiffenTime += Time.deltaTime;
+                //設定した最大硬直時間を超えたら
+
+                if (m_stiffenTime >= MAX_STIFFIN_TIME)
+                {
+                    //計測した硬直時間をリセット
+                    m_stiffenTime = 0.0f;
+                    //被弾時の回転リアクションの総回転量をリセット
+                    m_spinedAngle = 0.0f;
+                    //攻撃フラグを直す
+                    m_isAttacked = false;
+                }
             }
             else
             {
-                //経過時間を計測する
-                m_frameCounter += Time.deltaTime;
-                //ゲームない時間が一定時間たったら
-                if (m_frameCounter >= UPDATE_DISTANCE_TIMING)
+                //壁ずり状態ならば
+                if (m_hittedWall)
+                {
+                    //壁に沿う移動方向を用いてスピードを計算
+                    m_moveSpeed = m_alongWallDir * MOVE_POWER;
+                    m_hittedWall = false;
+                }
+                //そうでないなら通常通り移動
+                m_rb.AddForce(m_moveSpeed - m_rb.velocity);
+            }
+
+            //ジェットを使用しているならば
+            if (m_isUsingJet)
+            {
+                //使用時間を増やして
+                m_dashTime += Time.deltaTime;
+                //最大継続時間を超えたら
+                if (m_dashTime >= MAX_DASH_TIME)
+                {
+                    //使っていないことにして
+                    m_isUsingJet = false;
+                    //タイムもリセット
+                    m_dashTime = 0.0f;
+                }
+            }
+            if (m_isUsingStar)
+            {
+                m_starTime += Time.deltaTime;
+                if (m_starTime >= MAX_STAR_REMAIN_TIME)
+                {
+                    m_starTime = 0.0f;
+                    m_isUsingStar = false;
+
+                    if (!PhotonNetwork.OfflineMode)
+                    {
+                        //ルームプロパティの無敵状態も戻しておく
+                        var hashtable = new ExitGames.Client.Photon.Hashtable();
+                        string name = PhotonNetwork.NickName + "Invincible";
+                        hashtable[name] = 0;
+                        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+                    }
+                }
+            }
+
+            //インゲームならば
+            if (SceneManager.GetActiveScene().name == "08_GameScene")
+            {
+                //オフラインモードならば
+                if (PhotonNetwork.OfflineMode)
                 {
                     //次のウェイポイントへの距離
                     Vector3 distanceToNextWayPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
                     //自分も持っておく
                     m_distanceToNextWayPoint = distanceToNextWayPoint.magnitude;
+                }
+                else
+                {
+                    //経過時間を計測する
+                    m_frameCounter += Time.deltaTime;
+                    //ゲームない時間が一定時間たったら
+                    if (m_frameCounter >= UPDATE_DISTANCE_TIMING)
+                    {
+                        //次のウェイポイントへの距離
+                        Vector3 distanceToNextWayPoint = this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position;
+                        //自分も持っておく
+                        m_distanceToNextWayPoint = distanceToNextWayPoint.magnitude;
 
 
-                    string key = PhotonNetwork.NickName + "Distance";
+                        string key = PhotonNetwork.NickName + "Distance";
 
-                    //オンラインで取得できるようにカスタムプロパティを更新
-                    var hashtable = new ExitGames.Client.Photon.Hashtable();
-                    hashtable[key] = distanceToNextWayPoint;
-                    PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+                        //オンラインで取得できるようにカスタムプロパティを更新
+                        var hashtable = new ExitGames.Client.Photon.Hashtable();
+                        hashtable[key] = distanceToNextWayPoint;
+                        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
 
-                    //リセット
-                    m_frameCounter = 0.0f;
+                        //リセット
+                        m_frameCounter = 0.0f;
+                    }
                 }
             }
-        }
 
-        if(this.gameObject.transform.position.y <= -2.0f)
-		{
-            Vector3 pos = this.gameObject.transform.position;
-            pos.y = 2.0f;
-            this.gameObject.transform.position = pos;
+            if (this.gameObject.transform.position.y <= -2.0f)
+            {
+                Vector3 pos = this.gameObject.transform.position;
+                pos.y = 2.0f;
+                this.gameObject.transform.position = pos;
 
+            }
         }
     }
 }
