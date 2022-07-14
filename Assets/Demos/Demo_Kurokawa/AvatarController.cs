@@ -203,6 +203,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
         return m_isUsingStar;
 	}
 
+    public bool GetIsUsingKiller()
+	{
+        return m_isUsingKiller;
+	}
+
     //プレイヤーは攻撃されているかを取得する
     public bool GetIsAttacked()
 	{
@@ -455,6 +460,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_killerTime = 0.0f;
                 //キラーを使っていない状態にする
                 m_isUsingKiller = false;
+                this.gameObject.GetComponent<ObtainItemController>().SetItemNothing();
 
                 m_rb.velocity = Vector3.zero;
                 m_moveSpeed = direction * MOVE_POWER_USING_KILLER * FIX_MOVESPEED_POWER_AFTER_KILLER;
@@ -515,6 +521,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
             m_aiScript.enabled = true;
             //AIで動けるようにする
             m_aiScript.SetCanMove(true);
+
+            //Destroy(Camera.main.GetComponent<CameraMove>());
+            //Camera.main.gameObject.AddComponent<AICameraScript>();
             
 		}
         //AIモードがONであれば
