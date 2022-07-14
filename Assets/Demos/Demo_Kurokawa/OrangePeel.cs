@@ -8,6 +8,7 @@ public class OrangePeel : MonoBehaviourPunCallbacks
     [PunRPC]
     private void DestroyItemWithName(string name)
     {
+        //シーンに出ているゲームオブジェクトを名前検索してデリートする
         GameObject.Find("SceneDirector").GetComponent<ItemStateCommunicator>().DestroyItemWithName(name);
     }
 
