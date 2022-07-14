@@ -19,6 +19,6 @@ public class UseItemMediater : MonoBehaviour
     public void LetPlayerUseItem()
 	{
         GameObject.Find("OwnPlayer").GetComponent<ObtainItemController>().SetUseItem();
-        Debug.Log("Item Touched");
+        //Debug.Log("Item Touched");
 	}
 }

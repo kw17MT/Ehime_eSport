@@ -25,8 +25,17 @@ public class OrangePeel : MonoBehaviourPunCallbacks
         if(col.gameObject.tag == "Player")
 		{
             //当たったAIを攻撃された判定にする。
-            col.gameObject.GetComponent<AICommunicator>().SetIsAttacked(true);
-            DestroyItemWithName(this.gameObject.name);
+            if (col.gameObject.GetComponent<AICommunicator>() != null)
+            {
+                col.gameObject.GetComponent<AICommunicator>().SetIsAttacked(true);
+                DestroyItemWithName(this.gameObject.name);
+            }
+            else if (col.gameObject.GetComponent<AvatarController>() != null)
+			{
+                //当たったプレイヤーを攻撃された判定にする。
+                col.gameObject.GetComponent<AvatarController>().SetIsAttacked();
+                DestroyItemWithName(this.gameObject.name);
+            }
         }
 
         if(col.gameObject.name.Length >= 7 && col.gameObject.name[0..7] == "Snapper")

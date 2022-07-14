@@ -12,6 +12,8 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     GameObject m_waitTimeText = null;                       //残り待機時間を表示するテキストインスタンス
     GameObject m_operation = null;                          //操作管理のインスタンス
     GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
+    private GameObject m_player = null;
+    private Vector3 m_position = Vector3.zero;
 
     int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
     float m_matchingWaitTime = 30.0f;                      //残り待機時間
@@ -79,10 +81,9 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     {
         //現在接続しているプレイヤー数を取得する。
         float currentPlayerNumber = (PhotonNetwork.PlayerList.Length - 1);
-        //プレイヤーを横に並べていく
-        var position = new Vector3(currentPlayerNumber * 1.5f, 0.0f, 0.0f);
         //Prefabからプレイヤーが操作するモデルを生成
-        var player =  PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+        m_player =  PhotonNetwork.Instantiate("Player", m_position, Quaternion.AngleAxis(180, Vector3.up));
+        m_player.GetComponent<Rigidbody>().isKinematic = true;
 
         //今までこのルームに何人が入ってきたかでアクターナンバーが増えていく（アクターナンバーに書き込み不可）
         int id = PhotonNetwork.LocalPlayer.ActorNumber;
@@ -120,6 +121,8 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
 		}
         //プレイヤーのIDを記録する
 		m_paramManager.GetComponent<ParamManage>().SetPlayerID(id);
+        string spawnerName = "PlayerSpawner/Player" + id;
+        m_position = GameObject.Find(spawnerName).transform.position;
     }
 
     //関数の通信の際に必要な表記
@@ -146,7 +149,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
                 //プレイヤーを横に並べていく
                 var position = new Vector3(i + 1.5f, 0.0f, 0.0f);
                 //PrefabからAIを生成
-                PhotonNetwork.Instantiate("AI", position, Quaternion.identity);
+                //PhotonNetwork.Instantiate("AI", position, Quaternion.identity);
             }
             //AIの生成終了
             m_isInstantiateAI = true;
@@ -199,6 +202,12 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
 
             //残り時間を他プレイヤーと同期する
             SynchronizeWaitTime();
+        }
+
+
+        if (m_player != null)
+        {
+            m_player.transform.position = m_position;
         }
 
         //Escが押された時
