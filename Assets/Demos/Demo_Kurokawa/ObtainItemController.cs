@@ -34,6 +34,11 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         m_paramManager = GameObject.Find("ParamManager");
 	}
 
+    public void SetItemNothing()
+	{
+        m_obtainItemType = EnItemType.enNothing;
+	}
+
     [PunRPC]
     private void InstantiateItem(string prefabName, Vector3 popPos, int wayPointNumber = -1, int playerNumber = -1)
 	{
@@ -206,5 +211,10 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 
 
         UseItem();
+
+        if(this.gameObject.GetComponent<AvatarController>().GetIsUsingKiller())
+		{
+            m_obtainItemType = EnItemType.enTrain;
+        }
     }
 }

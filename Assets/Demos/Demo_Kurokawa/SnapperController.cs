@@ -9,9 +9,11 @@ public class SnapperController : MonoBehaviourPunCallbacks
 {
     private GameObject m_targetPlayer = null;                   //ターゲットしたプレイヤーのオブジェクト
     private Vector3 m_targetPos = Vector3.zero;                 //次の目標地点
-    private float MOVE_POWER = 20.0f;                           //移動速度に乗算する倍率
+    private Vector3 m_moveDir = Vector3.zero;                   //移動方向
+    private float MOVE_POWER = 25.0f;                           //移動速度に乗算する倍率
     private bool m_isChasePlayer = false;                       //プレイヤーを見つけて追跡しているか
     private bool m_shouldCheckNextWayPoint = false;             //次のウェイポイントが更新すべきかどうか
+    private bool m_isAddFirstVelocity = false;
 
     private int m_ownerID = 0;
 
@@ -76,7 +78,8 @@ public class SnapperController : MonoBehaviourPunCallbacks
                 playerID = int.Parse(strID[6].ToString());
 			}
 
-            if (m_ownerID != playerID)
+            //発射したプレイヤーが自分でなく、感知したプレイヤーが自分の進行方向前方にいたら
+            if (m_ownerID != playerID && Vector3.Dot(m_moveDir, col.gameObject.transform.position - this.gameObject.transform.position) >= 1.0f)
             {
                 //追跡対象として保存
                 m_targetPlayer = col.gameObject;
@@ -87,7 +90,7 @@ public class SnapperController : MonoBehaviourPunCallbacks
 	}
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         //ターゲットとなるプレイヤーを見つけたならば
         if(m_isChasePlayer)
@@ -109,12 +112,18 @@ public class SnapperController : MonoBehaviourPunCallbacks
         }
 
         //目標地点に向かうベクトルを定義
-        Vector3 moveDir = m_targetPos - this.transform.position;
+        m_moveDir = m_targetPos - this.transform.position;
         //正規化
-        moveDir.Normalize();
+        m_moveDir.Normalize();
         //リジッドボディに目標地点方向に力を加える
         Rigidbody rb = this.GetComponent<Rigidbody>();
         //規定した移動速度より早くならないように
-        rb.AddForce((moveDir * MOVE_POWER) - rb.velocity);
+
+        if(!m_isAddFirstVelocity)
+        {
+            rb.velocity = m_moveDir * MOVE_POWER;
+            m_isAddFirstVelocity = true;
+        }
+        rb.AddForce((m_moveDir * MOVE_POWER) - rb.velocity);
     }
 }

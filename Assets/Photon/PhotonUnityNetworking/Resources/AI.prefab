@@ -176,7 +176,7 @@ MonoBehaviour:
   m_playerTag: OwnPlayer
   m_obstacleLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 32768
   m_innerShiftMaxLength: 5
   m_outerShiftMaxLength: 3
 --- !u!114 &-6493101101817206569
