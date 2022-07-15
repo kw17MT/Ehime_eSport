@@ -1,5 +1,7 @@
 Shader "MyShader/DrawOutLineShader"
 {
+    // DrawOutLineParam.cs‚Æ“¯‚¶\‘¢
+    // DrawOutLineFeature.cs‚©‚ç•ÏX‚·‚é
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
@@ -8,6 +10,8 @@ Shader "MyShader/DrawOutLineShader"
         _OutlineThick("OutlineThick", float) = 1.0
         _OutlineThreshold("OutlineThreshold", float) = 0.0001
         _HowToDrawOutline("HowToDrawOutline", int) = 3
+        _MaxDepthDistance("MaxDepthDistance", float) = 50.0
+        _OutlineBias("OutlineBias", Range(1.0, 2.0)) = 1.0
     }
     SubShader
     {
@@ -33,13 +37,14 @@ Shader "MyShader/DrawOutLineShader"
         //SAMPLER(sampler_CameraDepthTexture);
         float4 _CameraDepthTexture_TexelSize;
 
-
         CBUFFER_START(UnityPerMaterial)
             float4 _OutlineColor;
             float4 _MainTex_ST;
             float _OutlineThick;
             float _OutlineThreshold;
             int _HowToDrawOutline;
+            float _MaxDepthDistance;
+            float _OutlineBias;
         CBUFFER_END
 
         ENDHLSL
@@ -104,34 +109,46 @@ Shader "MyShader/DrawOutLineShader"
                 return isOutline;
             }
 
-            bool IsDepthOutlineBy8Texel(float2 uv)
+            bool IsDepthOutlineBy8Texel(float2 uv, inout bool isOutOfRange)
             {
-                float currentDepth = MyLinearDepth(SampleSceneDepth(uv));
-                //float depthThreshold = 10.0f / _ProjectionParams.z;
-                //if (currentDepth >= depthThreshold)
-                //{
-                //    return false;
-                //}
-
                 float diffX = _CameraDepthTexture_TexelSize.x * _OutlineThick;
                 float diffY = _CameraDepthTexture_TexelSize.y * _OutlineThick;
 
+                float2 uvOffset[8] =
+                {
+                    float2(0.0f, diffY),
+                    float2(0.0f, -diffY),
+                    float2(diffX, 0.0f),
+                    float2(-diffX, 0.0f),
+                    float2(diffX, diffY),
+                    float2(-diffX, diffY),
+                    float2(diffX, -diffY),
+                    float2(-diffX, -diffY),
+                };
+                float currentDepth = MyLinearDepth(SampleSceneDepth(uv));
+                float smallestDepth = currentDepth;
 
-                float nearDepth = 0.0f;
-                nearDepth += MyLinearDepth(SampleSceneDepth(uv + half2(0.0f, diffY)));
-                nearDepth += MyLinearDepth(SampleSceneDepth(uv + half2(0.0f, -diffY)));
-                nearDepth += MyLinearDepth(SampleSceneDepth(uv + half2(diffX, 0.0f)));
-                nearDepth += MyLinearDepth(SampleSceneDepth(uv + half2(-diffX, 0.0f)));
-                nearDepth += MyLinearDepth(SampleSceneDepth(uv + half2(diffX, diffY)));
-                nearDepth += MyLinearDepth(SampleSceneDepth(uv + half2(diffX, -diffY)));
-                nearDepth += MyLinearDepth(SampleSceneDepth(uv + half2(-diffX, diffY)));
-                nearDepth += MyLinearDepth(SampleSceneDepth(uv + half2(-diffX, -diffY)));
+                float neighborDepth = 0.0f;
 
-                nearDepth /= 8.0f;
+                [unroll]
+                for (int i = 0; i < 8; i++)
+                {
+                    float depth = MyLinearDepth(SampleSceneDepth(uv + uvOffset[i]));
+                    neighborDepth += depth;
+                    smallestDepth = min(smallestDepth, depth);
+                }
 
+                float maxDepht = _MaxDepthDistance / _ProjectionParams.z;
+                if (smallestDepth >= maxDepht)
+                {
+                    isOutOfRange = true;
+                    return false;
+                }
 
+                neighborDepth /= 8.0f;
+                isOutOfRange = false;
                 bool isOutline = false;
-                if (abs(currentDepth - nearDepth) > _OutlineThreshold)
+                if ((currentDepth - neighborDepth) / neighborDepth > _OutlineThreshold)
                 {
                     isOutline = true;
                 }
@@ -139,10 +156,96 @@ Shader "MyShader/DrawOutLineShader"
                 return isOutline;
             }
 
-            bool IsNormalOutline(float2 uv)
+            bool IsDepthOutlineBy8TexelHigh(float2 uv, inout bool isOutOfRange, inout float thickScale)
             {
                 float diffX = _CameraDepthTexture_TexelSize.x * _OutlineThick;
                 float diffY = _CameraDepthTexture_TexelSize.y * _OutlineThick;
+
+                float2 uvOffset[8] =
+                {
+                    float2(0.0f, diffY),
+                    float2(0.0f, -diffY),
+                    float2(diffX, 0.0f),
+                    float2(-diffX, 0.0f),
+                    float2(diffX, diffY),
+                    float2(-diffX, diffY),
+                    float2(diffX, -diffY),
+                    float2(-diffX, -diffY),
+                };
+                float currentDepth = MyLinearDepth(SampleSceneDepth(uv));
+                float smallestDepth = currentDepth;
+
+                float neighborDepth = 0.0f;
+
+                [unroll]
+                for (int i = 0; i < 8; i++)
+                {
+                    float depth = MyLinearDepth(SampleSceneDepth(uv + uvOffset[i]));
+                    neighborDepth += depth;
+                    smallestDepth = min(smallestDepth, depth);
+                }
+
+
+                float maxDepht = _MaxDepthDistance / _ProjectionParams.z;
+                if (smallestDepth >= maxDepht)
+                {
+                    isOutOfRange = true;
+                    return false;
+                }
+
+                smallestDepth = pow(smallestDepth, _OutlineBias);
+                thickScale = (maxDepht - smallestDepth) / maxDepht;
+                //thickScale = pow(thickScale, _OutlineBias);
+                diffX = _CameraDepthTexture_TexelSize.x * _OutlineThick * thickScale;
+                diffY = _CameraDepthTexture_TexelSize.y * _OutlineThick * thickScale;
+                float2 uvOffset2[8] =
+                {
+                    float2(0.0f, diffY),
+                    float2(0.0f, -diffY),
+                    float2(diffX, 0.0f),
+                    float2(-diffX, 0.0f),
+                    float2(diffX, diffY),
+                    float2(-diffX, diffY),
+                    float2(diffX, -diffY),
+                    float2(-diffX, -diffY),
+                };
+                smallestDepth = currentDepth;
+                neighborDepth = 0.0f;
+                [unroll]
+                for (i = 0; i < 8; i++)
+                {
+                    float depth = MyLinearDepth(SampleSceneDepth(uv + uvOffset2[i]));
+                    neighborDepth += depth;
+                    smallestDepth = min(smallestDepth, depth);
+                }
+
+                maxDepht = _MaxDepthDistance / _ProjectionParams.z;
+                if (smallestDepth >= maxDepht)
+                {
+                    isOutOfRange = true;
+                    return false;
+                }
+
+                neighborDepth /= 8.0f;
+                isOutOfRange = false;
+                bool isOutline = false;
+                if ((currentDepth - neighborDepth) / neighborDepth > _OutlineThreshold)
+                {
+                    isOutline = true;
+                }
+
+                return isOutline;
+            }
+
+            bool IsNormalOutline(float2 uv, bool isOutOfRage, float thickScale)
+            {
+                if (isOutOfRage)
+                {
+                    return false;
+                }
+
+                float diffX = _CameraDepthTexture_TexelSize.x * _OutlineThick * thickScale * 0.5f;
+                float diffY = _CameraDepthTexture_TexelSize.y * _OutlineThick * thickScale * 0.5f;
 
                 float2 uvOffset[8] =
                 {
@@ -196,16 +299,35 @@ Shader "MyShader/DrawOutLineShader"
 
             }
 
-            bool IsDepthAndNormalOutline(float2 uv)
+            bool IsDepthAndNormalOutline(float2 uv, inout bool isOutOfRange, inout float thickScale)
             {
-                return IsDepthOutlineBy8Texel(uv) || IsNormalOutline(uv);
+                bool outlineFlag = false;
+                outlineFlag = IsDepthOutlineBy8Texel(uv, isOutOfRange);
+                if (outlineFlag != true)
+                {
+                    outlineFlag = IsNormalOutline(uv, isOutOfRange, thickScale);
+                }
+                return outlineFlag;
+            }
+
+            bool IsDepthHighAndNormalOutline(float2 uv, inout bool isOutOfRange, inout float thickScale)
+            {
+                bool outlineFlag = false;
+                outlineFlag = IsDepthOutlineBy8TexelHigh(uv, isOutOfRange, thickScale);
+                if (outlineFlag != true)
+                {
+                    outlineFlag = IsNormalOutline(uv, isOutOfRange, thickScale);
+                }
+                return outlineFlag;
             }
 
             float4 frag(v2f i) : SV_Target
             {
                 float4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-
                 float4 finalCol = col;
+                
+                bool isOutOfRange = false;
+                float thickScale = 1.0f;
 
                 switch (_HowToDrawOutline)
                 {
@@ -216,19 +338,31 @@ Shader "MyShader/DrawOutLineShader"
                     }
                     break;
                 case 1:
-                    if (IsDepthOutlineBy8Texel(i.uv))
+                    if (IsDepthOutlineBy8Texel(i.uv, isOutOfRange))
                     {
                         finalCol = _OutlineColor;
                     }
                     break;
                 case 2:
-                    if (IsNormalOutline(i.uv))
+                    if (IsDepthOutlineBy8TexelHigh(i.uv, isOutOfRange, thickScale))
                     {
                         finalCol = _OutlineColor;
                     }
                     break;
                 case 3:
-                    if (IsDepthAndNormalOutline(i.uv))
+                    if (IsNormalOutline(i.uv, isOutOfRange, thickScale))
+                    {
+                        finalCol = _OutlineColor;
+                    }
+                    break;
+                case 4:
+                    if (IsDepthAndNormalOutline(i.uv, isOutOfRange, thickScale))
+                    {
+                        finalCol = _OutlineColor;
+                    }
+                    break;
+                case 5:
+                    if (IsDepthHighAndNormalOutline(i.uv, isOutOfRange, thickScale))
                     {
                         finalCol = _OutlineColor;
                     }

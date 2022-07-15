@@ -65,13 +65,17 @@ public class DrawOutLinePass : ScriptableRenderPass
         m_kDrawOutlineMaterial = mat;
     }
 
-    public void SetParam(RenderTargetIdentifier target, Color color, float thick, float threshold, int howToDrawOutline)
+    public void SetParam(
+        RenderTargetIdentifier target,
+        CDrawOutLineParam drawOutLineParam)
     {
         m_currentRenderTarget = target;
-        m_kDrawOutlineMaterial.SetColor("_OutlineColor", color);
-        m_kDrawOutlineMaterial.SetFloat("_OutlineThick", thick);
-        m_kDrawOutlineMaterial.SetFloat("_OutlineThreshold", threshold);
-        m_kDrawOutlineMaterial.SetInt("_HowToDrawOutline", howToDrawOutline);
+        m_kDrawOutlineMaterial.SetColor("_OutlineColor", drawOutLineParam.m_outLineColor);
+        m_kDrawOutlineMaterial.SetFloat("_OutlineThick", drawOutLineParam.m_outlineThick);
+        m_kDrawOutlineMaterial.SetFloat("_OutlineThreshold", drawOutLineParam.m_outlineThreshold);
+        m_kDrawOutlineMaterial.SetInt("_HowToDrawOutline", (int)drawOutLineParam.m_howToDrawOutline);
+        m_kDrawOutlineMaterial.SetFloat("_MaxDepthDistance", drawOutLineParam.m_maxDepthDistance);
+        m_kDrawOutlineMaterial.SetFloat("_OutlineBias", drawOutLineParam.m_outlineBias);
 
     }
 
