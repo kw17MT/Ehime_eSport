@@ -31,6 +31,9 @@ public class InGameScript : MonoBehaviourPunCallbacks
 
     private GameObject m_userSetting = null;
     public GameObject m_resultBoard;
+    public GameObject m_disconnectSprite;
+    private bool m_isDisconnected = false;
+    private float m_disconnectTimer = 0.0f;
 
     public GameObject[] m_youLabels;
 
@@ -132,6 +135,15 @@ public class InGameScript : MonoBehaviourPunCallbacks
             PhotonNetwork.CreateRoom(null, roomOptions);
         }
     }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        if(!m_canReturnModeSelection)
+		{
+            m_disconnectSprite.SetActive(true);
+            m_isDisconnected = true;
+		}
+	}
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
@@ -573,5 +585,18 @@ public class InGameScript : MonoBehaviourPunCallbacks
 			//自分の順位を保存
 			m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
 		}
+
+        //回線切断時
+        if(m_isDisconnected)
+		{
+            //ゲームタイムで切断からの経過時間を更新
+            m_disconnectTimer += Time.deltaTime;
+            //3秒以上たったら
+            if (m_disconnectTimer >= 3.0f)
+            {
+                //タイトルへ戻す
+                SceneManager.LoadScene("01_TitleScene");
+            }
+        }
 	}
 }

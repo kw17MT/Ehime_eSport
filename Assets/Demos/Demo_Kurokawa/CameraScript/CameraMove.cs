@@ -33,6 +33,12 @@ public class CameraMove : MonoBehaviour
             }
         }
 
+        //ゲームを終了した後、前のシーンに戻るときにヌルを参照しないようにするため
+        if(m_ownPlayer == null)
+		{
+            return;
+		}
+
         Vector3 cameraPos;
         if (!m_ownPlayer.GetComponent<AvatarController>().GetIsAttacked())
 		{
