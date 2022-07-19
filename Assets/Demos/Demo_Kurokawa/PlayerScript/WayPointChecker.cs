@@ -10,7 +10,7 @@ public class WayPointChecker : MonoBehaviour
     private Vector3 m_currentWayPointPos = Vector3.zero;        //現在通過済みのウェイポイントの座標
     private Vector3 m_nextWayPointPos = Vector3.zero;           //次のウェイポイントの座標
     private int m_nextWayPointNumber = 0;                       //次のウェイポイントの番号
-    private Transform m_nextWayPointTransform = null;
+    private Transform m_nextWayPointTransform = null;           //次のウェイポイントのTrasnform
 
     // Start is called before the first frame update
     void Start()
@@ -36,8 +36,32 @@ public class WayPointChecker : MonoBehaviour
         }
     }
 
+    //次のウェイポイントの座標を返す
+    public Vector3 GetNextWayPoint()
+    {
+        return m_nextWayPointPos;
+    }
+
+    //直近で通過したウェイポイントの座標を返す
+    public Vector3 GetCurrentWayPoint()
+    {
+        return m_currentWayPointPos;
+    }
+
+    //次のウェイポイントの番号を返す
+    public int GetNextWayPointNumber()
+    {
+        return m_nextWayPointNumber;
+    }
+
+    //次のウェイポイントの右方向を返す
+    public Vector3 GetNextWayPointRight()
+    {
+        return m_nextWayPointTransform.right;
+    }
+
     //他のクラス（主にプレイヤー）から直接現在直近で通過したウェイポイントの座標と番号を設定
-    public void SetCurrentWayPointDirectly(Vector3 currentPos, int wayPointNumber)
+    public void SetNextWayPointDirectly(Vector3 currentPos, int wayPointNumber)
 	{
         //下関数で次のウェイポイントを更新するため1つ前のポイントで初期化
         m_nextWayPointNumber = wayPointNumber;
@@ -103,29 +127,5 @@ public class WayPointChecker : MonoBehaviour
             //自分の次のウェイポイントはどこか更新させるように伝える
             this.GetComponent<SnapperController>().SetCheckNextWayPoint();
         }
-    }
-
-    //次のウェイポイントの座標を返す
-    public Vector3 GetNextWayPoint()
-	{
-        return m_nextWayPointPos;
-	}
-
-    //直近で通過したウェイポイントの座標を返す
-    public Vector3 GetCurrentWayPoint()
-    {
-        return m_currentWayPointPos;
-    }
-
-    //次のウェイポイントの番号を返す
-    public int GetNextWayPointNumber()
-    {
-        return m_nextWayPointNumber;
-    }
-
-    //次のウェイポイントの右方向を返す
-    public Vector3 GetNextWayPointRight()
-    {
-        return m_nextWayPointTransform.right;
     }
 }

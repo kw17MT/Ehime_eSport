@@ -4,21 +4,10 @@ using UnityEngine;
 
 public class UseItemMediater : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+	//キャンバス上のアイテム使用位置が押されたら、自分のプレイヤーにアイテムを使うように伝える
     public void LetPlayerUseItem()
 	{
+		//OwnPlayerはネットワークオブジェクトとしてInstantiateするため、生成されるまではOwnPlayerを参照できないため、この関数が必要
         GameObject.Find("OwnPlayer").GetComponent<ObtainItemController>().SetUseItem();
-        //Debug.Log("Item Touched");
 	}
 }

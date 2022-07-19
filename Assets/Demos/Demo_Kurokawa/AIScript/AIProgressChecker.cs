@@ -5,10 +5,9 @@ using Photon.Pun;
 
 public class AIProgressChecker : MonoBehaviourPunCallbacks
 {
-    private int m_lapCount = 0;
-    private bool m_canGoaled = false;
-
-    public int MAX_LAP_NUM = 3;
+    private int m_lapCount = 0;                     //AIの周回数
+    private bool m_canGoaled = false;               //AIはゴールできるか
+    [SerializeField] int MAX_LAP_NUM = 3;                     //AIのゴールラップ数
 
     public void SetCanGoaled()
 	{
@@ -21,12 +20,11 @@ public class AIProgressChecker : MonoBehaviourPunCallbacks
 	}
     public void CheckCanGoal()
 	{
+        //ゴールできるならば
         if(m_canGoaled)
 		{
             //ラップ数を加算
             m_lapCount++;
-
-            //Debug.Log(this.gameObject.GetComponent<AICommunicator>().GetAIName() + "  Count =  " + m_lapCount);
             if (!PhotonNetwork.OfflineMode)
             {
                 //次のウェイポイントの番号をルームプロパティに保存
@@ -43,22 +41,8 @@ public class AIProgressChecker : MonoBehaviourPunCallbacks
 			{
                 this.GetComponent<AICommunicator>().SetGoaled();
 			}
-
+            //次のゴール判定のためにフラグをオフ
             m_canGoaled = false;
-
-            //Debug.Log(m_lapCount);
         }
 	}
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

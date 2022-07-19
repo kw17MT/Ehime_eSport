@@ -7,10 +7,10 @@ using UnityEngine.SceneManagement;
 public class ProgressChecker : MonoBehaviour
 {
     private int m_lapCount = 0;                             //ゲーム中の周回回数
+    [SerializeField] int MAX_CHECKPOINT_NUM = 3;            //ステージに配置されるチェックポイントの数
+    [SerializeField] int MAX_LAP_NUM = 3;                   //何周するか
     private List<bool> m_checkPoint = new List<bool>();     //通過したチェックポイントの保存配列
 
-    public int MAX_CHECKPOINT_NUM = 3;                      //ステージに配置されるチェックポイントの数
-    public int MAX_LAP_NUM = 3;                             //何周するか
 
     void Start()
     {
@@ -21,8 +21,10 @@ public class ProgressChecker : MonoBehaviour
             m_checkPoint.Add(false);
 		}
 
+        //現在、ゲームシーンならば
         if(SceneManager.GetActiveScene().name == "08_GameScene")
 		{
+            //ラップ数を表示するオブジェクトを取得
             GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_lapCount);
         }
     }
