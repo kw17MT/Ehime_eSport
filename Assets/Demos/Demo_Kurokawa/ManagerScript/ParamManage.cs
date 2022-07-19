@@ -7,7 +7,6 @@ public class ParamManage : MonoBehaviour
 {
     private int m_playerID = 0;                         //プレイヤーのID（原則入ったもの順）
     private int m_place = 0;                            //現在のプレイヤーの順位
-    private bool m_isOfflineMode = false;               //オフラインモードでプレイするか
 
     // Start is called before the first frame update
     void Start()
@@ -28,18 +27,6 @@ public class ParamManage : MonoBehaviour
         return m_playerID;
 	}
 
-    //オフラインモードで開始するように
-    public void SetOfflineMode()
-	{
-        m_isOfflineMode = true;
-	}
-
-    //オフラインモードか
-    public bool GetIsOfflineMode()
-	{
-        return m_isOfflineMode;
-	}
-
     //自分の順位を記録
     public void SetPlace(int place)
     {
@@ -51,9 +38,4 @@ public class ParamManage : MonoBehaviour
     {
         return m_place;
     }
-
-    public void  TouchItemUI()
-	{
-        GameObject.Find("OwnPlayer").GetComponent<ObtainItemController>().SetUseItem();
-	}
 }

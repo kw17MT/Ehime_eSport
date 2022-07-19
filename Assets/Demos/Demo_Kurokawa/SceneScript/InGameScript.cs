@@ -8,34 +8,32 @@ using UnityEngine.SceneManagement;
 // MonoBehaviourPunCallbacksを継承して、PUNのコールバックを受け取れるようにする
 public class InGameScript : MonoBehaviourPunCallbacks
 {
-    [SerializeField] Sprite[] m_countDownSprite = {null};
-    private GameObject m_countDownComponent = null;                                          //カウントダウンを表示するテキストインスタンス
+    [SerializeField] Sprite[] m_countDownSprite = {null};                               //カウントダウンの数字を表示する画像
+    [SerializeField] GameObject[] m_youLabels;                                          //Youラベルをだす場所
+    [SerializeField] GameObject m_resultBoard;                                          //リザルトボード
+    [SerializeField] GameObject m_disconnectSprite;                                     //通信切断時に表示する画像
+    private GameObject m_userSetting = null;                                            //前回までのシーンでプレイヤーが選んできた情報を持つインスタンス
+    private GameObject m_countDownComponent = null;                                     //カウントダウンを表示するテキストインスタンス
     private GameObject m_paramManager = null;                                           //ゲーム中に使用するパラメータ保存インスタンス
-    private GameObject m_operation = null;
-    private GameObject m_player = null;
+    private GameObject m_operation = null;                                              //操作のインスタンス
+    private GameObject m_player = null;                                                 //プレイヤーのインスタンス
+    private bool m_isDisconnected = false;                                              //何らかの理由でサーバーから切断されたら
+    private bool m_isInstantiateAI = false;                                             //プレイヤーの不足分をAIで補ったかどうか
+    private bool m_isShownResult = false;                                               //リザルトを出しているか
+    private bool m_shouldCountDown = true;                                              //カウントダウンの数字を出すか
+    private bool m_canReturnModeSelection = false;                                      //リザルトを出していて、モード選択画面に戻れるかどうか
+    private bool m_isBGMStart = false;                                                  //BGMを鳴らしたかどうか
     private int m_goaledPlayerNum = 0;                                                  //ゴールしたプレイヤーの数
     private int m_playerReadyNum = 0;                                                   //走行の準備ができているプレイヤーの数
     private int m_prevCountDownNum = 0;                                                 //カウントダウンしている時、前の数値の整数値
     private float m_countDownNum = 4.0f;                                                //カウントダウンする際の開始数値
-    private bool m_isInstantiateAI = false;                                             //プレイヤーの不足分をAIで補ったかどうか
-    private bool m_isShownResult = false;                                                 //リザルトを出しているか
-    private bool m_shouldCountDown = true;                                              //カウントダウンの数字を出すか
-    private bool m_canReturnModeSelection = false;
-    private bool m_isBGMStart = false;
+    private float m_disconnectTimer = 0.0f;                                             //切断されてからの経過時間
     Dictionary<string, float> m_scoreBoard = new Dictionary<string, float>();           //ゴールしたプレイヤーの名前とタイム一覧
-
-    private List<GameObject> m_ai = new List<GameObject>();
+    private List<GameObject> m_ai = new List<GameObject>();                             //生成したAI
 
     private const int PLAYER_ONE = 1;                                                   //シングルプレイヤーだった時に設定するプレイヤーID
     private const int AI_NUM_IN_SINGLE_PLAY = 3;                                        //シングルプレイヤーだった時のAIの数
-
-    private GameObject m_userSetting = null;
-    public GameObject m_resultBoard;
-    public GameObject m_disconnectSprite;
-    private bool m_isDisconnected = false;
-    private float m_disconnectTimer = 0.0f;
-
-    public GameObject[] m_youLabels;
+    private const int OFFLINE_MODE = 1;
 
     private void Start()
     {
@@ -47,7 +45,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
         m_userSetting = GameObject.Find("UserSettingDataStorageSystem");
 
         //ゲームがオフラインで開始されたら
-        if (m_userSetting.GetComponent<UserSettingData>().GetSetModeType == 1/*m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode()*/)
+        if (m_userSetting.GetComponent<UserSettingData>().GetSetModeType == OFFLINE_MODE)
 		{
             //オフラインモードにする
             PhotonNetwork.OfflineMode = true;
@@ -110,14 +108,13 @@ public class InGameScript : MonoBehaviourPunCallbacks
         //BGMを停止
         nsSound.BGM.Instance.FadeOutStart();
         ////////////////////////////////////////////////////////////////////////////
-
     }
 
     //オフラインモードの時に使用する
     public override void OnConnectedToMaster()
     {
         //オフラインモードならば
-        if(m_userSetting.GetComponent<UserSettingData>().GetSetModeType == 1/*m_paramManager.GetComponent<ParamManage>().GetIsOfflineMode()*/)
+        if(m_userSetting.GetComponent<UserSettingData>().GetSetModeType == OFFLINE_MODE)
 		{
             //作成するルームの設定インスタンス
             RoomOptions roomOptions = new RoomOptions()
@@ -136,15 +133,20 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
     }
 
+    //サーバーから切断されたら
     public override void OnDisconnected(DisconnectCause cause)
     {
+        //モード選択画面に戻れる状態でない場合
         if(!m_canReturnModeSelection)
 		{
+            //何らかの理由で切断されたので、モード選択に自動的に戻るアナウンスをする
             m_disconnectSprite.SetActive(true);
+            //切断された
             m_isDisconnected = true;
 		}
 	}
 
+    //オンラインプレイヤーが参照できるルームプロパティが更新されたら
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
         //自分のプレイヤーのウェイポイントナンバーを示すキー部分を作成
@@ -253,7 +255,6 @@ public class InGameScript : MonoBehaviourPunCallbacks
 			}
         }
 
-        //Debug.Log(currentPlace);
         //順位を変化させる
         GameObject.Find("RankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace-1);
         //自分の順位を保存

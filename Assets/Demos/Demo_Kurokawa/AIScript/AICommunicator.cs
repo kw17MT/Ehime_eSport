@@ -6,18 +6,18 @@ using UnityEngine.SceneManagement;
 
 public class AICommunicator : MonoBehaviourPunCallbacks
 {
-    private string m_aiName = "";                       //設定するAIの名前ex.)Player2
-    private bool m_isGoaled = false;                    //ゴールしたか
-    private bool m_isToldRecord = false;                //ホストにゴールした時間を伝えたか
-    private bool m_isMoving = false;                    //現在移動しているか（走行時間の計測用フラグ）
-    private bool m_isAttacked = false;                  //このAIは攻撃されたか
-    private bool m_isInvincible = false;                //このAIは無敵状態か
-    private float m_runningTime = 0.0f;                 //走行時間＝ゴールタイム
-    private float m_frameCounter = 0.0f;                //フレーム時間の計測用変数
-    private float UPDATE_DISTANCE_TIMING = 0.1f;        //次のウェイポイントとの距離を更新するタイミング
-    private float m_distanceToNextWayPoint = 0.0f;      //次のウェイポイントへの距離
-    private float m_stiffinTime = 0.0f;                 //硬直している時間
-    public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
+    private string m_aiName = "";                                         //設定するAIの名前ex.)Player2
+    private bool m_isGoaled = false;                                      //ゴールしたか
+    private bool m_isToldRecord = false;                                  //ホストにゴールした時間を伝えたか
+    private bool m_isMoving = false;                                      //現在移動しているか（走行時間の計測用フラグ）
+    private bool m_isAttacked = false;                                    //このAIは攻撃されたか
+    private bool m_isInvincible = false;                                  //このAIは無敵状態か
+    private float m_runningTime = 0.0f;                                   //走行時間＝ゴールタイム
+    private float m_frameCounter = 0.0f;                                  //フレーム時間の計測用変数
+    private float UPDATE_DISTANCE_TIMING = 0.1f;                          //次のウェイポイントとの距離を更新するタイミング
+    private float m_distanceToNextWayPoint = 0.0f;                        //次のウェイポイントへの距離
+    private float m_stiffinTime = 0.0f;                                   //硬直している時間
+    [SerializeField] float MAX_STIFFIN_TIME = 1.5f;                       //攻撃が当たった時の最大硬直時間
 
     //このAIは攻撃されたかどうかを取得する
     public bool GetIsAttacked()
@@ -73,6 +73,7 @@ public class AICommunicator : MonoBehaviourPunCallbacks
         m_isMoving = isMoving;
 	}
 
+    //ホストに自分のタイムを送るのをやめさせる
     public void SetStopToTellRecord()
 	{
         m_isToldRecord = true;
@@ -120,7 +121,6 @@ public class AICommunicator : MonoBehaviourPunCallbacks
         }
     }
 
-	// Update is called once per frame
 	void Update()
     {
         //現在AIが動いていて、ゴールしていないならば
@@ -140,7 +140,6 @@ public class AICommunicator : MonoBehaviourPunCallbacks
             }
             //2回以上送信しないようにフラグで制限（オンラインだと何回も呼ばれてしまう）
             m_isToldRecord = true;
-            //Debug.Log("AI : " + m_aiName + " Clear : Time " + m_runningTime);
         }
 
         //インゲーム中で

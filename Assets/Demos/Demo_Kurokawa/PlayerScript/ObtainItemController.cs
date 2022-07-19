@@ -6,15 +6,11 @@ using Photon.Pun;
 //プレイヤーが取得しているアイテムの管理と使用するクラス。
 public class ObtainItemController : MonoBehaviourPunCallbacks
 {
-    GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
-    EnItemType m_obtainItemType = EnItemType.enNothing;
-
-    //アイテムシャッフル演出が終了したかフラグ
-    bool m_isLotteryFinish = false;
-    bool m_isUseItem = false;
-
-    const float SPACE_BETWEEN_PLAYER_FRONT = 4.0f;
-    const float SPACE_BETWEEN_PLAYER_BACK = -2.0f;
+    private bool m_isLotteryFinish = false;             //アイテムシャッフル演出が終了したかフラグ
+    private bool m_isUseItem = false;                   //アイテムを使使うか（外部から設定）
+    const float SPACE_BETWEEN_PLAYER_FRONT = 4.0f;      //プレイヤーから前方向へずらす幅
+    const float SPACE_BETWEEN_PLAYER_BACK = -2.0f;      //プレイヤーから後ろ方向にずらす幅
+    EnItemType m_obtainItemType = EnItemType.enNothing; //現在所持しているアイテム名
 
     //アイテムの種類
     enum EnItemType
@@ -28,25 +24,23 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         enItemTypeNum                                   //アイテムの種類の数
 	}
 
-    void Start()
-	{
-        //ゲーム中のパラメータを保存するインスタンスを取得
-        m_paramManager = GameObject.Find("ParamManager");
-	}
-
+    //アイテムを何も持っていない状態にする
     public void SetItemNothing()
 	{
         m_obtainItemType = EnItemType.enNothing;
 	}
 
+    //アイテム名をもとにゲーム中にアイテムを生成する
     [PunRPC]
     private void InstantiateItem(string prefabName, Vector3 popPos, int wayPointNumber = -1, int playerNumber = -1)
 	{
         GameObject.Find("SceneDirector").GetComponent<ItemStateCommunicator>().PopItem(prefabName, popPos, wayPointNumber, playerNumber);
 	}
 
+    //アイテムを使うように設定する
     public void SetUseItem()
 	{
+        //抽選が終わっていたら
         if(m_isLotteryFinish)
 		{
             m_isUseItem = true;
@@ -61,9 +55,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 		{
             //アイテムのナンバーをランダムに取得
             int type = (int)Random.Range((float)EnItemType.enOrangePeel, (float)EnItemType.enItemTypeNum);
-            m_obtainItemType = (EnItemType)type;
-
-            Debug.Log("取得したアイテム番号　＝　" + m_obtainItemType);          
+            m_obtainItemType = (EnItemType)type;       
         }
     }
 
@@ -79,16 +71,15 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         m_isLotteryFinish = isLotteryFinish;
     }
 
-    ///////////////////////////////////////////////////////////////
     //抽選演出が終了したかどうかのフラグを取得
     public bool GetLotteryFinish()
     {
         return m_isLotteryFinish;
     }
-    ///////////////////////////////////////////////////////////////
 
     public void UseItem()
 	{
+        //アイテムを使うならば
         if (m_isUseItem)
         {
             //自分が生成したインスタンスならば、
@@ -101,7 +92,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                         //オレンジの皮のポップ位置を自機の後ろにする
                         Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_BACK);
                         //オレンジの皮をネットワークオブジェクトとしてインスタンス化
-                        var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
+                        photonView.RPC(nameof(InstantiateItem), RpcTarget.All, "OrangePeel", orangePeelPos, -1, -1);
 
                         ////////////////////////////////////////////////
                         //皮を落とす音の再生
@@ -130,15 +121,11 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                     case EnItemType.enSnapperCannon:
                         //タイのポップ位置を自機の前にする
                         Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_FRONT);
-                        //ローカルでオレンジの皮を指定された座標に生成
-                        var snapper = PhotonNetwork.Instantiate("Snapper", snapperPos, Quaternion.identity);
-                        //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
-                        snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(this.gameObject.transform.position, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
                         // Player1 とか
                         string idStr = PhotonNetwork.NickName;
                         int id = int.Parse(idStr[6].ToString());
-                        snapper.GetComponent<SnapperController>().SetOwnerID(id);
-                        break;
+                        photonView.RPC(nameof(InstantiateItem), RpcTarget.All, "Snapper", snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber(), id);
+                break;
                     default:
                         return;
                 }
@@ -162,9 +149,6 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                 //オレンジの皮のポップ位置を自機の後ろにする
                 Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_BACK);
                 //オレンジの皮をネットワークオブジェクトとしてインスタンス化
-                //var orange = PhotonNetwork.Instantiate("OrangePeel", orangePeelPos, Quaternion.identity);
-
-                //string prefabName, Transform trans, int wayPointNumber = 0, int playerNumber = 0
                 photonView.RPC(nameof(InstantiateItem), RpcTarget.All, "OrangePeel", orangePeelPos, -1, -1);
 
             }
@@ -183,16 +167,9 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
             {
                 //タイのポップ位置を自機の前にする
                 Vector3 snapperPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_FRONT);
-                //ローカルでオレンジの皮を指定された座標に生成
-                //var snapper = PhotonNetwork.InstantiateRoomObject("Snapper", snapperPos, Quaternion.identity);
-                //プレイヤーが直近で通過したウェイポイントの番号、座標を与える
-                //Debug.Log(this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
-                //snapper.GetComponent<WayPointChecker>().SetCurrentWayPointDirectly(this.gameObject.transform, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber());
                 // Player1 とか
                 string idStr = PhotonNetwork.NickName;
                 int id = int.Parse(idStr[6].ToString());
-                //snapper.GetComponent<SnapperController>().SetOwnerID(id);
-
                 photonView.RPC(nameof(InstantiateItem), RpcTarget.All, "Snapper", snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber(), id);
             }
             //テストでボタンを押したらキラー使用状態にする。
@@ -207,8 +184,6 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
     {
         //デバッグ用-------------------------終わったら消すこと-------------------------
         DebugUseItem();
-
-
 
         UseItem();
 

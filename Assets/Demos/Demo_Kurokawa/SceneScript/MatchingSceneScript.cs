@@ -9,15 +9,14 @@ using System.Collections.Generic;
 //マッチング中の挙動のクラス
 public class MatchingSceneScript : MonoBehaviourPunCallbacks
 {
-    GameObject m_waitTimeText = null;                       //残り待機時間を表示するテキストインスタンス
-    GameObject m_operation = null;                          //操作管理のインスタンス
-    GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
-    private GameObject m_player = null;
-    private Vector3 m_position = Vector3.zero;
-
-    int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
-    float m_matchingWaitTime = 30.0f;                      //残り待機時間
-    bool m_isInstantiateAI = false;                         //AIインスタンスを生成したか
+    private GameObject m_waitTimeText = null;                       //残り待機時間を表示するテキストインスタンス
+    private GameObject m_operation = null;                          //操作管理のインスタンス
+    private GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
+    private GameObject m_player = null;                             //プレイヤーインスタンス
+    private bool m_isInstantiateAI = false;                         //AIインスタンスを生成したか
+    private int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
+    private float m_matchingWaitTime = 30.0f;                       //残り待機時間
+    private Vector3 m_position = Vector3.zero;                      //プレイヤーを設定する座標
 
     void Start()
     {
@@ -27,26 +26,10 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
         //マッチング待機時間を表示するインスタンスを取得
         m_waitTimeText = GameObject.Find("LimitTimeLabel");
-        if(m_waitTimeText != null)
-		{
-            Debug.Log("NULL WAIT TIME");
-		}
         //シーン間で保持するパラメータインスタンス
         m_paramManager = GameObject.Find("ParamManager");
         //シーンの遷移はホストクライアントに依存する
         PhotonNetwork.AutomaticallySyncScene = true;
-    }
-
-    //プレイヤーがルームに入ったら
-    public override void OnPlayerEnteredRoom(Player newPlayer)
-	{
-
-    }
-
-    //プレイヤーがルームから出てったら
-    public override void OnPlayerLeftRoom(Player player)
-	{
-
     }
 
     //作成するルームの設定インスタンス
