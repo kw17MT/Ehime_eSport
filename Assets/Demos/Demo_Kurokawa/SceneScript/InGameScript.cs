@@ -485,6 +485,13 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 m_prevCountDownNum = (int)m_countDownNum;
             }
 
+            if(Input.GetKeyDown(KeyCode.Space))
+			{
+                Debug.Log("プレイヤー数：" + PhotonNetwork.PlayerList.Length + 
+                    "   ShowResultFlag：" + m_isShownResult + 
+                    "   GoalPlayerNum：" + m_goaledPlayerNum );
+            }
+
             //ゴールしたプレイヤーの数がルーム内のプレイヤーの数と一致したら
             if (m_goaledPlayerNum == PhotonNetwork.PlayerList.Length && !m_isShownResult)
             {
