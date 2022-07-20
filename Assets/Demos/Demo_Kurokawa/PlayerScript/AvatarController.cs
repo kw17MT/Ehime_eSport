@@ -42,7 +42,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float MOVE_POWER = 25.0f;                  　//リジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_STAR = 35.0f;         //スター使用時のリジッドボディにかける移動の倍率
     public float MOVE_POWER_USING_JET = 50.0f;          //ジェット使用時のリジッドボディにかける移動の倍率
-    public float MOVE_POWER_USING_KILLER = 60.0f;       //キラー使用時のリジッドボディにかける移動の倍率
+    public float MOVE_POWER_USING_KILLER = 15.0f;       //キラー使用時のリジッドボディにかける移動の倍率
     public float ROT_POWER = 50.0f;                      //ハンドリング
     public float MAX_STAR_REMAIN_TIME = 10.5f;          //スターの最大継続時間
     public float MAX_KILLER_REMAIN_TIME = 3.0f;         //キラーの最大継続時間
@@ -341,7 +341,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //高さはいらない
             direction.y = 0.0f;
             //TRASNFORMで位置を更新（Rigidbodyを使うと速さも出ないし、速くしたらコースアウトする
-            this.transform.position += direction * 1.5f;
+            this.transform.position += direction /** 1.5f*/;
 
             //キラーを使用している時間をゲームタイムでインクリメント
             m_killerTime += Time.deltaTime;
