@@ -164,7 +164,9 @@ public class ItemDecide : MonoBehaviour
         //“_–Åˆ—‚ÍI—¹‚µ‚Ä‚¢‚È‚¢”»’è‚Éİ’è‚µ‚Ä‚¨‚­
         isBlinkingFinish = false;
 
-        //
-        obtainItemController.SetIsLotteryFinish(false);
+        if(obtainItemController != null)
+		{
+            obtainItemController.SetIsLotteryFinish(false);
+        }
     }
 }

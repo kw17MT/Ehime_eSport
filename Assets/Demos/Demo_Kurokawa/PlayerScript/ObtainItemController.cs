@@ -18,9 +18,9 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         enNothing = -1,
         enOrangePeel,                                   //オレンジの皮
         enOrangeJet,                                    //オレンジジュースジェット
+        enSnapperCannon,                                //タイ砲
         enTrain,                                        //坊ちゃん列車キラー
         enStar,                                         //スター
-        enSnapperCannon,                                //タイ砲
         enItemTypeNum                                   //アイテムの種類の数
 	}
 
@@ -53,9 +53,23 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
         //何も持っていなければ
         if(m_obtainItemType == EnItemType.enNothing)
 		{
-            //アイテムのナンバーをランダムに取得
-            int type = (int)Random.Range((float)EnItemType.enOrangePeel, (float)EnItemType.enItemTypeNum);
-            m_obtainItemType = (EnItemType)type;       
+            int currentPlace = GameObject.Find("ParamManager").GetComponent<ParamManage>().GetPlace();
+            int itemType = 0;
+            //現在の順位が一位の場合
+            if(currentPlace == 1)
+			{
+                //0（オレンジの皮）から1（ジェット）を抽選
+                itemType = (int)Random.Range((int)EnItemType.enOrangePeel, currentPlace);
+            }
+            //2,3,4位の場合
+			else
+			{
+                //自分の順位に応じたアイテムを抽選
+                //2位→0から2番のアイテムしか抽選されない
+                itemType = (int)Random.Range(currentPlace - 2, currentPlace);
+            }
+
+            m_obtainItemType = (EnItemType)itemType;       
         }
     }
 
