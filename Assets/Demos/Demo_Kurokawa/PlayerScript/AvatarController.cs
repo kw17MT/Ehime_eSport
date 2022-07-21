@@ -10,6 +10,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
 {
     Rigidbody m_rb = null;                              //割り当てられたリジッドボディ
     Vector3 m_moveDir = Vector3.zero;                   //移動する方向
+    Vector3 m_prevMoveDir = Vector3.zero;               //前フレームの移動方向
     Vector3 m_moveSpeed = Vector3.zero;                 //移動スピード
     Vector3 m_rot = Vector3.zero;                       //どちらに回転するかの向き
     Vector3 m_corseDir = Vector3.zero;                  //現在走っているコースの大まかな方向
@@ -595,6 +596,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 m_moveSpeed = m_alongWallDir * MOVE_POWER;
                 m_hittedWall = false;
             }
+
+
             //そうでないなら通常通り移動
             m_rb.AddForce(m_moveSpeed - m_rb.velocity);
         }
@@ -738,9 +741,12 @@ public class AvatarController : MonoBehaviourPunCallbacks
             rot = Quaternion.LookRotation(newForward);
             //緩やかにして適用
             transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * KILLER_HANDLING_RATE);
+            //m_rb.MoveRotation(Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * KILLER_HANDLING_RATE));
             //現在の回転を保存
             m_prevTrasnform = this.transform.rotation;
             return;
         }
+
+        m_prevMoveDir = m_moveDir;
     }
 }
