@@ -12,6 +12,7 @@ Shader "MyShader/DrawOutLineShader"
         _HowToDrawOutline("HowToDrawOutline", int) = 3
         _MaxDepthDistance("MaxDepthDistance", float) = 50.0
         _OutlineBias("OutlineBias", Range(1.0, 2.0)) = 1.0
+        _FadeBias("FadeBias", Range(1.0, 8.0)) = 4.0
     }
     SubShader
     {
@@ -45,6 +46,7 @@ Shader "MyShader/DrawOutLineShader"
             int _HowToDrawOutline;
             float _MaxDepthDistance;
             float _OutlineBias;
+            float _FadeBias;
         CBUFFER_END
 
         ENDHLSL
@@ -109,8 +111,10 @@ Shader "MyShader/DrawOutLineShader"
                 return isOutline;
             }
 
-            bool IsDepthOutlineBy8Texel(float2 uv, inout bool isOutOfRange)
+            bool IsDepthOutlineBy8Texel(float2 uv, inout bool isOutOfRange, inout float outlineColorRate)
             {
+                // アウトラインの太さの計算。
+
                 float diffX = _CameraDepthTexture_TexelSize.x * _OutlineThick;
                 float diffY = _CameraDepthTexture_TexelSize.y * _OutlineThick;
 
@@ -125,10 +129,12 @@ Shader "MyShader/DrawOutLineShader"
                     float2(diffX, -diffY),
                     float2(-diffX, -diffY),
                 };
-                float currentDepth = MyLinearDepth(SampleSceneDepth(uv));
-                float smallestDepth = currentDepth;
 
+                // 近傍8テクセルの深度値の調査
+
+                float currentDepth = MyLinearDepth(SampleSceneDepth(uv));
                 float neighborDepth = 0.0f;
+                float smallestDepth = currentDepth;
 
                 [unroll]
                 for (int i = 0; i < 8; i++)
@@ -138,16 +144,29 @@ Shader "MyShader/DrawOutLineShader"
                     smallestDepth = min(smallestDepth, depth);
                 }
 
+                // アウトラインを描画する最大距離を、深度値に合わせて正規化
                 float maxDepht = _MaxDepthDistance / _ProjectionParams.z;
+
+                // アウトライン判定より前に、アウトラインカラー率の計算をしておく。
+                // 法線でアウトラインが描画される可能性もあるため。
+                outlineColorRate = 1.0f - (maxDepht - smallestDepth) / maxDepht;
+                outlineColorRate = 1.0f - pow(outlineColorRate, _FadeBias);
+
+
+                // アウトライン判定。
+                bool isOutline = false;
+
+                // アウトライン描画範囲外
                 if (smallestDepth >= maxDepht)
                 {
                     isOutOfRange = true;
-                    return false;
+                    return isOutline;
                 }
 
-                neighborDepth /= 8.0f;
+                // アウトライン範囲内
                 isOutOfRange = false;
-                bool isOutline = false;
+
+                neighborDepth /= 8.0f;
                 if ((currentDepth - neighborDepth) / neighborDepth > _OutlineThreshold)
                 {
                     isOutline = true;
@@ -193,7 +212,7 @@ Shader "MyShader/DrawOutLineShader"
                     return false;
                 }
 
-                smallestDepth = pow(smallestDepth, _OutlineBias);
+                smallestDepth = pow(max(smallestDepth,0.0f), _OutlineBias);
                 thickScale = (maxDepht - smallestDepth) / maxDepht;
                 //thickScale = pow(thickScale, _OutlineBias);
                 diffX = _CameraDepthTexture_TexelSize.x * _OutlineThick * thickScale;
@@ -299,10 +318,10 @@ Shader "MyShader/DrawOutLineShader"
 
             }
 
-            bool IsDepthAndNormalOutline(float2 uv, inout bool isOutOfRange, inout float thickScale)
+            bool IsDepthAndNormalOutline(float2 uv, inout bool isOutOfRange, inout float thickScale, inout float outlineColorRate)
             {
                 bool outlineFlag = false;
-                outlineFlag = IsDepthOutlineBy8Texel(uv, isOutOfRange);
+                outlineFlag = IsDepthOutlineBy8Texel(uv, isOutOfRange, outlineColorRate);
                 if (outlineFlag != true)
                 {
                     outlineFlag = IsNormalOutline(uv, isOutOfRange, thickScale);
@@ -328,6 +347,7 @@ Shader "MyShader/DrawOutLineShader"
                 
                 bool isOutOfRange = false;
                 float thickScale = 1.0f;
+                float outlineColorRate = 0.0f;
 
                 switch (_HowToDrawOutline)
                 {
@@ -338,9 +358,9 @@ Shader "MyShader/DrawOutLineShader"
                     }
                     break;
                 case 1:
-                    if (IsDepthOutlineBy8Texel(i.uv, isOutOfRange))
+                    if (IsDepthOutlineBy8Texel(i.uv, isOutOfRange, outlineColorRate))
                     {
-                        finalCol = _OutlineColor;
+                        finalCol = lerp(col, _OutlineColor, outlineColorRate);
                     }
                     break;
                 case 2:
@@ -356,9 +376,9 @@ Shader "MyShader/DrawOutLineShader"
                     }
                     break;
                 case 4:
-                    if (IsDepthAndNormalOutline(i.uv, isOutOfRange, thickScale))
+                    if (IsDepthAndNormalOutline(i.uv, isOutOfRange, thickScale, outlineColorRate))
                     {
-                        finalCol = _OutlineColor;
+                        finalCol = lerp(col, _OutlineColor, outlineColorRate);
                     }
                     break;
                 case 5:

@@ -76,6 +76,7 @@ public class DrawOutLinePass : ScriptableRenderPass
         m_kDrawOutlineMaterial.SetInt("_HowToDrawOutline", (int)drawOutLineParam.m_howToDrawOutline);
         m_kDrawOutlineMaterial.SetFloat("_MaxDepthDistance", drawOutLineParam.m_maxDepthDistance);
         m_kDrawOutlineMaterial.SetFloat("_OutlineBias", drawOutLineParam.m_outlineBias);
+        m_kDrawOutlineMaterial.SetFloat("_FadeBias", drawOutLineParam.m_fadeBias);
 
     }
 

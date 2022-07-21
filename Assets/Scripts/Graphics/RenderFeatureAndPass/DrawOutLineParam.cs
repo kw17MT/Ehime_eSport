@@ -22,4 +22,6 @@ public class CDrawOutLineParam
     public float m_maxDepthDistance = 50.0f;
     [Range(1.0f,2.0f)]
     public float m_outlineBias = 1.0f;
+    [Range(1.0f, 8.0f)]
+    public float m_fadeBias = 4.0f;
 }
