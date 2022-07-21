@@ -516,14 +516,26 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
 
         //ゲームが終了していて、長押ししたら
-        if(m_canReturnModeSelection && m_operation.GetComponent<Operation>().GetIsLongTouch)
+        if(m_canReturnModeSelection)
 		{
-            //ルームから出る
-            PhotonNetwork.LeaveRoom();
-            //サーバーから出る
-            PhotonNetwork.Disconnect();
-            //モード選択シーンに遷移する
-            SceneManager.LoadScene("02_ModeSelectScene");
+            if (m_operation.GetComponent<Operation>().GetIsLongTouch)
+			{
+                //ルームから出る
+                PhotonNetwork.LeaveRoom();
+                //サーバーから出る
+                PhotonNetwork.Disconnect();
+                //モード選択シーンに遷移する
+                SceneManager.LoadScene("02_ModeSelectScene");
+            }
+            else if(m_operation.GetComponent<Operation>().GetIsDoubleTouch())
+			{
+                //ルームから出る
+                PhotonNetwork.LeaveRoom();
+                //サーバーから出る
+                PhotonNetwork.Disconnect();
+                //モード選択シーンに遷移する
+                SceneManager.LoadScene("07_MatchingScene");
+            }
         }
 
         //Escが押された時
