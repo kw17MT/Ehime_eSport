@@ -137,7 +137,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
     public override void OnDisconnected(DisconnectCause cause)
     {
         //モード選択画面に戻れる状態でない場合
-        if(!m_canReturnModeSelection)
+        if(!m_canReturnModeSelection
+            && !GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
 		{
             //何らかの理由で切断されたので、モード選択に自動的に戻るアナウンスをする
             m_disconnectSprite.SetActive(true);
@@ -516,10 +517,10 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
 
         //ゲームが終了していて、長押ししたら
-        if(m_canReturnModeSelection)
-		{
+        if (m_canReturnModeSelection)
+        {
             if (m_operation.GetComponent<Operation>().GetIsLongTouch)
-			{
+            {
                 //ルームから出る
                 PhotonNetwork.LeaveRoom();
                 //サーバーから出る
@@ -527,16 +528,30 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 //モード選択シーンに遷移する
                 SceneManager.LoadScene("02_ModeSelectScene");
             }
-            else if(m_operation.GetComponent<Operation>().GetIsDoubleTouch())
-			{
-                //ルームから出る
-                PhotonNetwork.LeaveRoom();
-                //サーバーから出る
-                PhotonNetwork.Disconnect();
-                //モード選択シーンに遷移する
-                SceneManager.LoadScene("07_MatchingScene");
+            else if (m_operation.GetComponent<Operation>().GetIsDoubleTouch())
+            {
+                //オンラインでゲームをしていたら
+                if (!PhotonNetwork.OfflineMode)
+                {
+                    //ルームから出る
+                    PhotonNetwork.LeaveRoom();
+                    //サーバーから出る
+                    PhotonNetwork.Disconnect();
+                    //マッチングシーンに遷移する
+                    SceneManager.LoadScene("07_MatchingScene");
+                }
+                else
+                {
+                    //ルームから出る
+                    PhotonNetwork.LeaveRoom();
+                    //サーバーから出る
+                    PhotonNetwork.Disconnect();
+                    //シングルゲームシーンに遷移する
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                }
             }
         }
+
 
         //Escが押された時
         if (Input.GetKey(KeyCode.Escape))
@@ -612,4 +627,51 @@ public class InGameScript : MonoBehaviourPunCallbacks
             }
         }
 	}
+
+	private void Update()
+	{
+        //ポーズ中はFixedUpdateが呼ばれないため、こちらで処理
+        if (GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
+        {
+            //オンラインでゲームをしていたら
+            if (!PhotonNetwork.OfflineMode)
+            {
+                if (m_operation.GetComponent<Operation>().GetIsLongTouch)
+                {
+                    //ルームから出る
+                    PhotonNetwork.LeaveRoom();
+                    //サーバーから出る
+                    PhotonNetwork.Disconnect();
+                    //マッチングシーンに遷移する
+                    SceneManager.LoadScene("02_ModeSelectScene");
+                }
+            }
+            //オフラインモードならば
+            else
+            {
+                if (m_operation.GetComponent<Operation>().GetIsLongTouch)
+                {
+                    //ルームから出る
+                    PhotonNetwork.LeaveRoom();
+                    //サーバーから出る
+                    PhotonNetwork.Disconnect();
+                    //マッチングシーンに遷移する
+                    SceneManager.LoadScene("02_ModeSelectScene");
+                    Time.timeScale = 1.0f;
+                }
+                else if (m_operation.GetComponent<Operation>().GetIsDoubleTouch())
+                {
+                    //ポーズ状態を解除
+                    GameObject.Find("PauseButton").GetComponent<PauseButton>().OffPausePanel();
+                    //ルームから出る
+                    PhotonNetwork.LeaveRoom();
+                    //サーバーから出る
+                    PhotonNetwork.Disconnect();
+                    //シングルゲームシーンに遷移する
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                    Time.timeScale = 1.0f;
+                }
+            }
+        }
+    }
 }

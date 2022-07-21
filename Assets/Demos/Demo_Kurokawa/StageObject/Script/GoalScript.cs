@@ -5,6 +5,7 @@ using Photon.Pun;
 
 public class GoalScript : MonoBehaviourPunCallbacks
 {
+
     //ƒS[ƒ‹‚ğ‚­‚®‚Á‚½‚Æ‚«
     void OnTriggerEnter(Collider col)
 	{
