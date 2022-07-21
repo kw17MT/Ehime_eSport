@@ -98,7 +98,8 @@ public class Operation : MonoBehaviour
         }
 
         //長押し関数
-        LongTach();
+        //LongTach();
+        LongTouch_();
 
         //Wタップを下かどうかを判断する
         JudgeIsDoubleTouch();
@@ -175,30 +176,33 @@ public class Operation : MonoBehaviour
         float directionY = m_touchEndPos.y - m_touchStartPos.y;
         string ope = "";
 
-        if (Mathf.Abs(directionY) < Mathf.Abs(directionX))
+        if (Mathf.Abs(directionY) >= 4 && Mathf.Abs(directionX) >= 4)
         {
-            if (SWIPE_AMOUNT < directionX)
+            if (Mathf.Abs(directionY) < Mathf.Abs(directionX))
             {
-                //右向きにフリック
-                ope = "right";
+                if (30 < directionX)
+                {
+                    //右向きにフリック
+                    ope = "right";
+                }
+                else if (-30 > directionX)
+                {
+                    //左向きにフリック
+                    ope = "left";
+                }
             }
-            else if (-SWIPE_AMOUNT > directionX)
+            else if (Mathf.Abs(directionX) < Mathf.Abs(directionY))
             {
-                //左向きにフリック
-                ope = "left";
-            }
-        }
-        else if (Mathf.Abs(directionX) < Mathf.Abs(directionY))
-        {
-            if (SWIPE_AMOUNT < directionY)
-            {
-                //上向きにフリック
-                ope = "up";
-            }
-            else if (-SWIPE_AMOUNT > directionY)
-            {
-                //下向きのフリック
-                ope = "down";
+                if (30 < directionY)
+                {
+                    //上向きにフリック
+                    ope = "up";
+                }
+                else if (-30 > directionY)
+                {
+                    //下向きのフリック
+                    ope = "down";
+                }
             }
         }
         else
@@ -318,6 +322,19 @@ public class Operation : MonoBehaviour
         //スライドしていなかったら、
         //長押し時間読み上げ開始
         m_isLongTouch = NowOperation() == "touch" ? true : false;
+    }
+
+    private void LongTouch_()
+	{
+        if (NowOperation() == "touch")
+        {
+            m_touchTime += Time.deltaTime;
+            if (m_touchTime >= m_longTachJudgmentActivationTime)
+            {
+                m_touchTime = 0.0f;
+                m_isLongTouch = true;
+            }
+        }
     }
 
     public string GetTouchedScreenDirection()
