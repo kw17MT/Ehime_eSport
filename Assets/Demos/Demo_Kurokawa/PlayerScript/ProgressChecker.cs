@@ -6,6 +6,11 @@ using UnityEngine.SceneManagement;
 //このスクリプトが割り当てられたインスタンスのチェックポイント管理インスタンス
 public class ProgressChecker : MonoBehaviour
 {
+    private GameObject m_lapLabel = null;
+    private GameObject m_lapCountLabel = null;
+    private float m_displayTime = 0.0f;
+    private bool m_isDisplayingLapLabel = false;
+
     private int m_lapCount = 0;                             //ゲーム中の周回回数
     [SerializeField] int MAX_CHECKPOINT_NUM = 3;            //ステージに配置されるチェックポイントの数
     [SerializeField] int MAX_LAP_NUM = 3;                   //何周するか
@@ -25,7 +30,10 @@ public class ProgressChecker : MonoBehaviour
         if(SceneManager.GetActiveScene().name == "08_GameScene")
 		{
             //ラップ数を表示するオブジェクトを取得
-            GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_lapCount);
+            m_lapLabel = GameObject.Find("Lap");
+            m_lapCountLabel = GameObject.Find("LapLabel");
+            m_lapCountLabel.GetComponent<LapChange>().SetLapNum(m_lapCount);
+            m_lapLabel.SetActive(false);
         }
     }
 
@@ -69,7 +77,10 @@ public class ProgressChecker : MonoBehaviour
         //完走したラップ数を増やす
         m_lapCount++;
 
-        GameObject.Find("LapLabel").GetComponent<LapChange>().SetLapNum(m_lapCount);
+        //m_lapLabel.GetComponent<LapChange>().SetLapNum(m_lapCount);
+        m_lapLabel.SetActive(true);
+        m_lapCountLabel.GetComponent<LapChange>().SetLapNum(m_lapCount);
+        m_isDisplayingLapLabel = true;
 
         if (!PhotonNetwork.OfflineMode)
         {
@@ -106,6 +117,20 @@ public class ProgressChecker : MonoBehaviour
 		{
             //続ける
             return false;
+		}
+	}
+
+    private void Update()
+	{
+        if(m_isDisplayingLapLabel)
+		{
+            m_displayTime += Time.deltaTime;
+            if(m_displayTime >= 2.0f)
+			{
+                m_displayTime = 0.0f;
+                m_isDisplayingLapLabel = false;
+                m_lapLabel.SetActive(false);
+			}
 		}
 	}
 }

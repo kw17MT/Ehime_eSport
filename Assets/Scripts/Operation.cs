@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// ユーザー操作(左右フリックやタッチ)
@@ -24,6 +25,7 @@ public class Operation : MonoBehaviour
     const float TOUCH_ACTIVE_TIME = 1.0f;                 //タッチの効力時間
     const float SWIPE_AMOUNT = 100;
     private bool m_isDoubleTouch = false;
+    private float m_prevDeltaTime = 0.0f;
 
 	public struct InputInfo
 	{
@@ -49,8 +51,8 @@ public class Operation : MonoBehaviour
         FireMouseButtonDown();
 
        　//毎フレームタッチの移動量を取得するモードならば
-        if (m_isWorkEveryFrame)
-        {
+        //if (m_isWorkEveryFrame)
+        //{
        　    //タッチしているとき、一番初めのタップ一から現在のタップ位置でフリック方向を決定する
        　   if (m_isTouching)
             {
@@ -63,28 +65,28 @@ public class Operation : MonoBehaviour
                 //フリック方向またはタップの情報を渡せない状態にする
                 m_canDataThrow = false;
             }
-        }
+       // }
        　//タップ開始位置からタップを離したところまでをフリック操作とみなすモードならば
-        else
-        {
-       　    //タップが離された時
-       　   if (Input.GetMouseButtonUp(0))
-            {
-       　       //タッチのフラグや数値を初期化する
-       　       TachDataInit();
+        //else
+        //{
+       　//    //タップが離された時
+       　//   if (Input.GetMouseButtonUp(0))
+        //    {
+       　//       //タッチのフラグや数値を初期化する
+       　//       TachDataInit();
 
-       　       //フリック方向またはタップの情報を渡せる状態にする
-                m_canDataThrow = true;
-                //入力方向と回転の量をリセット
-                m_iputInfo.dir = "";
-                m_iputInfo.power = 0.0f;
-            }
-           else
-           {
-               //フリック方向またはタップの情報を渡せない状態にする
-               m_canDataThrow = false;
-           }
-        }
+       　//       //フリック方向またはタップの情報を渡せる状態にする
+        //        m_canDataThrow = true;
+        //        //入力方向と回転の量をリセット
+        //        m_iputInfo.dir = "";
+        //        m_iputInfo.power = 0.0f;
+        //    }
+        //   else
+        //   {
+        //       //フリック方向またはタップの情報を渡せない状態にする
+        //       m_canDataThrow = false;
+        //   }
+        //}
 
         //タップが離されたとき、
         if (Input.GetMouseButtonUp(0))
@@ -98,11 +100,15 @@ public class Operation : MonoBehaviour
         }
 
         //長押し関数
-        //LongTach();
-        LongTouch_();
+        LongTach();
 
         //Wタップを下かどうかを判断する
         JudgeIsDoubleTouch();
+
+        if (SceneManager.GetActiveScene().name == "08_GameScene" && !GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
+		{
+            m_prevDeltaTime = Time.deltaTime;
+		}
     }
 
     //タップされたときの処理関数
@@ -122,13 +128,19 @@ public class Operation : MonoBehaviour
 
     private void JudgeIsDoubleTouch()
 	{
+        if(m_isDoubleTouch)
+		{
+            //m_isSingleTouch = false;
+            m_isDoubleTouch = false;
+		}
+
         //ボタンを離したら
         if (Input.GetMouseButtonUp(0))
         {
             //操作はタップ操作か
             if (NowOperation() == "touch")
             {
-                //過去1秒以内に位階タッチしていたら
+                //過去1秒以内に1回タッチしていたら
                 if (m_isSingleTouch)
                 {
                     //Wタッチした
@@ -148,8 +160,25 @@ public class Operation : MonoBehaviour
         //1回目のタッチはしていたら
         if (m_isSingleTouch)
         {
-            //タッチしてからの経過時間を測定
-            m_timeFromFirstTouch += Time.deltaTime;
+            if (SceneManager.GetActiveScene().name == "08_GameScene")
+            {
+                if (GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
+                {
+                    m_timeFromFirstTouch += m_prevDeltaTime;
+                }
+                else
+                {
+                    //タッチしてからの経過時間を測定
+                    m_timeFromFirstTouch += Time.deltaTime;
+                }
+            }
+			else
+			{
+                //タッチしてからの経過時間を測定
+                m_timeFromFirstTouch += Time.deltaTime;
+            }
+
+
             //規定以上たったら
             if (m_timeFromFirstTouch > TOUCH_ACTIVE_TIME)
             {
@@ -163,7 +192,15 @@ public class Operation : MonoBehaviour
 
     public bool GetIsDoubleTouch()
     {
-        return m_isDoubleTouch;
+        if(m_isDoubleTouch)
+		{
+            m_isDoubleTouch = false;
+            return true;
+		}
+		else
+		{
+            return m_isDoubleTouch;
+        }
     }
 
     //現在どんな操作をしているか判断する関数
@@ -290,6 +327,7 @@ public class Operation : MonoBehaviour
         m_isDecideDirWhenLongTouch = false;
         //タッチしている時間をリセット
         m_touchTime = 0.0f;
+
     }
 
     //長押し関数
@@ -301,8 +339,23 @@ public class Operation : MonoBehaviour
             return;
         }
 
-        //タッチしている時間をゲームタイムで計測
-        m_touchTime += Time.deltaTime;
+        if (SceneManager.GetActiveScene().name == "08_GameScene")
+        {
+            if (GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
+            {
+                m_touchTime += m_prevDeltaTime;
+            }
+            else
+            {
+                //タッチしている時間をゲームタイムで計測
+                m_touchTime += Time.deltaTime;
+            }
+        }
+		else
+		{
+            //タッチしている時間をゲームタイムで計測
+            m_touchTime += Time.deltaTime;
+        }
 
         //ある程度長押しするまでは長押しチェックを行わない。
         if (m_touchTime <= m_longTachJudgmentActivationTime)
@@ -324,19 +377,6 @@ public class Operation : MonoBehaviour
         m_isLongTouch = NowOperation() == "touch" ? true : false;
     }
 
-    private void LongTouch_()
-	{
-        if (NowOperation() == "touch")
-        {
-            m_touchTime += Time.deltaTime;
-            if (m_touchTime >= m_longTachJudgmentActivationTime)
-            {
-                m_touchTime = 0.0f;
-                m_isLongTouch = true;
-            }
-        }
-    }
-
     public string GetTouchedScreenDirection()
     {
         if (m_isTouching)
@@ -354,5 +394,12 @@ public class Operation : MonoBehaviour
         {
             return "nothing";
         }
+    }
+
+    public void ResetDoubleTapParam()
+	{
+        m_isSingleTouch = false;
+        m_isDoubleTouch = false;
+        m_timeFromFirstTouch = TOUCH_ACTIVE_TIME;
     }
 }
