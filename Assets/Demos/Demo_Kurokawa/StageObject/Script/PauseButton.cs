@@ -5,29 +5,25 @@ using Photon.Pun;
 
 public class PauseButton : MonoBehaviourPunCallbacks
 {
-    public GameObject m_pauseButtonPrefab;
-    private GameObject m_pausePanel = null;
-    private bool m_isDisplayPausePanel = false;
+    public GameObject m_pausePanel;                     //ポーズ画面
+    private bool m_isDisplayPausePanel = false;         //ポーズ画面を出しているかどうか
 
     // Start is called before the first frame update
     void Start()
     {
-        m_pauseButtonPrefab.SetActive(false);
+        //ポーズ画面をオフにする
+        m_pausePanel.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    //インゲーム側でポーズ画面をオフにする
     public void OffPausePanel()
 	{
         m_isDisplayPausePanel = false;
-        m_pauseButtonPrefab.SetActive(false);
+        m_pausePanel.SetActive(false);
         Time.timeScale = 1.0f;
     }
 
+    //現在ポーズしているかどうか
     public bool GetIsPause()
 	{
         return m_isDisplayPausePanel;
@@ -35,14 +31,17 @@ public class PauseButton : MonoBehaviourPunCallbacks
 
     public void OnPauseButtonClicked()
 	{
+        //ポーズの状態を反転させる
         m_isDisplayPausePanel = !m_isDisplayPausePanel;
 
+        //ダブルタップの状態をリセットする
         GameObject.Find("OperationSystem").GetComponent<Operation>().ResetDoubleTapParam();
 
+        //ポーズ画面を出しているならば
         if(m_isDisplayPausePanel)
 		{
-            //m_pausePanel = Instantiate(m_pauseButtonPrefab, Vector3.one, Quaternion.identity);
-            m_pauseButtonPrefab.SetActive(true);
+            //ポーズ画面をオンにする
+            m_pausePanel.SetActive(true);
             if (PhotonNetwork.OfflineMode)
 			{
                 Time.timeScale = 0.0f;
@@ -50,7 +49,7 @@ public class PauseButton : MonoBehaviourPunCallbacks
         }
 		else
 		{
-            m_pauseButtonPrefab.SetActive(false);
+            m_pausePanel.SetActive(false);
             Time.timeScale = 1.0f;
 		}
 	}

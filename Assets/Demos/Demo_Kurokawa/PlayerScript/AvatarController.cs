@@ -657,6 +657,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
             {
                 GameObject.Find("SceneDirector").GetComponent<InGameScript>().SetStopToTellAIRecord();
             }
+
+            //ゴール後不要なUI群を削除
+            Destroy(GameObject.Find("Lap"));
+            Destroy(GameObject.Find("RankingImage"));
+            Destroy(GameObject.Find("Item"));
         }
     }
 

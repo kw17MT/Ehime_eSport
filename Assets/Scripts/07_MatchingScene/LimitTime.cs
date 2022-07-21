@@ -23,12 +23,17 @@ public class LimitTime : MonoBehaviour
         maxLimitTimeValue = limitTimeValue;
     }
 
+    public void SetLimitTime(int time)
+	{
+        limitTimeValue = time;
+	}
+
     void Update()
     {
         //制限時間が0になるまで制限時間カウント実行
         if (limitTimeValue >= 0)
         {
-            limitTimeValue -= Time.deltaTime;
+            //limitTimeValue -= Time.deltaTime;
         }
         //制限時間が来たら、
         else
@@ -41,7 +46,7 @@ public class LimitTime : MonoBehaviour
         limitTimeBackImage2.fillAmount += Time.deltaTime / maxLimitTimeValue;
 
         //制限時間が終了わずかになったら色を変化させる
-        if(limitTimeValue<=6)
+        if (limitTimeValue<=6)
         {
             //赤色
             limitTimeBackImage1.color = Color.red;

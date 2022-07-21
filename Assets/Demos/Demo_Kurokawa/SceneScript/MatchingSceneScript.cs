@@ -117,6 +117,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
 		{
             //テキストの中身を残り待機時間に書き換える。数値はホストクライアント側で計測
             m_waitTimeText.GetComponent<Text>().text = currentTime.ToString();
+            GameObject.Find("SceneManager").GetComponent<LimitTime>().SetLimitTime(currentTime);
         }
     }
 
