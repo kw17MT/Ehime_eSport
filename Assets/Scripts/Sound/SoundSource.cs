@@ -122,15 +122,16 @@ namespace nsSound
                     m_atomExAcb = CriAtom.GetAcb("CueSheet_SE");
                     break;
                 case EnSoundTypes.enBGM:
-                    m_soundTypeVolume = m_soundManager.GetSEVolume();
+                    m_soundTypeVolume = m_soundManager.GetBGMVolume();
                     m_atomExAcb = CriAtom.GetAcb("CueSheet_BGM");
                     break;
                 case EnSoundTypes.enNarration:
-                    m_soundTypeVolume = m_soundManager.GetSEVolume();
-                    m_atomExAcb = CriAtom.GetAcb("test03");
+                    m_soundTypeVolume = m_soundManager.GetNarrationVolume();
+                    m_atomExAcb = CriAtom.GetAcb("CueSheet_Narration");
+                    SetSourceVolume(1.0f);   //ナレーションの音量を大きくしたい(仮)
                     break;
                 case EnSoundTypes.enCharaVoice:
-                    m_soundTypeVolume = m_soundManager.GetSEVolume();
+                    m_soundTypeVolume = m_soundManager.GetCharaVoiceVolume();
                     m_atomExAcb = CriAtom.GetAcb("test03");
                     break;
                 default:
@@ -185,6 +186,12 @@ namespace nsSound
                 return;
             }
             m_sourceVolume = volume;
+
+            if (m_enSoundType == EnSoundTypes.enNarration)
+            {
+                m_sourceVolume *= 8.0f; //ナレーションの音量を大きくしたい(仮)
+            }
+
             //ソースの音量と、このソースの分類の音量と、全体の音量で、最終の音量を設定する。
             m_atomExPlayer.SetVolume(m_sourceVolume * m_soundTypeVolume * m_soundManager.GetAllVolume());
             m_atomExPlayer.UpdateAll();

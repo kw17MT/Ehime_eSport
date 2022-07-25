@@ -634,6 +634,10 @@ MonoBehaviour:
     acbFile: CueSheet_BGM.acb
     awbFile: CueSheet_BGM.awb
     loaderStatus: 0
+  - name: CueSheet_Narration
+    acbFile: CueSheet_Narration.acb
+    awbFile: CueSheet_Narration.awb
+    loaderStatus: 0
   dspBusSetting: 
   dontDestroyOnLoad: 1
   dontRemoveExistsCueSheet: 0
