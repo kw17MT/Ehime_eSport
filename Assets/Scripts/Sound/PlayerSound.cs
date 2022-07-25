@@ -53,13 +53,14 @@ namespace nsSound
             m_acceleSE.Set3DMinMaxDistance(m_3DSoundMinDistance, m_3DSoundMaxDistance);
             m_acceleSE.PlayStart(nsSound.SENames.m_accele);
 
-            StartCoroutine("Init");
-
+            // StartCoroutine("Init");
+            Init();
         }
 
-        IEnumerator Init()
+        //コルーチン辞めろ
+        void Init()
         {
-            yield return null;
+            //yield return null;
 
             //このゲームオブジェクトがプレイヤー自信ならば
             if (this.gameObject.name == "OwnPlayer")
@@ -177,7 +178,7 @@ namespace nsSound
                         itemSlotLotteryEndSS.PlayStart(nsSound.SENames.m_itemSlotLotteryEnd);
 
                         //アイテムスロットの音を再生し終わったのでフラグをfalseに。
-                        m_itemSlotSoundPlayFlag = false;    
+                        m_itemSlotSoundPlayFlag = false;
                     }
                 }
             }
