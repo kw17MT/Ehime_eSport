@@ -150,116 +150,120 @@ public class InGameScript : MonoBehaviourPunCallbacks
     //オンラインプレイヤーが参照できるルームプロパティが更新されたら
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
-        //自分のプレイヤーのウェイポイントナンバーを示すキー部分を作成
-        string myWayPointNumberKey = PhotonNetwork.NickName + "WayPointNumber";
-        //自分のプレイヤーのラップ数を示すキー部分を作成
-        string myLapCountKey = PhotonNetwork.NickName + "LapCount";
-        //自分の次のウェイポイントを取得
-        int nextMyWayPoint = (PhotonNetwork.CurrentRoom.CustomProperties[myWayPointNumberKey] is int value) ? value : 0;
-        //現在の自分のラップカウントを取得
-        int currentMyLapCount = (PhotonNetwork.CurrentRoom.CustomProperties[myLapCountKey] is int count) ? count : 0;
+        //プレイヤーがゴールしていなければ、順位を更新する
+        if (!m_player.gameObject.GetComponent<AvatarController>().GetGoaled())
+        {
+            //自分のプレイヤーのウェイポイントナンバーを示すキー部分を作成
+            string myWayPointNumberKey = PhotonNetwork.NickName + "WayPointNumber";
+            //自分のプレイヤーのラップ数を示すキー部分を作成
+            string myLapCountKey = PhotonNetwork.NickName + "LapCount";
+            //自分の次のウェイポイントを取得
+            int nextMyWayPoint = (PhotonNetwork.CurrentRoom.CustomProperties[myWayPointNumberKey] is int value) ? value : 0;
+            //現在の自分のラップカウントを取得
+            int currentMyLapCount = (PhotonNetwork.CurrentRoom.CustomProperties[myLapCountKey] is int count) ? count : 0;
 
-        //適用する順位
-        int currentPlace = 1;
-        //順位を決める
-        for (int i = 1; i < 5; i++)
-		{
-            //他のプレイヤーのラップ数取得のためのキー文字配列
-            string lapCountKey = "Player" + i + "LapCount";
-            //そのキーが自分であれば
-            if (myLapCountKey == lapCountKey)
-			{
-                //順位の比較はしない
-                continue;
-			}
-
-            //他のプレイヤーのラップ数
-            int otherPlayerLapCount = (PhotonNetwork.CurrentRoom.CustomProperties[lapCountKey] is int rapCount) ? rapCount : 0;
-            //相手のラップ数が自分より多ければ
-            if (currentMyLapCount < otherPlayerLapCount)
+            //適用する順位
+            int currentPlace = 1;
+            //順位を決める
+            for (int i = 1; i < 5; i++)
             {
-                //自分の順位を一つ下す
-                currentPlace += 1;
-                continue;
-            }
-            //相手より多く周回していたら、ウェイポイントによる順位比較をしない
-			else if(currentMyLapCount > otherPlayerLapCount)
-			{
-                continue;
-			}
-
-            //プレイヤーＮのルームプロパティのキーを作成
-            string otherPlayerWayPointName = "Player" + i + "WayPointNumber";
-            //プレイヤーＮの次のウェイポイント番号を取得
-            int otherPlayerWayPointNumber = (PhotonNetwork.CurrentRoom.CustomProperties[otherPlayerWayPointName] is int point) ? point : 0;
-            //他のプレイヤーの方が自分より進んでいれば且つ自分or相手の次のナンバーが0（ゴール最寄り位置）でないなら
-            if ((otherPlayerWayPointNumber > nextMyWayPoint && nextMyWayPoint != 0) 
-                || otherPlayerWayPointNumber == 0)
-			{
-                currentPlace += 1;
-			}
-            //同一ウェイポイントを通過している場合
-            else if(otherPlayerWayPointNumber == nextMyWayPoint)
-			{
-                //他のプレイヤーをとってくる
-                foreach (Player pl in PhotonNetwork.PlayerListOthers)
+                //他のプレイヤーのラップ数取得のためのキー文字配列
+                string lapCountKey = "Player" + i + "LapCount";
+                //そのキーが自分であれば
+                if (myLapCountKey == lapCountKey)
                 {
-                    //ニックネームと同じやつなら以下の処理を行う
-                    if(pl.NickName == "Player" + i)
-					{
-                        //そのプレイヤーのカスタムプロパティの中の次のウェイポイントへの距離を取得
-                        var hashtable = new ExitGames.Client.Photon.Hashtable();
-                        string key = "Player" + i + "Distance";
+                    //順位の比較はしない
+                    continue;
+                }
 
-                        float otherPlayerDistance = (PhotonNetwork.CurrentRoom.CustomProperties[key] is float distance) ? distance : 0;
+                //他のプレイヤーのラップ数
+                int otherPlayerLapCount = (PhotonNetwork.CurrentRoom.CustomProperties[lapCountKey] is int rapCount) ? rapCount : 0;
+                //相手のラップ数が自分より多ければ
+                if (currentMyLapCount < otherPlayerLapCount)
+                {
+                    //自分の順位を一つ下す
+                    currentPlace += 1;
+                    continue;
+                }
+                //相手より多く周回していたら、ウェイポイントによる順位比較をしない
+                else if (currentMyLapCount > otherPlayerLapCount)
+                {
+                    continue;
+                }
 
-                        float myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+                //プレイヤーＮのルームプロパティのキーを作成
+                string otherPlayerWayPointName = "Player" + i + "WayPointNumber";
+                //プレイヤーＮの次のウェイポイント番号を取得
+                int otherPlayerWayPointNumber = (PhotonNetwork.CurrentRoom.CustomProperties[otherPlayerWayPointName] is int point) ? point : 0;
+                //他のプレイヤーの方が自分より進んでいれば且つ自分or相手の次のナンバーが0（ゴール最寄り位置）でないなら
+                if ((otherPlayerWayPointNumber > nextMyWayPoint && nextMyWayPoint != 0)
+                    || otherPlayerWayPointNumber == 0)
+                {
+                    currentPlace += 1;
+                }
+                //同一ウェイポイントを通過している場合
+                else if (otherPlayerWayPointNumber == nextMyWayPoint)
+                {
+                    //他のプレイヤーをとってくる
+                    foreach (Player pl in PhotonNetwork.PlayerListOthers)
+                    {
+                        //ニックネームと同じやつなら以下の処理を行う
+                        if (pl.NickName == "Player" + i)
+                        {
+                            //そのプレイヤーのカスタムプロパティの中の次のウェイポイントへの距離を取得
+                            var hashtable = new ExitGames.Client.Photon.Hashtable();
+                            string key = "Player" + i + "Distance";
 
-                        //Debug.Log("myDistance " + myDistance + " / OtherDistance " + otherPlayerDistance);
+                            float otherPlayerDistance = (PhotonNetwork.CurrentRoom.CustomProperties[key] is float distance) ? distance : 0;
 
-                        //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
-                        if(otherPlayerDistance < myDistance)
-						{
-                            //自分の順位を1落とす
-                            currentPlace += 1;
-						}
-                        break;
+                            float myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+
+                            //Debug.Log("myDistance " + myDistance + " / OtherDistance " + otherPlayerDistance);
+
+                            //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
+                            if (otherPlayerDistance < myDistance)
+                            {
+                                //自分の順位を1落とす
+                                currentPlace += 1;
+                            }
+                            break;
+                        }
+                    }
+                    //該当プレイヤーがいない場合AIも検索
+                    foreach (GameObject ai in m_ai)
+                    {
+                        if (ai.gameObject.GetComponent<AICommunicator>().GetAIName() == "Player" + i)
+                        {
+                            //そのプレイヤーのカスタムプロパティの中の次のウェイポイントへの距離を取得
+                            var hashtable = new ExitGames.Client.Photon.Hashtable();
+                            string key = "Player" + i + "Distance";
+                            float otherPlayerDistance = (PhotonNetwork.CurrentRoom.CustomProperties[key] is float distance) ? distance : 0;
+
+                            float myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
+
+                            if (photonView.IsMine)
+                            {
+                                //Debug.Log("Other : " + otherPlayerDistance + "My : " + myDistance);
+                            }
+
+
+                            //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
+                            if (ai.GetComponent<AICommunicator>().GetDistanceToNextWayPoint()/*otherPlayerDistance*/ < myDistance)
+                            {
+                                //自分の順位を1落とす
+                                currentPlace += 1;
+                            }
+                            break;
+                        }
                     }
                 }
-                //該当プレイヤーがいない場合AIも検索
-                foreach(GameObject ai in m_ai)
-				{
-                    if(ai.gameObject.GetComponent<AICommunicator>().GetAIName() == "Player" + i)
-					{
-                        //そのプレイヤーのカスタムプロパティの中の次のウェイポイントへの距離を取得
-                        var hashtable = new ExitGames.Client.Photon.Hashtable();
-                        string key = "Player" + i + "Distance";
-                        float otherPlayerDistance = (PhotonNetwork.CurrentRoom.CustomProperties[key] is float distance) ? distance : 0;
+            }
 
-                        float myDistance = GameObject.Find("OwnPlayer").GetComponent<AvatarController>().GetDistanceToNextWayPoint();
-
-                        if(photonView.IsMine)
-						{
-                            //Debug.Log("Other : " + otherPlayerDistance + "My : " + myDistance);
-                        }
-
-
-                        //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
-                        if (ai.GetComponent<AICommunicator>().GetDistanceToNextWayPoint()/*otherPlayerDistance*/ < myDistance)
-                        {
-                            //自分の順位を1落とす
-                            currentPlace += 1;
-                        }
-                        break;
-                    }
-				}
-			}
+            //順位を変化させる
+            GameObject.Find("RankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace - 1);
+            //自分の順位を保存
+            m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
         }
-
-        //順位を変化させる
-        GameObject.Find("RankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace-1);
-        //自分の順位を保存
-        m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
     }
 
     //オフラインのルームに入ったら
@@ -369,13 +373,17 @@ public class InGameScript : MonoBehaviourPunCallbacks
     //ゴールしたプレイヤー名とタイムをホストに記録
     public void AddGoaledPlayerNameAndRecordTime(string playerName, float time, bool isPlayer)
     {
-        //プレイヤー名をキーに、クリアタイムをバリューに
-        m_scoreBoard.Add(playerName, time);
-        //Debug.Log(playerName + "    " + time);
-        if (isPlayer)
+        //記録を行いたいキーがまだ登録されていなければ
+        if (!m_scoreBoard.ContainsKey(playerName))
         {
-            //ゴールしたプレイヤーの総数をインクリメント
-            m_goaledPlayerNum++;
+            //プレイヤー名をキーに、クリアタイムをバリューに
+            m_scoreBoard.Add(playerName, time);
+            //Debug.Log(playerName + "    " + time);
+            if (isPlayer)
+            {
+                //ゴールしたプレイヤーの総数をインクリメント
+                m_goaledPlayerNum++;
+            }
         }
     }
 

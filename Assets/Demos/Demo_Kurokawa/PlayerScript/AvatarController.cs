@@ -89,9 +89,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
 
         //1秒間に何回通信するか
-        PhotonNetwork.SendRate = 5;
+        PhotonNetwork.SendRate = 15;
         //1秒間に何回同期を行うか
-        PhotonNetwork.SerializationRate = 5;
+        PhotonNetwork.SerializationRate = 15;
 
         //プレイヤーについているスクリプトの取得
         m_aiScript = this.GetComponent<RaceAIScript>();
@@ -657,6 +657,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
             {
                 GameObject.Find("SceneDirector").GetComponent<InGameScript>().SetStopToTellAIRecord();
             }
+
+            //ゴール後不要なUI群を削除
+            Destroy(GameObject.Find("Lap"));
+            Destroy(GameObject.Find("RankingImage"));
+            Destroy(GameObject.Find("Item"));
         }
     }
 

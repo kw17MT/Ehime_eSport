@@ -64,6 +64,12 @@ public class ProgressChecker : MonoBehaviour
     //ゴールできるかチェックする
     public bool CheckCanGoal()
 	{
+        //ゴール済みならば、以下処理を行わない
+        if(this.gameObject.GetComponent<AvatarController>().GetGoaled())
+		{
+            return false;
+		}
+
         //全てのチェックポイントを
         foreach(var isThrough in m_checkPoint)
         {
@@ -129,7 +135,12 @@ public class ProgressChecker : MonoBehaviour
 			{
                 m_displayTime = 0.0f;
                 m_isDisplayingLapLabel = false;
-                m_lapLabel.SetActive(false);
+
+                //ゴール後周回ラベルを破棄するためヌルチェック
+                if(m_lapLabel != null)
+				{
+                    m_lapLabel.SetActive(false);
+                }
 			}
 		}
 	}
