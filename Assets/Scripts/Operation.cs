@@ -213,7 +213,7 @@ public class Operation : MonoBehaviour
         float directionY = m_touchEndPos.y - m_touchStartPos.y;
         string ope = "";
 
-        if (Mathf.Abs(directionY) >= 4 && Mathf.Abs(directionX) >= 4)
+        if (Mathf.Abs(directionY) >= 3 && Mathf.Abs(directionX) >= 3)
         {
             if (Mathf.Abs(directionY) < Mathf.Abs(directionX))
             {

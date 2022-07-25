@@ -106,7 +106,7 @@ namespace nsSound
                 }
             }
 
-            Debug.Log("ロードが完了したので初期化します。");
+            //Debug.Log("ロードが完了したので初期化します。");
 
             //サウンドマネージャーのインスタンスを取得。
             m_soundManager = SoundManager.Instance;
