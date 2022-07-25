@@ -630,6 +630,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             //3•bˆÈã‚½‚Á‚½‚ç
             if (m_disconnectTimer >= 3.0f)
             {
+                Destroy(m_paramManager);
                 //ƒ^ƒCƒgƒ‹‚Ö–ß‚·
                 SceneManager.LoadScene("01_TitleScene");
             }
