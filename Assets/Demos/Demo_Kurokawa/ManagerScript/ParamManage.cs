@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 //自分のプレイヤーのため記録場所で、通信からは遮断したクラス
 public class ParamManage : MonoBehaviour
@@ -38,4 +39,12 @@ public class ParamManage : MonoBehaviour
     {
         return m_place;
     }
+
+	private void Update()
+	{
+		//if(SceneManager.GetActiveScene().name == "01_TitleScene")
+		//{
+  //          Destroy(this.gameObject);
+		//}
+	}
 }

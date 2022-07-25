@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
 /// <summary>
 ///設定シーンから前のシーン(モード選択シーン)に戻るクラス
 /// </summary>
-public class ReturnPreviousScene : MonoBehaviour
+public class ReturnPreviousScene : MonoBehaviourPunCallbacks
 {
     //操作システム
     Operation m_operation = null;
@@ -14,6 +15,8 @@ public class ReturnPreviousScene : MonoBehaviour
     [SerializeField] string m_previousSceneName = null;
     //設定シーンかどうか
     [SerializeField] bool m_isSettingScene = false;
+    //マッチングシーンかどうか
+    [SerializeField] bool m_isMatchingScene = false;
 
     void Start()
     {
@@ -33,6 +36,18 @@ public class ReturnPreviousScene : MonoBehaviour
             //ブラインドモードかどうかのデータを保存
             GameObject.Find("UserSettingDataStorageSystem").GetComponent<UserSettingData>().GetSetBlindMode = GameObject.Find("BlindToggle").GetComponent<ToggleOnOff>().GetToggleValue;
         }
+        else if(m_isMatchingScene)
+		{
+            //ルームから出る
+            PhotonNetwork.LeaveRoom();
+            //サーバーから出る
+            PhotonNetwork.Disconnect();
+        }
+
+        if(SceneManager.GetActiveScene().name == "02_ModeSelectScene")
+		{
+            Destroy(GameObject.Find("ParamManager"));
+		}
 
         //モード選択シーンに遷移
         SceneManager.LoadScene(m_previousSceneName);
