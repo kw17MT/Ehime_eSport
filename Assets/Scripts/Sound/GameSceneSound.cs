@@ -6,8 +6,8 @@ namespace nsSound
 {
     public class GameSceneSound : MonoBehaviour
     {
-        //プレイヤーのアバターの情報
-        AvatarController m_ownPlayerAvatarController = null;
+        //ゴールの情報
+        GoalScript m_goalScript = null;
         //プレイヤーのパラメータの取得
         ParamManage m_paramManager = null;
 
@@ -29,16 +29,17 @@ namespace nsSound
             m_startEngineSE.SetLoop(false);
             m_startEngineSE.PlayStart(nsSound.SENames.m_startEngine);
 
-            StartCoroutine("Init");
-
+            //StartCoroutine("Init");
+            Init();
 
         }
-        IEnumerator Init()
+        //コルーチン辞めろ
+        void Init()
         {
-            yield return null;
+            //yield return null;
 
-            //プレイヤーのアバターの情報
-            m_ownPlayerAvatarController = GameObject.Find("OwnPlayer").GetComponent<AvatarController>();
+            //ゴールの情報
+            m_goalScript = GameObject.Find("Goal").GetComponent<GoalScript>();
             //ゲーム中のパラメータ保存インスタンスを取得する
             m_paramManager = GameObject.Find("ParamManager").GetComponent<ParamManage>();
         }
@@ -46,26 +47,26 @@ namespace nsSound
         // Update is called once per frame
         void Update()
         {
-            
+
 
             GoalSound();
-            
+
         }
 
-		private void OnDestroy()
-		{
+        private void OnDestroy()
+        {
             if (m_goalFanfare != null)
             {
                 m_goalFanfare.FadeOutStart();
             }
-		}
+        }
 
-		private void GoalSound()
+        private void GoalSound()
         {
             if (m_goaled == false)
             {
                 //ゴールしていたら
-                if (m_ownPlayerAvatarController.GetGoaled())
+                if (m_goalScript.GetOwnPlayerGoaled())
                 {
                     //フラグをゴールしたことに
                     m_goaled = true;
