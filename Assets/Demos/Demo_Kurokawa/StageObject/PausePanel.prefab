@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 2692155595102286653}
   - component: {fileID: 6685778814258901921}
   m_Layer: 5
-  m_Name: Image
+  m_Name: PauseText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -111,8 +111,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 171, y: -16}
-  m_SizeDelta: {x: 500, y: 100}
+  m_AnchoredPosition: {x: 60, y: -77}
+  m_SizeDelta: {x: 750, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2692155595102286653
 CanvasRenderer:
@@ -155,7 +155,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Pause
+  m_Text: "\u3000\u3000\u3000     Pause\n\u9577\u62BC\u3057\u3067\u30E2\u30FC\u30C9\u305B\u3093\u305F\u304F\u306B\u3082\u3069\u308C\u308B\u3088\uFF01\n\nW\u30BF\u30C3\u30D7\u3067\u30EA\u30C8\u30E9\u30A4\u3067\u304D\u308B\u3088\uFF01\n\uFF08\u30B7\u30F3\u30B0\u30EB\u30D7\u30EC\u30A4\u306E\u307F\uFF09"
 --- !u!1 &4256894386539098291
 GameObject:
   m_ObjectHideFlags: 0

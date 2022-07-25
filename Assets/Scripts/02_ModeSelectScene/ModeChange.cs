@@ -59,8 +59,8 @@ public class ModeChange : MonoBehaviour
         //操作は左右フリック
         ChangeSelectMode();
 
-        //画面が長押しされたら、
-        if (m_operation.GetIsLongTouch)
+        //画面がWタップされたら、
+        if (m_operation.GetIsDoubleTouch())
         {
             //次のシーンに遷移させる
             GoNextScene();

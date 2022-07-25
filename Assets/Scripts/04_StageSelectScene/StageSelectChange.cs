@@ -63,7 +63,7 @@ public class StageSelectChange : MonoBehaviour
         ChangeSelectStage();
 
         //‰æ–Ê‚ª’·‰Ÿ‚µ‚³‚ê‚½‚çA
-        if (m_operation.GetIsLongTouch)
+        if (m_operation.GetIsDoubleTouch())
         {
             //Ÿ‚ÌƒV[ƒ“‚É‘JˆÚ‚³‚¹‚é
             GoNextScene();

@@ -288,6 +288,11 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
     }
 
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        Debug.Log($"ルームへの参加に失敗しました: {message}");
+    }
+
     //スポーンしていないポイントを見つけ、そこにAIをスポーンさせる（オンラインモード時に使用）
     private void FindEmptySpawnPointAndPopAI()
 	{
@@ -493,7 +498,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                     m_shouldCountDown = false;
                     //game開始フラグを立てるように通信を送る
                     photonView.RPC(nameof(SetPlayerMovable), RpcTarget.All);
-
+                    //BGMを鳴らし始める
                     m_isBGMStart = true;
                 }
                 //待機時間の秒数が変わったらそれを同期する
@@ -531,6 +536,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             {
                 //ルームから出る
                 PhotonNetwork.LeaveRoom();
+                PhotonNetwork.LeaveLobby();
                 //サーバーから出る
                 PhotonNetwork.Disconnect();
                 //モード選択シーンに遷移する
@@ -543,6 +549,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 {
                     //ルームから出る
                     PhotonNetwork.LeaveRoom();
+                    PhotonNetwork.LeaveLobby();
                     //サーバーから出る
                     PhotonNetwork.Disconnect();
                     //マッチングシーンに遷移する
@@ -552,24 +559,13 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 {
                     //ルームから出る
                     PhotonNetwork.LeaveRoom();
+                    PhotonNetwork.LeaveLobby();
                     //サーバーから出る
                     PhotonNetwork.Disconnect();
                     //シングルゲームシーンに遷移する
                     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 }
             }
-        }
-
-
-        //Escが押された時
-        if (Input.GetKey(KeyCode.Escape))
-        {
-
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;//ゲームプレイ終了
-#else
-            Application.Quit();//ゲームプレイ終了
-#endif
         }
 
 		//シングルプレイモードの時
@@ -649,6 +645,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 {
                     //ルームから出る
                     PhotonNetwork.LeaveRoom();
+                    PhotonNetwork.LeaveLobby();
                     //サーバーから出る
                     PhotonNetwork.Disconnect();
                     //マッチングシーンに遷移する
@@ -662,6 +659,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 {
                     //ルームから出る
                     PhotonNetwork.LeaveRoom();
+                    PhotonNetwork.LeaveLobby();
                     //サーバーから出る
                     PhotonNetwork.Disconnect();
                     //マッチングシーンに遷移する
@@ -674,6 +672,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                     GameObject.Find("PauseButton").GetComponent<PauseButton>().OffPausePanel();
                     //ルームから出る
                     PhotonNetwork.LeaveRoom();
+                    PhotonNetwork.LeaveLobby();
                     //サーバーから出る
                     PhotonNetwork.Disconnect();
                     //シングルゲームシーンに遷移する
