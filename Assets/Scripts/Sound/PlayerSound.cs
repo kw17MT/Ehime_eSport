@@ -72,7 +72,7 @@ namespace nsSound
             else
             {
                 m_ownPlayerRaceAI = GameObject.Find("OwnPlayer").GetComponent<RaceAIScript>();
-            }
+            } 
         }
 
         // Update is called once per frame
