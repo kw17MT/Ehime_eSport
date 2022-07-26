@@ -113,4 +113,12 @@ public class CircleCenterRotateAround : MonoBehaviour
             return m_countTime;
         }
     }
+
+    ////////////////////////////////////////////////////////////
+    //‰ñ“]’†‚©‚Ç‚¤‚©‚ðŽæ“¾
+    public bool GetAroundMoveOn()
+    {
+        return m_aroundMoveOn;
+    }
+    ////////////////////////////////////////////////////////////
 }

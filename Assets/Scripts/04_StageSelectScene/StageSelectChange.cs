@@ -179,4 +179,12 @@ public class StageSelectChange : MonoBehaviour
             m_selectMoveCount = 0;
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //Œ»İ‚Ì‘I‘ğ‚µ‚Ä‚¢‚éó‘Ô‚ğæ“¾
+    public int GetNowSelectState()
+    {
+        return (int)m_nowSelectStage;
+    }
+    ///////////////////////////////////////////////////////////////////////////////
 }
