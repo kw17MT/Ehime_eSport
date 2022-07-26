@@ -571,6 +571,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //環境に依存されない、一定期間のUpdate関数（移動はここにかくこと）
     private void FixedUpdate()
     {
+        if(SceneManager.GetActiveScene().name != "08_GameScene")
+		{
+            return;
+		}
+
         SwitchUsingControllerScript();
 
         //キラー使用時の移動。キラー使用時はこの関数以降の処理は行わない
