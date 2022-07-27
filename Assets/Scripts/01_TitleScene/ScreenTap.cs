@@ -84,7 +84,7 @@ public class ScreenTap : MonoBehaviour
         //操作の判定を初期化させる
         m_operation.TachDataInit();
 
-        //モード選択シーンに遷移
-        SceneManager.LoadScene("02_ModeSelectScene");
+        //チュートリアルシーンに遷移
+        SceneManager.LoadScene("015_TutorialScene");
     }
 }
