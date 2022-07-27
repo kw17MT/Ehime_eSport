@@ -17,6 +17,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private GameObject m_paramManager = null;                                           //ゲーム中に使用するパラメータ保存インスタンス
     private GameObject m_operation = null;                                              //操作のインスタンス
     private GameObject m_player = null;                                                 //プレイヤーのインスタンス
+    private GameObject m_rankingImage = null;
     private bool m_isDisconnected = false;                                              //何らかの理由でサーバーから切断されたら
     private bool m_isInstantiateAI = false;                                             //プレイヤーの不足分をAIで補ったかどうか
     private bool m_isShownResult = false;                                               //リザルトを出しているか
@@ -43,6 +44,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
         m_operation = GameObject.Find("OperationSystem");
         //ユーザーが選択してきたものを記録したインスタンスを取得
         m_userSetting = GameObject.Find("UserSettingDataStorageSystem");
+        //ランキングの数字部分のスプライトを取得
+        m_rankingImage = GameObject.Find("RankingImage");
 
         //ゲームがオフラインで開始されたら
         if (m_userSetting.GetComponent<UserSettingData>().GetSetModeType == OFFLINE_MODE)
@@ -151,8 +154,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
         //プレイヤーがゴールしていなければ、順位を更新する
-        if (!m_player.gameObject.GetComponent<AvatarController>().GetGoaled())
-        {
+        //if (!m_player.gameObject.GetComponent<AvatarController>().GetGoaled())
+        //{
             //自分のプレイヤーのウェイポイントナンバーを示すキー部分を作成
             string myWayPointNumberKey = PhotonNetwork.NickName + "WayPointNumber";
             //自分のプレイヤーのラップ数を示すキー部分を作成
@@ -259,11 +262,14 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 }
             }
 
+        if (m_rankingImage != null)
+        {
             //順位を変化させる
-            GameObject.Find("RankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace - 1);
+            m_rankingImage.GetComponent<NowRankingChange>().ChangeRanking(currentPlace - 1);
             //自分の順位を保存
             m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
         }
+
     }
 
     //オフラインのルームに入ったら
@@ -612,11 +618,14 @@ public class InGameScript : MonoBehaviourPunCallbacks
 				}
 			}
 
-			//順位を変化させる
-			GameObject.Find("RankingImage").GetComponent<NowRankingChange>().ChangeRanking(currentPlace - 1);
-			//自分の順位を保存
-			m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
-		}
+            if (m_rankingImage != null)
+            {
+                //順位を変化させる
+                m_rankingImage.GetComponent<NowRankingChange>().ChangeRanking(currentPlace - 1);
+                //自分の順位を保存
+                m_paramManager.GetComponent<ParamManage>().SetPlace(currentPlace);
+            }
+        }
 
         //回線切断時
         if(m_isDisconnected)
