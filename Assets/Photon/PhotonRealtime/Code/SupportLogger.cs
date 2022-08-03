@@ -379,7 +379,7 @@ namespace Photon.Realtime
 
         public void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
         {
-			Debug.Log(this.GetFormattedTimestamp() + " SupportLogger OnRoomPropertiesUpdate(propertiesThatChanged).");
+			//Debug.Log(this.GetFormattedTimestamp() + " SupportLogger OnRoomPropertiesUpdate(propertiesThatChanged).");
         }
 
         public void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)

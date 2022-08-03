@@ -20,7 +20,7 @@ public class OrangePeel : MonoBehaviourPunCallbacks
 		{
             //当たったプレイヤーを攻撃された判定にする。
             col.gameObject.GetComponent<AvatarController>().SetIsAttacked();
-            DestroyItemWithName(this.gameObject.name);
+            photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
         }
         if(col.gameObject.tag == "Player")
 		{
@@ -28,24 +28,27 @@ public class OrangePeel : MonoBehaviourPunCallbacks
             if (col.gameObject.GetComponent<AICommunicator>() != null)
             {
                 col.gameObject.GetComponent<AICommunicator>().SetIsAttacked(true);
-                DestroyItemWithName(this.gameObject.name);
+                photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
+
             }
             else if (col.gameObject.GetComponent<AvatarController>() != null)
 			{
                 //当たったプレイヤーを攻撃された判定にする。
                 col.gameObject.GetComponent<AvatarController>().SetIsAttacked();
-                DestroyItemWithName(this.gameObject.name);
+                photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
+
             }
         }
 
         if(col.gameObject.name.Length >= 7 && col.gameObject.name[0..7] == "Snapper")
 		{
             if((col.gameObject.transform.position - this.gameObject.transform.position).magnitude < 2.0f)
-			{   
+			{
                 //オレンジの皮のインスタンスを消す通信を行う
-                DestroyItemWithName(this.gameObject.name);
+                photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
+
                 //タイのインスタンスを消す通信を行う
-                DestroyItemWithName(col.gameObject.name);
+                photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, col.gameObject.name);
             }
         }
 	}

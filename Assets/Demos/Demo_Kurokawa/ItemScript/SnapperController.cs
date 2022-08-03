@@ -35,6 +35,7 @@ public class SnapperController : MonoBehaviourPunCallbacks
     [PunRPC]
     private void DestroyItemWithName(string name)
     {
+        Debug.Log("Destroy snapper");
         GameObject.Find("SceneDirector").GetComponent<ItemStateCommunicator>().DestroyItemWithName(name);
     }
 
@@ -45,7 +46,7 @@ public class SnapperController : MonoBehaviourPunCallbacks
         if (col.gameObject.tag != "OwnPlayer" && col.gameObject.tag != "Ground")
 		{
             //è¡Ç∑ÅBÅiï«Ç≈Ç†Ç¡ÇƒÇ‡è¡Ç¶ÇÈÇÊÇ§Ç…Åj
-            DestroyItemWithName(this.gameObject.name);
+            photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
         }
     }
 

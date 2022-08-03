@@ -184,6 +184,8 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                 // Player1 とか
                 string idStr = PhotonNetwork.NickName;
                 int id = int.Parse(idStr[6].ToString());
+
+                Debug.Log(idStr + "  :  " + id);
                 photonView.RPC(nameof(InstantiateItem), RpcTarget.All, "Snapper", snapperPos, this.gameObject.GetComponent<WayPointChecker>().GetNextWayPointNumber(), id);
             }
             //テストでボタンを押したらキラー使用状態にする。
