@@ -27,12 +27,12 @@ public class RaceAIScript : MonoBehaviour
     //運の良さ?
 
 
+    private float m_shiftLength = 0.0f;                                         //目指す地点がウェイポイントから右方向にどれだけ離れているか
     private Vector3 m_targetOffset = new Vector3(0.0f,0.0f,0.0f);               //現在の目標のウェイポイントからずらす幅
     private int m_targetNumber = -1;                                            //現在目標にしているウェイポイントの番号
 
 
     //障害物避け用変数
-    private float m_shiftLength = 0;                                            //目指す地点がウェイポイントから右方向にどれだけ離れているか
     public LayerMask m_obstacleLayerMask;                                       //障害物のレイヤーマスク
     RaycastHit m_sphereCastHit;                                                 //SphereCastの結果を格納する変数
     float m_sphereCastRadius = 1.0f;                                            //SphereCastの半径
@@ -41,8 +41,9 @@ public class RaceAIScript : MonoBehaviour
 
 
     //ウェイポイントから目標地点をずらす幅(コースによって幅が違うためウェイポイント側への実装も検討)
-    public float m_innerShiftMaxLength = 5.0f;//内側への最大のずらし幅
+    public float m_innerShiftMaxLength = 4.0f;//内側への最大のずらし幅
     public float m_outerShiftMaxLength = 3.0f;//外側への最大のずらし幅
+    private float m_currentShiftRatio = 0.5f;//現在のずらし幅の割合(内側:0.0f～外側:1.0f)
 
     //AIはウェイポイントとの距離に応じてどの角度以内ならハンドルを切るかを変化させる
     //例:
@@ -131,8 +132,17 @@ public class RaceAIScript : MonoBehaviour
             this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
         }
 
-        //ウェイポイントの座標からずらす幅を乱数で決定
-        m_shiftLength = Random.Range(-m_innerShiftMaxLength, m_outerShiftMaxLength);
+        //現在のウェイポイントの座標からずらす割合に変化を与える値を乱数で決定
+        float moveRatio = Random.Range(-0.2f, 0.2f);
+
+        //現在の割合に加算
+        m_currentShiftRatio += moveRatio;
+
+        //0~1に整える(規定値より内・外にいかないように)
+        m_currentShiftRatio = Mathf.Clamp01(m_currentShiftRatio);
+
+        //割合から実際にずらす長さを計算
+        m_shiftLength = Mathf.Lerp(-m_innerShiftMaxLength, m_outerShiftMaxLength, m_currentShiftRatio);
 
         //目指す位置をローカル座標系で左右にずらすベクトルを計算
         m_targetOffset = m_wayPointChecker.GetNextWayPointRight() * m_shiftLength;
