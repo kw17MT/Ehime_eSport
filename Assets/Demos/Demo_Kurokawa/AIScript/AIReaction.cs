@@ -57,7 +57,8 @@ public class AIReaction : MonoBehaviourPunCallbacks
 				{
 					//çUåÇÇ≥ÇÍÇΩ
 					this.gameObject.GetComponent<AICommunicator>().SetIsAttacked(true);
-				}			}
+				}			
+			}
 		}
 		//ÉIÉåÉìÉWÇÃîÁÇ≈Ç†ÇÍÇŒ
 		if (col.gameObject.name.Length >= 10 && col.gameObject.name[0..10] == "OrangePeel")
