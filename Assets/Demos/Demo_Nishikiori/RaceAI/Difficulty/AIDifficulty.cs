@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObjects/AIDifficulty")]
-public class SpawnManagerScriptableObject : ScriptableObject
+public class AIDifficulty : ScriptableObject
 {
     //“à‘¤‚Ì‰½Š„‚Ì•‚Ü‚Å–Ú•W’n“_‚É‚È‚è“¾‚é‚©
     [Range(-1.0f,1.0f)]

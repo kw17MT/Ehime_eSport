@@ -11,6 +11,7 @@ public class RaceAIScript : MonoBehaviour
     public string m_playerTag = "OwnPlayer";                                    //プレイヤーにつけられたゲームオブジェクトのタグ
     private Rigidbody m_rigidbody = null;                                       //AIキャラクターの剛体
     private WayPointChecker m_wayPointChecker = null;                           //AIキャラクターのウェイポイントチェッカー
+    public AIDifficulty m_AIDifficulty = null;
 
     //ステータス//
     //スピード
@@ -138,8 +139,8 @@ public class RaceAIScript : MonoBehaviour
         nextHalfWidth -= 2.0f;
 
         //内外に取りうる値の最大値をウェイポイントの幅と難易度から設定
-        float innerShiftMaxLength = nextHalfWidth;// * (AI難易度による内側への割合);
-        float outerShiftMaxLength = nextHalfWidth;// * (AI難易度による外側への割合);
+        float innerShiftMaxLength = nextHalfWidth * m_AIDifficulty.innerShiftMaxRatio;
+        float outerShiftMaxLength = nextHalfWidth * m_AIDifficulty.outerShiftMaxRatio;
 
 
 

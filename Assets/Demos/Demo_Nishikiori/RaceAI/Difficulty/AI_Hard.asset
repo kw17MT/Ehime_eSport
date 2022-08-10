@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: b08fef62b4b79b247a602a763d9f739c, type: 3}
   m_Name: AI_Hard
-  m_EditorClassIdentifier: Assembly-CSharp::SpawnManagerScriptableObject
-  innerShiftMaxRatio: 0
-  outerShiftMaxRatio: 0
+  m_EditorClassIdentifier: 
+  innerShiftMaxRatio: 1
+  outerShiftMaxRatio: -0.5
