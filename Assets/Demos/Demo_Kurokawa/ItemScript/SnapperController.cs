@@ -35,7 +35,6 @@ public class SnapperController : MonoBehaviourPunCallbacks
     [PunRPC]
     private void DestroyItemWithName(string name)
     {
-        Debug.Log("Destroy snapper");
         GameObject.Find("SceneDirector").GetComponent<ItemStateCommunicator>().DestroyItemWithName(name);
     }
 
