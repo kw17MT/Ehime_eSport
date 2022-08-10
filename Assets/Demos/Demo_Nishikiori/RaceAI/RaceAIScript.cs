@@ -40,9 +40,8 @@ public class RaceAIScript : MonoBehaviour
     float m_onLineLength = 1.0f;                                                //障害物がライン上にあると判断する距離
 
 
-    //ウェイポイントから目標地点をずらす幅(コースによって幅が違うためウェイポイント側への実装も検討)
-    public float m_innerShiftMaxLength = 4.0f;//内側への最大のずらし幅
-    public float m_outerShiftMaxLength = 3.0f;//外側への最大のずらし幅
+    //ウェイポイントから目標地点をずらす幅
+    public float m_maxMoveRatio = 0.2f;
     private float m_currentShiftRatio = 0.5f;//現在のずらし幅の割合(内側:0.0f～外側:1.0f)
 
     //AIはウェイポイントとの距離に応じてどの角度以内ならハンドルを切るかを変化させる
@@ -132,8 +131,20 @@ public class RaceAIScript : MonoBehaviour
             this.GetComponent<AICommunicator>().SetNextWayPoint(m_targetNumber);
         }
 
+        //次のウェイポイントの幅の半分を取得
+        float nextHalfWidth = m_wayPointChecker.GetNextWayPointHalfWidth();
+        
+        //ウェイポイントの幅をそのまま使うとコースアウトギリギリまで行ってしまうので少しだけ値を減らす
+        nextHalfWidth -= 2.0f;
+
+        //内外に取りうる値の最大値をウェイポイントの幅と難易度から設定
+        float innerShiftMaxLength = nextHalfWidth;// * (AI難易度による内側への割合);
+        float outerShiftMaxLength = nextHalfWidth;// * (AI難易度による外側への割合);
+
+
+
         //現在のウェイポイントの座標からずらす割合に変化を与える値を乱数で決定
-        float moveRatio = Random.Range(-0.2f, 0.2f);
+        float moveRatio = Random.Range(-m_maxMoveRatio, m_maxMoveRatio);
 
         //現在の割合に加算
         m_currentShiftRatio += moveRatio;
@@ -142,7 +153,7 @@ public class RaceAIScript : MonoBehaviour
         m_currentShiftRatio = Mathf.Clamp01(m_currentShiftRatio);
 
         //割合から実際にずらす長さを計算
-        m_shiftLength = Mathf.Lerp(-m_innerShiftMaxLength, m_outerShiftMaxLength, m_currentShiftRatio);
+        m_shiftLength = Mathf.Lerp(-innerShiftMaxLength, outerShiftMaxLength, m_currentShiftRatio);
 
         //目指す位置をローカル座標系で左右にずらすベクトルを計算
         m_targetOffset = m_wayPointChecker.GetNextWayPointRight() * m_shiftLength;

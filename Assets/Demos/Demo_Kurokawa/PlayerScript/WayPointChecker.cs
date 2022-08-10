@@ -11,6 +11,7 @@ public class WayPointChecker : MonoBehaviour
     private Vector3 m_nextWayPointPos = Vector3.zero;           //次のウェイポイントの座標
     private int m_nextWayPointNumber = 0;                       //次のウェイポイントの番号
     private Transform m_nextWayPointTransform = null;           //次のウェイポイントのTrasnform
+    private float m_nextWayPointHalfWidth = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +24,8 @@ public class WayPointChecker : MonoBehaviour
             //次のウェイポイントの座標を取得
             m_nextWayPointPos = nextWayPoint.transform.position;
             m_nextWayPointTransform = nextWayPoint.transform;
+            //次のウェイポイントの幅の半分の長さを取得
+            m_nextWayPointHalfWidth = nextWayPoint.gameObject.GetComponent<BoxCollider>().size.x / 2.0f;
         }
 
         //Playerタグ(AI)だったら
@@ -33,6 +36,8 @@ public class WayPointChecker : MonoBehaviour
             //次のウェイポイントの座標を取得
             m_nextWayPointPos = nextWayPoint.transform.position;
             m_nextWayPointTransform = nextWayPoint.transform;
+            //次のウェイポイントの幅の半分の長さを取得
+            m_nextWayPointHalfWidth = nextWayPoint.gameObject.GetComponent<BoxCollider>().size.x / 2.0f;
         }
     }
 
@@ -52,6 +57,11 @@ public class WayPointChecker : MonoBehaviour
     public int GetNextWayPointNumber()
     {
         return m_nextWayPointNumber;
+    }
+
+    public float GetNextWayPointHalfWidth()
+    {
+        return m_nextWayPointHalfWidth;
     }
 
     //次のウェイポイントの右方向を返す
@@ -106,6 +116,9 @@ public class WayPointChecker : MonoBehaviour
 
         //新しいポイントのトランスフォームを取得
         m_nextWayPointTransform = nextWayPoint.transform;
+
+        //新しいポイントの当たり判定の幅の半分の長さを取得
+        m_nextWayPointHalfWidth = nextWayPoint.gameObject.GetComponent<BoxCollider>().size.x / 2.0f;
 
         if (this.gameObject.tag == "OwnPlayer"
             && !PhotonNetwork.OfflineMode)
