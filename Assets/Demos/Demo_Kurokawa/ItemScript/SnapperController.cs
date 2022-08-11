@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 //鯛の基本行動クラス
 public class SnapperController : MonoBehaviourPunCallbacks
@@ -124,5 +125,11 @@ public class SnapperController : MonoBehaviourPunCallbacks
             m_isAddFirstVelocity = true;
         }
         rb.AddForce((m_moveDir * MOVE_POWER) - rb.velocity);
+
+        if(SceneManager.GetActiveScene().name == "08_EasyGameScene")
+		{
+            //消す。（壁であっても消えるように）
+            photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
+        }
     }
 }

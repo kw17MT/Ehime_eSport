@@ -59,7 +59,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
         //リジッドボディを取得
         m_rb = GetComponent<Rigidbody>();
         //インゲーム中であれば
-        if (SceneManager.GetActiveScene().name == "08_GameScene")
+        if (SceneManager.GetActiveScene().name[0..2] == "08")
         {
             //重力をオンにする
             m_rb.useGravity = true;
@@ -427,6 +427,13 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 this.GetComponent<AvatarController>().enabled = false;
             }
         }
+        else if(SceneManager.GetActiveScene().name == "08_EasyGameScene")
+		{
+            if (m_isGoaled)
+            {
+                this.GetComponent<AvatarController>().enabled = false;
+            }
+        }
     }
 
     private void CalcRotation()
@@ -571,7 +578,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     //環境に依存されない、一定期間のUpdate関数（移動はここにかくこと）
     private void FixedUpdate()
     {
-        if(SceneManager.GetActiveScene().name != "08_GameScene")
+        if(SceneManager.GetActiveScene().name[0..2] != "08")
 		{
             return;
 		}
@@ -613,7 +620,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
        
 
         //インゲームならば
-        if (SceneManager.GetActiveScene().name == "08_GameScene")
+        if (SceneManager.GetActiveScene().name[0..2] == "08")
         {
             //オフラインモードならば
             if (PhotonNetwork.OfflineMode)
@@ -681,7 +688,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
         m_corseDir.y = 0.0f;
 
         //現在のシーンがインゲームでカウントダウンが終了して動ける状態ならば
-        if (SceneManager.GetActiveScene().name == "08_GameScene" && m_canMove)
+        if (SceneManager.GetActiveScene().name[0..2] == "08" && m_canMove)
         {
             // 自身が生成したオブジェクトだけに移動処理を行う
             if (photonView.IsMine)
@@ -735,6 +742,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 //走行時間をゲームタイムで計測し続ける。
                 m_runningTime += Time.deltaTime;
             }
+        }
+
+        if(m_orepation.GetComponent<Operation>().GetIsDoubleTouch())
+		{
+            this.GetComponent<ObtainItemController>().SetUseItem();
         }
     }
 

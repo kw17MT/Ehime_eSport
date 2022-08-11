@@ -105,7 +105,7 @@ public class Operation : MonoBehaviour
         //Wタップを下かどうかを判断する
         JudgeIsDoubleTouch();
 
-        if (SceneManager.GetActiveScene().name == "08_GameScene" && !GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
+        if (SceneManager.GetActiveScene().name[0..2] == "08" && !GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
 		{
             m_prevDeltaTime = Time.deltaTime;
 		}
@@ -160,7 +160,7 @@ public class Operation : MonoBehaviour
         //1回目のタッチはしていたら
         if (m_isSingleTouch)
         {
-            if (SceneManager.GetActiveScene().name == "08_GameScene")
+            if (SceneManager.GetActiveScene().name[0..2] == "08")
             {
                 if (GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
                 {
@@ -339,7 +339,7 @@ public class Operation : MonoBehaviour
             return;
         }
 
-        if (SceneManager.GetActiveScene().name == "08_GameScene")
+        if (SceneManager.GetActiveScene().name[0..2] == "08")
         {
             if (GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
             {

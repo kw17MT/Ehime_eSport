@@ -104,6 +104,11 @@ public class InGameScript : MonoBehaviourPunCallbacks
         //カウントダウンを表示するテキストインスタンスを取得
         m_countDownComponent = GameObject.Find("CountDownImage");
 
+        if(m_countDownComponent == null)
+		{
+            Debug.Log("Null Count Down");
+		}
+
         //秒数の整数部分の変化を見るために保存する。
         m_prevCountDownNum = (int)m_countDownNum;
 
