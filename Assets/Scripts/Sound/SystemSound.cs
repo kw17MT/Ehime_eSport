@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace nsSound
 {
@@ -51,7 +52,8 @@ namespace nsSound
         //長押しSEの再生
         private void LongTouchSound()
         {
-            if (m_operation.GetNowOperation() == "touch")
+            if (m_operation.GetNowOperation() == "touch"
+                && SceneManager.GetActiveScene().name == "07_MatchingScene")
             {
                 if (m_isLongTouchSSPlaying == false)
                 {
@@ -76,7 +78,8 @@ namespace nsSound
 
         public void PlayEnterSound()
         {
-            if (m_operation.GetIsLongTouch)
+            if (m_operation.GetIsLongTouch
+                && SceneManager.GetActiveScene().name == "07_MatchingScene")
             {
                 //長押ししているかの判定がリセットされては困るので、再設定。
                 m_operation.SetIsLongTouch(true);
