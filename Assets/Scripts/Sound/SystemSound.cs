@@ -53,16 +53,33 @@ namespace nsSound
         private void LongTouchSound()
         {
             if (m_operation.GetNowOperation() == "touch"
-                && SceneManager.GetActiveScene().name == "07_MatchingScene")
+                  && (SceneManager.GetActiveScene().name[0..2] == "07"
+                 || SceneManager.GetActiveScene().name[0..2] == "08"))
             {
+
                 if (m_isLongTouchSSPlaying == false)
                 {
-                    m_longTouchSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
-                    m_longTouchSS.SetSoundType(nsSound.EnSoundTypes.enSE);
-                    m_longTouchSS.Be3DSound();
-                    m_longTouchSS.PlayStart(nsSound.SENames.m_longPress);
+                    if (SceneManager.GetActiveScene().name[0..2] == "07")
+                    {
+                        m_longTouchSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                        m_longTouchSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                        m_longTouchSS.Be3DSound();
+                        m_longTouchSS.PlayStart(nsSound.SENames.m_longPress);
 
-                    m_isLongTouchSSPlaying = true;
+                        m_isLongTouchSSPlaying = true;
+                    }
+					else
+					{
+                        if(GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
+						{
+                            m_longTouchSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                            m_longTouchSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                            m_longTouchSS.Be3DSound();
+                            m_longTouchSS.PlayStart(nsSound.SENames.m_longPress);
+
+                            m_isLongTouchSSPlaying = true;
+                        }
+					}
                 }
             }
 
@@ -79,16 +96,31 @@ namespace nsSound
         public void PlayEnterSound()
         {
             if (m_operation.GetIsLongTouch
-                && SceneManager.GetActiveScene().name == "07_MatchingScene")
+                && (SceneManager.GetActiveScene().name[0..2] == "07"
+                 || SceneManager.GetActiveScene().name[0..2] == "08"))
             {
                 //長押ししているかの判定がリセットされては困るので、再設定。
                 m_operation.SetIsLongTouch(true);
 
-                //決定音の再生と、長押しSEの停止
-                nsSound.SoundSource enterSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
-                enterSS.SetSoundType(nsSound.EnSoundTypes.enSE);
-                enterSS.Be3DSound();
-                enterSS.PlayStart(nsSound.SENames.m_enter);
+                if (SceneManager.GetActiveScene().name[0..2] == "07")
+                {
+                    //決定音の再生と、長押しSEの停止
+                    nsSound.SoundSource enterSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                    enterSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                    enterSS.Be3DSound();
+                    enterSS.PlayStart(nsSound.SENames.m_enter);
+                }
+				else
+				{
+                    if (GameObject.Find("PauseButton").GetComponent<PauseButton>().GetIsPause())
+                    {
+                        //決定音の再生と、長押しSEの停止
+                        nsSound.SoundSource enterSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                        enterSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                        enterSS.Be3DSound();
+                        enterSS.PlayStart(nsSound.SENames.m_enter);
+                    }
+                }
 
                 if (m_isLongTouchSSPlaying)
                 {
