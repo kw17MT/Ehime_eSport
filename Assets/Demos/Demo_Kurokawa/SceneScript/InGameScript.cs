@@ -447,6 +447,28 @@ public class InGameScript : MonoBehaviourPunCallbacks
             if(PhotonNetwork.NickName == scores.Key)
 			{
                 m_youLabels[labelNumber - 1].SetActive(true);
+
+                //サウンドソースを生成。
+                nsSound.SoundSource rankSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                rankSS.SetSoundType(nsSound.EnSoundTypes.enNarration);
+                rankSS.Be3DSound();
+
+                //順位に対応するボイスを再生。
+                switch (labelNumber) 
+                {
+                    case 1:
+                        rankSS.PlayStart(nsSound.NarResultNames.m_ICHII);
+                        break;
+                    case 2:
+                        rankSS.PlayStart(nsSound.NarResultNames.m_NII);
+                        break;
+                    case 3:
+                        rankSS.PlayStart(nsSound.NarResultNames.m_SANNi);
+                        break;
+                    case 4:
+                        rankSS.PlayStart(nsSound.NarResultNames.m_YONNi);
+                        break;
+                }
             }
 
             labelNumber++;
