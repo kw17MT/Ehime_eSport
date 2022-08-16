@@ -90,20 +90,60 @@ Shader "MyShader/DrawOutLineShader"
                 return 1.0 / (_ZBufferParams.x * z + _ZBufferParams.y);
             }
 
-            bool IsDepthOutlineBy4Texel(float2 uv)
+            bool IsDepthOutlineBy4Texel(float2 uv, inout bool isOutOfRange, inout float outlineColorRate)
             {
                 float diffX = _CameraDepthTexture_TexelSize.x * _OutlineThick;
                 float diffY = _CameraDepthTexture_TexelSize.y * _OutlineThick;
+
+                float2 uvOffset[4] =
+                {
+                    float2(diffX, diffY),
+                    float2(-diffX, diffY),
+                    float2(diffX, -diffY),
+                    float2(-diffX, -diffY),
+                };
+
+                float currentDepth = MyLinearDepth(SampleSceneDepth(uv));
+                float neighborDepth = 0.0f;
+                float smallestDepth = currentDepth;
+
+                [unroll]
+                for (int i = 0; i < 4; i++)
+                {
+                    float depth = MyLinearDepth(SampleSceneDepth(uv + uvOffset[i]));
+                    neighborDepth += depth;
+                    smallestDepth = min(smallestDepth, depth);
+                }
 
                 float col00 = MyLinearDepth(SampleSceneDepth(uv + half2(-diffX, -diffY)));
                 float col10 = MyLinearDepth(SampleSceneDepth(uv + half2(0, -diffY)));
                 float col01 = MyLinearDepth(SampleSceneDepth(uv + half2(-diffX, 0)));
                 float col11 = MyLinearDepth(SampleSceneDepth(uv + half2(0, 0)));
 
-                float outlineValue = (col00 - col11) * (col00 - col11) + (col10 - col01) * (col10 - col01);
+                // アウトラインを描画する最大距離を、深度値に合わせて正規化
+                float maxDepht = _MaxDepthDistance / _ProjectionParams.z;
 
+                // アウトライン判定より前に、アウトラインカラー率の計算をしておく。
+                // 法線でアウトラインが描画される可能性もあるため。
+                outlineColorRate = max(0.0f,1.0f - (maxDepht - smallestDepth) / maxDepht);
+                outlineColorRate = 1.0f - pow(outlineColorRate, _FadeBias);
+
+
+                // アウトライン判定。
                 bool isOutline = false;
-                if (outlineValue - _OutlineThreshold > 0.0f)
+
+                // アウトライン描画範囲外
+                if (smallestDepth >= maxDepht)
+                {
+                    isOutOfRange = true;
+                    return isOutline;
+                }
+
+                // アウトライン範囲内
+                isOutOfRange = false;
+
+                neighborDepth /= 4.0f;
+                if ((currentDepth - neighborDepth) / neighborDepth > _OutlineThreshold)
                 {
                     isOutline = true;
                 }
@@ -149,7 +189,7 @@ Shader "MyShader/DrawOutLineShader"
 
                 // アウトライン判定より前に、アウトラインカラー率の計算をしておく。
                 // 法線でアウトラインが描画される可能性もあるため。
-                outlineColorRate = 1.0f - (maxDepht - smallestDepth) / maxDepht;
+                outlineColorRate = max(0.0f,1.0f - (maxDepht - smallestDepth) / maxDepht);
                 outlineColorRate = 1.0f - pow(outlineColorRate, _FadeBias);
 
 
@@ -352,9 +392,9 @@ Shader "MyShader/DrawOutLineShader"
                 switch (_HowToDrawOutline)
                 {
                 case 0:
-                    if (IsDepthOutlineBy4Texel(i.uv))
+                    if (IsDepthOutlineBy4Texel(i.uv, isOutOfRange, outlineColorRate))
                     {
-                        finalCol = _OutlineColor;
+                        finalCol = lerp(col, _OutlineColor, outlineColorRate);
                     }
                     break;
                 case 1:
