@@ -157,8 +157,18 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
             //2秒くらい待ってインゲームに移行
             if (m_matchingWaitTime < -2.0f)
             {
-                //ゲーム開始
-                SceneManager.LoadScene("08_GameScene");
+                int stageType = GameObject.Find("UserSettingDataStorageSystem").GetComponent<UserSettingData>().GetSetStageType;
+                //ユーザーが選択してきたものを記録したインスタンスを取得
+                if (stageType == 0)
+				{
+                    //ゲーム開始
+                    SceneManager.LoadScene("08_EasyGameScene");
+                }
+                else if(stageType == 1)
+				{
+                    //ゲーム開始
+                    SceneManager.LoadScene("08_GameScene");
+                }
             }
         }
         //待機時間の秒数が変わったらそれを同期する
@@ -180,8 +190,18 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
             //ホストクライアントがボタンを長押しすると
             if(m_operation.GetComponent<Operation>().GetIsLongTouch)
 			{
-                //強制的にインゲームに遷移する
-                SceneManager.LoadScene("08_GameScene");
+                int stageType = GameObject.Find("UserSettingDataStorageSystem").GetComponent<UserSettingData>().GetSetStageType;
+                //ユーザーが選択してきたものを記録したインスタンスを取得
+                if (stageType == 0)
+                {
+                    //ゲーム開始
+                    SceneManager.LoadScene("08_EasyGameScene");
+                }
+                else if (stageType == 1)
+                {
+                    //ゲーム開始
+                    SceneManager.LoadScene("08_GameScene");
+                }
             }
 
             //残り時間を他プレイヤーと同期する

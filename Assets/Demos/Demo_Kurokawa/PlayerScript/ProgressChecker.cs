@@ -27,13 +27,20 @@ public class ProgressChecker : MonoBehaviour
 		}
 
         //現在、ゲームシーンならば
-        if(SceneManager.GetActiveScene().name == "08_GameScene")
+        if(SceneManager.GetActiveScene().name[0..2] == "08")
 		{
             //ラップ数を表示するオブジェクトを取得
             m_lapLabel = GameObject.Find("Lap");
             m_lapCountLabel = GameObject.Find("LapLabel");
             m_lapCountLabel.GetComponent<LapChange>().SetLapNum(m_lapCount);
+            MAX_LAP_NUM = 3;
             m_lapLabel.SetActive(false);
+
+
+            if(SceneManager.GetActiveScene().name == "08_EasyGameScene")
+			{
+                MAX_LAP_NUM = 1;
+            }
         }
     }
 

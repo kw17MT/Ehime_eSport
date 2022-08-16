@@ -17,10 +17,11 @@ public class WayPointChecker : MonoBehaviour
     void Start()
     {
         //このクラスを持っているのが自分のプレイヤーだったら
-        if(this.gameObject.tag == "OwnPlayer" && SceneManager.GetActiveScene().name == "08_GameScene")
+        if(this.gameObject.tag == "OwnPlayer" && SceneManager.GetActiveScene().name[0..2] == "08")
 		{
             //カメラ回転抑制の都合上最初はウェイポイント1目指す。
             GameObject nextWayPoint = GameObject.Find("WayPoint1");
+            m_currentWayPointPos = this.gameObject.transform.position;
             //次のウェイポイントの座標を取得
             m_nextWayPointPos = nextWayPoint.transform.position;
             m_nextWayPointTransform = nextWayPoint.transform;

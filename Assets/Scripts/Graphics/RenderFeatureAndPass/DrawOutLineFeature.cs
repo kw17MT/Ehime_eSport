@@ -4,26 +4,13 @@ using UnityEngine.Rendering.Universal;
 
 public class DrawOutLineFeature : ScriptableRendererFeature
 {
-    // define
-    enum EnHowToDrawOutline
-    {
-        enDepthBy4Texel,
-        enDepthBy8Texel,
-        enNormal,
-        enDepthAndNormal
-    }
 
     // Serialize Field
     [SerializeField]
     Shader m_drawOutLineShader;
     [SerializeField]
-    Color m_outLineColor = Color.black;
-    [SerializeField]
-    float m_outlineThick = 1.0f;
-    [SerializeField]
-    float m_outlineThreshold = 0.0001f;
-    [SerializeField]
-    EnHowToDrawOutline m_howToDrawOutline = EnHowToDrawOutline.enDepthAndNormal;
+    CDrawOutLineParam m_drawOutLineParam;
+
 
     // Field
     DrawOutLinePass m_drawOutLinePass;
@@ -50,10 +37,7 @@ public class DrawOutLineFeature : ScriptableRendererFeature
     {
         m_drawOutLinePass.SetParam(
             renderer.cameraColorTarget,
-            m_outLineColor,
-            m_outlineThick,
-            m_outlineThreshold,
-            (int)m_howToDrawOutline
+           m_drawOutLineParam
             );
         renderer.EnqueuePass(m_drawOutLinePass);
     }

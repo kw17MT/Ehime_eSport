@@ -128,7 +128,14 @@ public class CpuPowerSettingChange : MonoBehaviour
         }
 		else if(m_userSettingData.GetSetModeType == 1)
 		{
-            SceneManager.LoadScene("08_GameScene");
+            if(m_userSettingData.GetSetStageType == 0)
+			{
+                SceneManager.LoadScene("08_EasyGameScene");
+            }
+            else if(m_userSettingData.GetSetStageType == 1)
+            { 
+                SceneManager.LoadScene("08_GameScene");
+            }
         }
     }
 

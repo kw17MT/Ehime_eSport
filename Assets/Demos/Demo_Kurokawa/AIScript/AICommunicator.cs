@@ -143,7 +143,7 @@ public class AICommunicator : MonoBehaviourPunCallbacks
         }
 
         //インゲーム中で
-        if (SceneManager.GetActiveScene().name == "08_GameScene")
+        if (SceneManager.GetActiveScene().name[0..2] == "08")
         {
             //オフラインモードならば、毎フレーム次のウェイポイントまでの位置を記録する
             if (PhotonNetwork.OfflineMode)
