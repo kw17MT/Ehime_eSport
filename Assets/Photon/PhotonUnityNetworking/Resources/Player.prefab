@@ -207,11 +207,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AITag: Player
   m_playerTag: OwnPlayer
+  m_AIDifficulty: {fileID: 11400000, guid: bb9defb917d71194c85f41800fbc2a50, type: 2}
   m_obstacleLayerMask:
     serializedVersion: 2
-    m_Bits: 0
-  m_innerShiftMaxLength: 5
-  m_outerShiftMaxLength: 3
+    m_Bits: 32768
+  m_maxMoveRatio: 0.2
 --- !u!114 &-2291717988889518658
 MonoBehaviour:
   m_ObjectHideFlags: 0
