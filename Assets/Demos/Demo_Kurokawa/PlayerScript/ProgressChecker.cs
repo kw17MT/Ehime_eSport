@@ -95,6 +95,26 @@ public class ProgressChecker : MonoBehaviour
         m_lapCountLabel.GetComponent<LapChange>().SetLapNum(m_lapCount);
         m_isDisplayingLapLabel = true;
 
+        //ラップ切り替え時の音源を再生。
+        //サウンドソースを生成。
+        nsSound.SoundSource lapSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+        lapSS.SetSoundType(nsSound.EnSoundTypes.enNarration);
+        lapSS.Be3DSound();
+
+        //ラップ数に対応する音源を再生。
+        switch (m_lapCount)
+        {
+            case 1:
+                lapSS.PlayStart(nsSound.NarInGameLiveNames.m_1);
+                break;
+            case 2:
+                lapSS.PlayStart(nsSound.NarInGameLiveNames.m_2);
+                break;
+            case 3:
+                //ラップ３のときはゴールなので再生しない。
+                break;
+        }
+
         if (!PhotonNetwork.OfflineMode)
         {
             //次のウェイポイントの番号をルームプロパティに保存
