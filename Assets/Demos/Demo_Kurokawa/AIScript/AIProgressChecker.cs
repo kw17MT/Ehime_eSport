@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
 public class AIProgressChecker : MonoBehaviourPunCallbacks
 {
@@ -9,7 +10,16 @@ public class AIProgressChecker : MonoBehaviourPunCallbacks
     private bool m_canGoaled = false;               //AIはゴールできるか
     [SerializeField] int MAX_LAP_NUM = 3;                     //AIのゴールラップ数
 
-    public void SetCanGoaled()
+	private void Start()
+	{
+        MAX_LAP_NUM = 3;
+		if(SceneManager.GetActiveScene().name == "08_EasyGameScene")
+		{
+            MAX_LAP_NUM = 1;
+		}
+	}
+
+	public void SetCanGoaled()
 	{
         m_canGoaled = true;
 	}
