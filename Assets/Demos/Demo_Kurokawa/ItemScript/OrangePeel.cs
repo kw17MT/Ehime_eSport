@@ -21,6 +21,7 @@ public class OrangePeel : MonoBehaviourPunCallbacks
             //当たったプレイヤーを攻撃された判定にする。
             col.gameObject.GetComponent<AvatarController>().SetIsAttacked();
             photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
+            Destroy(this.gameObject);
         }
         if(col.gameObject.tag == "Player")
 		{
@@ -38,6 +39,8 @@ public class OrangePeel : MonoBehaviourPunCallbacks
                 photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
 
             }
+
+            Destroy(this.gameObject);
         }
 
         if(col.gameObject.name.Length >= 7 && col.gameObject.name[0..7] == "Snapper")
@@ -46,7 +49,7 @@ public class OrangePeel : MonoBehaviourPunCallbacks
 			{
                 //オレンジの皮のインスタンスを消す通信を行う
                 photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
-
+                Destroy(this.gameObject);
                 //タイのインスタンスを消す通信を行う
                 photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, col.gameObject.name);
             }
