@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 public class SwitchPipelineAssetScript : MonoBehaviour
 {
     // Define
-    enum EnPipelineAsset
+    private enum EnPipelineAsset
     {
         enHigh,
         enMideum,
