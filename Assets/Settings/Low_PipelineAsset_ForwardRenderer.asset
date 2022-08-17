@@ -65,13 +65,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19701e04e4a70de47be4dd79339cd43f, type: 3}
   m_Name: DrawOutLineFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   m_drawOutLineShader: {fileID: 4800000, guid: a4260d6bc21edad4f93e8f570a222bc8, type: 3}
   m_drawOutLineParam:
     m_outLineColor: {r: 0, g: 0, b: 0, a: 1}
-    m_outlineThick: 3
+    m_outlineThick: 2
     m_outlineThreshold: 0.01
     m_howToDrawOutline: 0
-    m_maxDepthDistance: 50
+    m_maxDepthDistance: 200
     m_outlineBias: 1
     m_fadeBias: 4

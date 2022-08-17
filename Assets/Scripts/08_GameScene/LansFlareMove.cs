@@ -26,7 +26,7 @@ public class LansFlareMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (m_enableMove != true)
+        if (m_enableMove != true || m_mainCam == null)
         {
             return;
         }
