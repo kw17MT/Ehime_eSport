@@ -32,7 +32,10 @@ public class ItemStateCommunicator : MonoBehaviourPunCallbacks
             m_orangePeelSum++;
             //オレンジの皮生成
             GameObject peel = Instantiate(m_orangePeel, popPos, Quaternion.identity);
+            //GameObject peel = PhotonNetwork.Instantiate("OrangePeel", popPos, Quaternion.identity);
             peel.name = "OrangePeel" + m_orangePeelSum;
+            //PhotonView view = peel.GetComponent<PhotonView>();
+            //view.ViewID = 1;
         }
         //タイが指定されていた場合
         else if(prefabName == "Snapper")
@@ -41,11 +44,14 @@ public class ItemStateCommunicator : MonoBehaviourPunCallbacks
             m_snapperSum++;
             //タイ生成
             GameObject snapper = Instantiate(m_snapper, popPos, Quaternion.identity);
+            //GameObject snapper = PhotonNetwork.Instantiate("Snapper", popPos, Quaternion.identity);
             //次目指すウェイポイントを設定
             snapper.GetComponent<WayPointChecker>().SetNextWayPointDirectly(popPos, wayPointNumber);
             //発射したプレイヤーのIDを記録
             snapper.GetComponent<SnapperController>().SetOwnerID(playerNumber);
             snapper.name = "Snapper" + m_snapperSum;
+            //PhotonView view = snapper.GetComponent<PhotonView>();
+            //view.ViewID = 1;
         }
     }
 }

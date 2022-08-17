@@ -8,7 +8,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 {
     private bool m_isLotteryFinish = false;             //アイテムシャッフル演出が終了したかフラグ
     private bool m_isUseItem = false;                   //アイテムを使使うか（外部から設定）
-    const float SPACE_BETWEEN_PLAYER_FRONT = 4.0f;      //プレイヤーから前方向へずらす幅
+    const float SPACE_BETWEEN_PLAYER_FRONT = 5.0f;      //プレイヤーから前方向へずらす幅
     const float SPACE_BETWEEN_PLAYER_BACK = -2.0f;      //プレイヤーから後ろ方向にずらす幅
     EnItemType m_obtainItemType = EnItemType.enNothing; //現在所持しているアイテム名
 

@@ -12,7 +12,7 @@ public class SnapperController : MonoBehaviourPunCallbacks
     private bool m_isChasePlayer = false;                       //プレイヤーを見つけて追跡しているか
     private bool m_shouldCheckNextWayPoint = false;             //次のウェイポイントが更新すべきかどうか
     private bool m_isAddFirstVelocity = false;                  //初めてポップされた時に強い力で押して発射したプレイヤーとの接触を回避したか
-    private int m_ownerID = 0;                                  //発射したプレイヤーの番号
+    private int m_ownerID = -1;                                  //発射したプレイヤーの番号
     private float MOVE_POWER = 25.0f;                           //移動速度に乗算する倍率
     private Vector3 m_targetPos = Vector3.zero;                 //次の目標地点
     private Vector3 m_moveDir = Vector3.zero;                   //移動方向
@@ -45,6 +45,10 @@ public class SnapperController : MonoBehaviourPunCallbacks
         //それが自分ではなく、地面ではない場合
         if (col.gameObject.tag != "OwnPlayer" && col.gameObject.tag != "Ground")
 		{
+            if (col.gameObject.name.Length >= 10 && col.gameObject.name[0..10] == "OrangePeel")
+            {
+                Destroy((this.gameObject));
+            }
             //消す。（壁であっても消えるように）
             photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
         }
@@ -75,7 +79,12 @@ public class SnapperController : MonoBehaviourPunCallbacks
 			else
 			{
                 string strID = aiCommunicator.GetAIName();
-                playerID = int.Parse(strID[6].ToString());
+                if(strID.Length >= 7)
+				{
+                    playerID = int.Parse(strID[6].ToString());
+                }
+
+                Debug.Log(playerID + " " + m_ownerID);
 			}
 
             //発射したプレイヤーが自分でなく、感知したプレイヤーが自分の進行方向前方にいたら
@@ -87,7 +96,7 @@ public class SnapperController : MonoBehaviourPunCallbacks
                 m_isChasePlayer = true;
             }
         }
-	}
+    }
 
     // Update is called once per frame
     void FixedUpdate()
@@ -126,10 +135,12 @@ public class SnapperController : MonoBehaviourPunCallbacks
         }
         rb.AddForce((m_moveDir * MOVE_POWER) - rb.velocity);
 
-        if(SceneManager.GetActiveScene().name == "08_EasyGameScene")
+        if(SceneManager.GetActiveScene().name == "08_EasyGameScene"
+            && this.GetComponent<WayPointChecker>().GetNextWayPointNumber() == 0)
 		{
             //消す。（壁であっても消えるように）
             photonView.RPC(nameof(DestroyItemWithName), RpcTarget.All, this.gameObject.name);
+            Destroy(this.gameObject);
         }
     }
 }
