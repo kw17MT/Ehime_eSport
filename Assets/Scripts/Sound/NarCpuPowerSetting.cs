@@ -54,7 +54,7 @@ namespace nsSound
         protected override bool CheckNowSelectState()
         {
             //モードの選択が変わっていたら、
-            if (m_selectStateNo != (int)m_sceneScript.GetNowSelectState())
+            if (m_selectStateNo != (int)m_sceneScript.GetNowSelectState() && m_narList.Count > (int)m_sceneScript.GetNowSelectState())
             {
                 //モードの選択を更新
                 m_selectStateNo = (int)m_sceneScript.GetNowSelectState();
