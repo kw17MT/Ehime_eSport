@@ -66,6 +66,7 @@ namespace nsSound
         public const string m_NIKETTEI = "Nar_Advance_NIKETTEI";
         public const string m_SAYUUHURIKKUDE = "Nar_Advance_SAYUUHURIKKUDE";
         public const string m_WOERABERUYO = "Nar_Advance_WOERABERUYO";
+        public const string m_ERABINAOSHITAITOKIHAGAMENHIDARIUEWONAGAOSHISHITENE = "Nar_Advance_ERABINAOSHITAITOKIHAGAMENHIDARIUEWONAGAOSHISHITENE";
     }
     public static class NarTitleNames
     {
@@ -120,6 +121,9 @@ namespace nsSound
         public const string m_NANYOSTAGE = "Nar_StageSele_NANYOSTAGE";
         public const string m_OCHITEIRUMIKANNICHUUISHIYOU = "Nar_StageSele_OCHITEIRUMIKANNICHUUISHIYOU";
         public const string m_STAGEWOERABERUYO = "Nar_StageSele_STAGEWOERABERUYO";
+        public const string m_CHOKUSENNNOSTAGEDAYO = "Nar_StageSele_CHOKUSENNNOSTAGEDAYO";
+        public const string m_DAENKEINOSTAGEDAYO = "Nar_StageSele_DAENKEINOSTAGEDAYO";
+
     }
     public static class NarInGameNames
     {
