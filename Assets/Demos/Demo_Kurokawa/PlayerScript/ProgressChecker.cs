@@ -108,10 +108,10 @@ public class ProgressChecker : MonoBehaviour
             switch (m_lapCount)
             {
                 case 1:
-                    lapSS.PlayStart(nsSound.NarInGameLiveNames.m_1);
+                    lapSS.PlayStart(nsSound.NarInGameNames.m_RAP1);
                     break;
                 case 2:
-                    lapSS.PlayStart(nsSound.NarInGameLiveNames.m_2);
+                    lapSS.PlayStart(nsSound.NarInGameNames.m_RAP2);
                     break;
             }
 
@@ -122,7 +122,7 @@ public class ProgressChecker : MonoBehaviour
                 nsSound.BGM.Instance.FadeOutStart();
 
                 //最終周用のBGMを再生。
-                nsSound.BGM.Instance.SetPlayBGM(nsSound.BGMNames.m_menu);
+                nsSound.BGM.Instance.SetPlayBGM(nsSound.BGMNames.m_lastLap);
             }
         }
 
