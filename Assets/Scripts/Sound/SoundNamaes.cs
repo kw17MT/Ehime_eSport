@@ -46,6 +46,7 @@ namespace nsSound
         public const string m_fanfare1 = "BGM_Fanfare1";
         public const string m_fanfare2 = "BGM_Fanfare2";
         public const string m_star = "BGM_Star";
+        public const string m_lastLap = "BGM_LastLap";
 
         //–¼‘O‚È‚µ
         public const string m_nothing = "nothing";
@@ -67,6 +68,8 @@ namespace nsSound
         public const string m_SAYUUHURIKKUDE = "Nar_Advance_SAYUUHURIKKUDE";
         public const string m_WOERABERUYO = "Nar_Advance_WOERABERUYO";
         public const string m_ERABINAOSHITAITOKIHAGAMENHIDARIUEWONAGAOSHISHITENE = "Nar_Advance_ERABINAOSHITAITOKIHAGAMENHIDARIUEWONAGAOSHISHITENE";
+        public const string m_ERABINAOSHITAITOKIHAGAMENHIDARIUEWOTAPSHITENE = "Nar_Advance_ERABINAOSHITAITOKIHAGAMENHIDARIUEWOTAPSHITENE";
+
     }
     public static class NarTitleNames
     {
@@ -139,6 +142,13 @@ namespace nsSound
         public const string m_MIGINIIKOU = "Nar_InGame_MIGINIIKOU";
         public const string m_SUKOSHI = "Nar_InGame_SUKOSHI";
         public const string m_YURUYAKANA = "Nar_InGame_YURUYAKANA";
+        public const string m_HIDARINOKABENIATATTEIRUYO = "Nar_InGame_HIDARINOKABENIATATTEIRUYO";
+        public const string m_MIGINOKABENIATATTEIRUYO = "Nar_InGame_MIGINOKABENIATATTEIRUYO";
+        public const string m_RAP1 = "Nar_InGame_RAP1";
+        public const string m_RAP2 = "Nar_InGame_RAP2";
+        public const string m_RAP3 = "Nar_InGame_RAP3";
+        public const string m_GOAAAL = "Nar_InGame_GOAAAL";
+
     }
     public static class NarInGameItemNames
     {
