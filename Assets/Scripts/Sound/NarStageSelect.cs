@@ -27,7 +27,7 @@ namespace nsSound
             m_commonNarList = new List<string>();
             m_commonNarList.Add(nsSound.NarAdvanceNames.m_SAYUUHURIKKUDE);
             m_commonNarList.Add(nsSound.NarStageSeleNames.m_STAGEWOERABERUYO);
-            m_commonNarList.Add(nsSound.NarAdvanceNames.m_ERABINAOSHITAITOKIHAGAMENHIDARISHITAWONAGAOSHISHITENE);
+            m_commonNarList.Add(nsSound.NarAdvanceNames.m_ERABINAOSHITAITOKIHAGAMENHIDARIUEWOTAPSHITENE);
 
             //3.
             //直線ステージ選択時のナレーションのリスト
