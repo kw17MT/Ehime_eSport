@@ -102,6 +102,9 @@ public class RaceAIScript : MonoBehaviour
 		{
             this.GetComponent<AICommunicator>().SetMoving(canMove);
         }
+
+        this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY;
+        this.gameObject.GetComponent<Rigidbody>().freezeRotation = true;
     }
 
     public int GetNextWayPoint()

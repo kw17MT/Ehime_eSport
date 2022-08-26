@@ -130,6 +130,10 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public void SetMovable()
     {
         m_canMove = true;
+        Rigidbody rb = this.gameObject.GetComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezePositionY;
+        //freeze使うとRotationまでチェック外れるぽいのでチェック入れる
+        rb.freezeRotation = true;
     }
 
     //プレイヤーがゴールしたかを設定する
