@@ -31,6 +31,11 @@ public class AICameraScript : MonoBehaviour
         
     }
 
+    public void SetPlayer(GameObject go)
+	{
+        m_AIPlayer = go;
+	}
+
     void FixedUpdate()
     {
         //Œ»İ‚ÌŒü‚«‚ğæ“¾
