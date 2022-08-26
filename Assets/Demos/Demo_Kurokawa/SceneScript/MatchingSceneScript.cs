@@ -13,6 +13,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     private GameObject m_operation = null;                          //操作管理のインスタンス
     private GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
     private GameObject m_player = null;                             //プレイヤーインスタンス
+    private GameObject m_userSetting = null;
     private bool m_isInstantiateAI = false;                         //AIインスタンスを生成したか
     private bool m_isJoinedRoom = false;                            //ルームに入れたか
     private int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
@@ -29,6 +30,8 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         m_waitTimeText = GameObject.Find("LimitTimeLabel");
         //シーン間で保持するパラメータインスタンス
         m_paramManager = GameObject.Find("ParamManager");
+        //プレイヤーの設定情報
+        m_userSetting = GameObject.Find("UserSettingDataStorageSystem");
         //シーンの遷移はホストクライアントに依存する
         PhotonNetwork.AutomaticallySyncScene = true;
     }
@@ -60,15 +63,16 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         PhotonNetwork.CreateRoom(null, roomOptions);
     }
 
+    //ホストにだけ送ること
+    [PunRPC]
+    private void TellMyCharactorNumberToHost(int number)
+	{
+        m_paramManager.GetComponent<ParamManage>().SaveCharactorNumber(number);
+    }
+
     // ゲームサーバーへの接続が成功した時に呼ばれるコールバック
     public override void OnJoinedRoom()
     {
-        //現在接続しているプレイヤー数を取得する。
-        float currentPlayerNumber = (PhotonNetwork.PlayerList.Length - 1);
-        //Prefabからプレイヤーが操作するモデルを生成
-        m_player =  PhotonNetwork.Instantiate("Player", m_position, Quaternion.AngleAxis(180, Vector3.up));
-        m_player.GetComponent<Rigidbody>().isKinematic = true;
-
         //今までこのルームに何人が入ってきたかでアクターナンバーが増えていく（アクターナンバーに書き込み不可）
         int id = PhotonNetwork.LocalPlayer.ActorNumber;
         //プレイヤーに5以上のIDが割り振られたことはどこかのタイミングで一人以上抜けている
@@ -107,6 +111,14 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
 		m_paramManager.GetComponent<ParamManage>().SetPlayerID(id);
         string spawnerName = "PlayerSpawner/Player" + id;
         m_position = GameObject.Find(spawnerName).transform.position;
+
+        //プレイヤーが選んだキャラとゲーム中のIDから使用するプレファブを決める
+        string prefabName = "Player" + m_userSetting.GetComponent<UserSettingData>().GetSetCharacter + "_" + id;
+        //Prefabからプレイヤーが操作するモデルを生成
+        m_player = PhotonNetwork.Instantiate("Player", m_position, Quaternion.AngleAxis(180, Vector3.up));
+        m_player.GetComponent<Rigidbody>().isKinematic = true;
+
+        photonView.RPC(nameof(TellMyCharactorNumberToHost), RpcTarget.MasterClient, m_userSetting.GetComponent<UserSettingData>().GetSetCharacter);
 
         m_isJoinedRoom = true;
     }
