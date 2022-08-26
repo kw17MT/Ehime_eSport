@@ -420,9 +420,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 //AIで動けるようにする
                 m_aiScript.SetCanMove(true);
 
-                //Destroy(Camera.main.GetComponent<CameraMove>());
-                //Camera.main.gameObject.AddComponent<AICameraScript>();
-
+                Destroy(Camera.main.GetComponent<CameraMove>());
+                Camera.main.gameObject.AddComponent<AICameraScript>();
+                Camera.main.gameObject.GetComponent<AICameraScript>().SetPlayer(gameObject);
             }
             //AIモードがONであれば
             if (m_aiScript.enabled)
