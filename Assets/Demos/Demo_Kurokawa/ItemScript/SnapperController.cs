@@ -128,7 +128,13 @@ public class SnapperController : MonoBehaviourPunCallbacks
         Rigidbody rb = this.GetComponent<Rigidbody>();
         //規定した移動速度より早くならないように
 
-        if(!m_isAddFirstVelocity)
+
+        Quaternion rot;
+        //進行方向への回転を計算して適用する
+        rot = Quaternion.LookRotation(m_moveDir - this.transform.forward);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime);
+
+        if (!m_isAddFirstVelocity)
         {
             rb.velocity = m_moveDir * MOVE_POWER;
             m_isAddFirstVelocity = true;
