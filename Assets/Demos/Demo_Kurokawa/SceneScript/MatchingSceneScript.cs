@@ -14,6 +14,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
     private GameObject m_paramManager = null;                       //シーン以降で保持したいパラメータの保管インスタンス
     private GameObject m_player = null;                             //プレイヤーインスタンス
     private bool m_isInstantiateAI = false;                         //AIインスタンスを生成したか
+    private bool m_isJoinedRoom = false;                            //ルームに入れたか
     private int m_prevMatchingWaitTime = 0;                         //前までの残り待機時間の整数部分
     private float m_matchingWaitTime = 30.0f;                       //残り待機時間
     private Vector3 m_position = Vector3.zero;                      //プレイヤーを設定する座標
@@ -106,6 +107,8 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
 		m_paramManager.GetComponent<ParamManage>().SetPlayerID(id);
         string spawnerName = "PlayerSpawner/Player" + id;
         m_position = GameObject.Find(spawnerName).transform.position;
+
+        m_isJoinedRoom = true;
     }
 
     //関数の通信の際に必要な表記
@@ -188,7 +191,8 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             //ホストクライアントがボタンを長押しすると
-            if(m_operation.GetComponent<Operation>().GetIsLongTouch)
+            if(m_operation.GetComponent<Operation>().GetIsLongTouch
+                && m_isJoinedRoom)
 			{
                 int stageType = GameObject.Find("UserSettingDataStorageSystem").GetComponent<UserSettingData>().GetSetStageType;
                 //ユーザーが選択してきたものを記録したインスタンスを取得

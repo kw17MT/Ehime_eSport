@@ -53,6 +53,10 @@ public class AICommunicator : MonoBehaviourPunCallbacks
     public void SetGoaled()
 	{
         m_isGoaled = true;
+        if(SceneManager.GetActiveScene().name == "08_EasyGameScene")
+		{
+            this.gameObject.GetComponent<RaceAIScript>().SetCanMove(false);
+		}
 	}
 
     //‚±‚ÌAI‚Ì–¼‘O‚ðŽæ“¾‚·‚é
