@@ -6,8 +6,9 @@ using UnityEngine.SceneManagement;
 //自分のプレイヤーのため記録場所で、通信からは遮断したクラス
 public class ParamManage : MonoBehaviour
 {
-    private int m_playerID = 0;                         //プレイヤーのID（原則入ったもの順）
-    private int m_place = 0;                            //現在のプレイヤーの順位
+    private int m_playerID = 0;                                //プレイヤーのID（原則入ったもの順）
+    private int m_place = 0;                                   //現在のプレイヤーの順位
+    private List<int> m_usedCharaNumber = new List<int>();     //オンラインプレイヤーが使用しているキャラの番号群
 
     // Start is called before the first frame update
     void Start()
@@ -39,6 +40,16 @@ public class ParamManage : MonoBehaviour
     {
         return m_place;
     }
+
+    public void SaveCharactorNumber(int number)
+	{
+        m_usedCharaNumber.Add(number);
+	}
+
+    public ref List<int> GetCharactorNumber()
+	{
+        return ref m_usedCharaNumber;
+	}
 
 	private void Update()
 	{

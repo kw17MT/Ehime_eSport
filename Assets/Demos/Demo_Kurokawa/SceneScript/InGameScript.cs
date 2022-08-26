@@ -70,6 +70,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
         string spawnPointName = "PlayerSpawnPoint" + (m_paramManager.GetComponent<ParamManage>().GetPlayerID() - 1);
         //取得したスポーンポイントの座標を取得
         var position = GameObject.Find(spawnPointName).transform.position;
+        //使用するプレファブの名前を定義。Player + CharaNo + _ + ID
+        string prefabName = "Player" + m_userSetting.GetComponent<UserSettingData>().GetSetCharacter + "_" + m_paramManager.GetComponent<ParamManage>().GetPlayerID();
         //自分のプレイヤーをスポーンポイントの位置へ生成
         m_player = PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
         //ホストのみ実行する部分（オフラインモードでも呼ばれる）
@@ -282,13 +284,42 @@ public class InGameScript : MonoBehaviourPunCallbacks
     {
         //スポーンポイントの検索用名前の定義
         string spawnPointName;
+        var usedCharaNo = new List<int>();
+        usedCharaNo.Add(m_userSetting.GetComponent<UserSettingData>().GetSetCharacter);
         //オフラインモードのため、AIを3体用意
-        for(int i = 0; i < AI_NUM_IN_SINGLE_PLAY; i++)
+        for (int i = 0; i < AI_NUM_IN_SINGLE_PLAY; i++)
 		{
             //AIにスポーンポイントを1から3まで順番に割り振る
             spawnPointName = "PlayerSpawnPoint" + (i + 1);
             //スポーン位置を取得
             Vector3 popPos = GameObject.Find(spawnPointName).transform.position;
+
+            string prefabName = "AI";
+
+            if (!usedCharaNo.Contains(0))
+			{
+                prefabName += 0;
+                usedCharaNo.Add(0);
+			}
+            else if(!usedCharaNo.Contains(1))
+			{
+                prefabName += 1;
+                usedCharaNo.Add(1);
+            }
+            else if (!usedCharaNo.Contains(2))
+            {
+                prefabName += 2;
+                usedCharaNo.Add(2);
+            }
+            else if (!usedCharaNo.Contains(3))
+            {
+                prefabName += 3;
+                usedCharaNo.Add(3);
+            }
+            prefabName += "_";
+            prefabName += (i + 1);
+
+            
             //AIを生成
             GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", popPos, Quaternion.identity);
             //Playerとタグ付けする
@@ -302,6 +333,28 @@ public class InGameScript : MonoBehaviourPunCallbacks
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         Debug.Log($"ルームへの参加に失敗しました: {message}");
+    }
+
+    private int SerchNotUsedCharactorNumber()
+	{
+        int number = 0;
+        if(!m_paramManager.GetComponent<ParamManage>().GetCharactorNumber().Contains(0))
+		{
+		}
+        else if (!m_paramManager.GetComponent<ParamManage>().GetCharactorNumber().Contains(1))
+        {
+            number =  1;
+        }
+        else if (!m_paramManager.GetComponent<ParamManage>().GetCharactorNumber().Contains(2))
+        {
+            number = 2;
+        }
+        else if (!m_paramManager.GetComponent<ParamManage>().GetCharactorNumber().Contains(3))
+        {
+            number = 3;
+        }
+        m_paramManager.GetComponent<ParamManage>().SaveCharactorNumber(number);
+        return number;
     }
 
     //スポーンしていないポイントを見つけ、そこにAIをスポーンさせる（オンラインモード時に使用）
@@ -320,26 +373,32 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 cantUsePosition.Add(pl.NickName);
             }
 
+
 			//生成しなくてはならないAIの数分回す
 			for (int i = 0; i < PhotonNetwork.CurrentRoom.MaxPlayers - PhotonNetwork.PlayerList.Length; i++)
 			{
 				GameObject AISpawnPoint;
+                string prefabName = "AI";
                 //Player1という名前のユーザーがいなければ、ID1を使用する。
                 if (!cantUsePosition.Contains("Player1"))
 				{
-					AISpawnPoint = GameObject.Find("PlayerSpawnPoint0");
-					//PrefabからAIをルームオブジェクトとして生成
-					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+                    AISpawnPoint = GameObject.Find("PlayerSpawnPoint0");
+                    prefabName += "0_";
+                    prefabName += SerchNotUsedCharactorNumber();
+                    //PrefabからAIをルームオブジェクトとして生成
+                    GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
-                    ai.GetComponent<AICommunicator>().SetAIName("Player1");
+					ai.GetComponent<AICommunicator>().SetAIName("Player1");
 					cantUsePosition.Add("Player1");
-                    m_ai.Add(ai);
-                }
+					m_ai.Add(ai);
+				}
 				else if (!cantUsePosition.Contains("Player2"))
 				{
-					AISpawnPoint = GameObject.Find("PlayerSpawnPoint1");
-					//PrefabからAIをルームオブジェクトとして生成
-					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+                    AISpawnPoint = GameObject.Find("PlayerSpawnPoint1");
+                    prefabName += "1_";
+                    prefabName += SerchNotUsedCharactorNumber();
+                    //PrefabからAIをルームオブジェクトとして生成
+                    GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
                     ai.GetComponent<AICommunicator>().SetAIName("Player2");
                     cantUsePosition.Add("Player2");
@@ -347,9 +406,11 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 }
 				else if (!cantUsePosition.Contains("Player3"))
 				{
-					AISpawnPoint = GameObject.Find("PlayerSpawnPoint2");
-					//PrefabからAIをルームオブジェクトとして生成
-					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+                    AISpawnPoint = GameObject.Find("PlayerSpawnPoint2");
+                    prefabName += "2_";
+                    prefabName += SerchNotUsedCharactorNumber();
+                    //PrefabからAIをルームオブジェクトとして生成
+                    GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
                     ai.GetComponent<AICommunicator>().SetAIName("Player3");
                     cantUsePosition.Add("Player3");
@@ -357,14 +418,18 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 }
 				else if (!cantUsePosition.Contains("Player4"))
 				{
-					AISpawnPoint = GameObject.Find("PlayerSpawnPoint3");
-					//PrefabからAIをルームオブジェクトとして生成
-					GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+                    AISpawnPoint = GameObject.Find("PlayerSpawnPoint3");
+                    prefabName += "3_";
+                    prefabName += SerchNotUsedCharactorNumber();
+                    //PrefabからAIをルームオブジェクトとして生成
+                    GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
                     ai.GetComponent<AICommunicator>().SetAIName("Player4");
                     cantUsePosition.Add("Player4");
                     m_ai.Add(ai);
                 }
+
+                //Debug.Log(prefabName);
             }
 
 			//AIを生成した。
