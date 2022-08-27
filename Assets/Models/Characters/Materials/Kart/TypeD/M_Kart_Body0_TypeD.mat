@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_Kart_Body1
+  m_Name: M_Kart_Body0_TypeD
   m_Shader: {fileID: 4800000, guid: 7c1f305b9849d314a83a10bbe8dff51f, type: 3}
   m_ValidKeywords:
   - IS_RIMLIGHT
@@ -48,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 8d448c72456a3e140ab95222643c41ab, type: 3}
+        m_Texture: {fileID: 2800000, guid: c75c801ab7ef9d54384914e134c0f7d4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
