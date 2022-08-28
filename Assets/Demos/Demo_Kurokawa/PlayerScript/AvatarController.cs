@@ -613,8 +613,15 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //壁ずり状態ならば
             if (m_hittedWall)
             {
-                //壁に沿う移動方向を用いてスピードを計算
-                m_moveSpeed = m_alongWallDir * MOVE_POWER;
+                //コースの進行方向と壁ずり移動方向が正反対ならば
+				if (Vector3.Dot(m_alongWallDir, m_corseDir) < 0.0f)
+				{
+                    //コースの進行方向に直す
+					m_alongWallDir *= -1.0f;
+				}
+
+				//壁に沿う移動方向を用いてスピードを計算
+				m_moveSpeed = m_alongWallDir * MOVE_POWER;
                 m_hittedWall = false;
             }
 
