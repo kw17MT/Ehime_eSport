@@ -73,7 +73,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
         //使用するプレファブの名前を定義。Player + CharaNo + _ + ID
         string prefabName = "Player" + m_userSetting.GetComponent<UserSettingData>().GetSetCharacter + "_" + m_paramManager.GetComponent<ParamManage>().GetPlayerID();
         //自分のプレイヤーをスポーンポイントの位置へ生成
-        m_player = PhotonNetwork.Instantiate("Player", position, Quaternion.identity);
+        m_player = PhotonNetwork.Instantiate(prefabName, position, Quaternion.identity);
         //ホストのみ実行する部分（オフラインモードでも呼ばれる）
         if (PhotonNetwork.LocalPlayer.IsMasterClient && !PhotonNetwork.OfflineMode)
         {
@@ -317,11 +317,11 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 usedCharaNo.Add(3);
             }
             prefabName += "_";
-            prefabName += (i + 1);
+            prefabName += (i + 2);
 
             
             //AIを生成
-            GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", popPos, Quaternion.identity);
+            GameObject ai = PhotonNetwork.InstantiateRoomObject(prefabName, popPos, Quaternion.identity);
             //Playerとタグ付けする
             ai.gameObject.tag = "Player";
             ai.gameObject.name = "Player" + (i + 2);
@@ -338,10 +338,10 @@ public class InGameScript : MonoBehaviourPunCallbacks
     private int SerchNotUsedCharactorNumber()
 	{
         int number = 0;
-        if(!m_paramManager.GetComponent<ParamManage>().GetCharactorNumber().Contains(0))
+		if (!m_paramManager.GetComponent<ParamManage>().GetCharactorNumber().Contains(0))
 		{
 		}
-        else if (!m_paramManager.GetComponent<ParamManage>().GetCharactorNumber().Contains(1))
+		else if (!m_paramManager.GetComponent<ParamManage>().GetCharactorNumber().Contains(1))
         {
             number =  1;
         }
@@ -383,10 +383,10 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 if (!cantUsePosition.Contains("Player1"))
 				{
                     AISpawnPoint = GameObject.Find("PlayerSpawnPoint0");
-                    prefabName += "0_";
                     prefabName += SerchNotUsedCharactorNumber();
+                    prefabName += "_1";
                     //PrefabからAIをルームオブジェクトとして生成
-                    GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+                    GameObject ai = PhotonNetwork.InstantiateRoomObject(prefabName, AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
 					ai.GetComponent<AICommunicator>().SetAIName("Player1");
 					cantUsePosition.Add("Player1");
@@ -395,10 +395,10 @@ public class InGameScript : MonoBehaviourPunCallbacks
 				else if (!cantUsePosition.Contains("Player2"))
 				{
                     AISpawnPoint = GameObject.Find("PlayerSpawnPoint1");
-                    prefabName += "1_";
                     prefabName += SerchNotUsedCharactorNumber();
+                    prefabName += "_2";
                     //PrefabからAIをルームオブジェクトとして生成
-                    GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+                    GameObject ai = PhotonNetwork.InstantiateRoomObject(prefabName, AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
                     ai.GetComponent<AICommunicator>().SetAIName("Player2");
                     cantUsePosition.Add("Player2");
@@ -407,10 +407,10 @@ public class InGameScript : MonoBehaviourPunCallbacks
 				else if (!cantUsePosition.Contains("Player3"))
 				{
                     AISpawnPoint = GameObject.Find("PlayerSpawnPoint2");
-                    prefabName += "2_";
                     prefabName += SerchNotUsedCharactorNumber();
+                    prefabName += "_3";
                     //PrefabからAIをルームオブジェクトとして生成
-                    GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+                    GameObject ai = PhotonNetwork.InstantiateRoomObject(prefabName, AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
                     ai.GetComponent<AICommunicator>().SetAIName("Player3");
                     cantUsePosition.Add("Player3");
@@ -419,10 +419,10 @@ public class InGameScript : MonoBehaviourPunCallbacks
 				else if (!cantUsePosition.Contains("Player4"))
 				{
                     AISpawnPoint = GameObject.Find("PlayerSpawnPoint3");
-                    prefabName += "3_";
                     prefabName += SerchNotUsedCharactorNumber();
+                    prefabName += "_4";
                     //PrefabからAIをルームオブジェクトとして生成
-                    GameObject ai = PhotonNetwork.InstantiateRoomObject("AI", AISpawnPoint.transform.position, Quaternion.identity);
+                    GameObject ai = PhotonNetwork.InstantiateRoomObject(prefabName, AISpawnPoint.transform.position, Quaternion.identity);
 					ai.gameObject.tag = "Player";
                     ai.GetComponent<AICommunicator>().SetAIName("Player4");
                     cantUsePosition.Add("Player4");
@@ -632,6 +632,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
         {
             if (m_operation.GetComponent<Operation>().GetIsLongTouch)
             {
+                m_paramManager.GetComponent<ParamManage>().ResetSavedCharaNumber();
                 //ルームから出る
                 PhotonNetwork.LeaveRoom();
                 PhotonNetwork.LeaveLobby();
@@ -645,6 +646,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 //オンラインでゲームをしていたら
                 if (!PhotonNetwork.OfflineMode)
                 {
+                    m_paramManager.GetComponent<ParamManage>().ResetSavedCharaNumber();
+                    m_paramManager.GetComponent<ParamManage>().SaveCharactorNumber(m_userSetting.GetComponent<UserSettingData>().GetSetCharacter);
                     //ルームから出る
                     PhotonNetwork.LeaveRoom();
                     PhotonNetwork.LeaveLobby();
@@ -744,6 +747,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             {
                 if (m_operation.GetComponent<Operation>().GetIsLongTouch)
                 {
+                    m_paramManager.GetComponent<ParamManage>().ResetSavedCharaNumber();
                     //ルームから出る
                     PhotonNetwork.LeaveRoom();
                     PhotonNetwork.LeaveLobby();
@@ -758,6 +762,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             {
                 if (m_operation.GetComponent<Operation>().GetIsLongTouch)
                 {
+                    m_paramManager.GetComponent<ParamManage>().ResetSavedCharaNumber();
                     //ルームから出る
                     PhotonNetwork.LeaveRoom();
                     PhotonNetwork.LeaveLobby();

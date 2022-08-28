@@ -13,7 +13,7 @@ public class SnapperController : MonoBehaviourPunCallbacks
     private bool m_shouldCheckNextWayPoint = false;             //次のウェイポイントが更新すべきかどうか
     private bool m_isAddFirstVelocity = false;                  //初めてポップされた時に強い力で押して発射したプレイヤーとの接触を回避したか
     private int m_ownerID = -1;                                  //発射したプレイヤーの番号
-    private float MOVE_POWER = 25.0f;                           //移動速度に乗算する倍率
+    private float MOVE_POWER = 35.0f;                           //移動速度に乗算する倍率
     private Vector3 m_targetPos = Vector3.zero;                 //次の目標地点
     private Vector3 m_moveDir = Vector3.zero;                   //移動方向
 

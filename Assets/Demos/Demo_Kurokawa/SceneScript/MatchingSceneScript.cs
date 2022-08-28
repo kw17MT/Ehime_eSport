@@ -115,7 +115,7 @@ public class MatchingSceneScript : MonoBehaviourPunCallbacks
         //プレイヤーが選んだキャラとゲーム中のIDから使用するプレファブを決める
         string prefabName = "Player" + m_userSetting.GetComponent<UserSettingData>().GetSetCharacter + "_" + id;
         //Prefabからプレイヤーが操作するモデルを生成
-        m_player = PhotonNetwork.Instantiate("Player", m_position, Quaternion.AngleAxis(180, Vector3.up));
+        m_player = PhotonNetwork.Instantiate(prefabName, m_position, Quaternion.AngleAxis(180, Vector3.up));
         m_player.GetComponent<Rigidbody>().isKinematic = true;
 
         photonView.RPC(nameof(TellMyCharactorNumberToHost), RpcTarget.MasterClient, m_userSetting.GetComponent<UserSettingData>().GetSetCharacter);
