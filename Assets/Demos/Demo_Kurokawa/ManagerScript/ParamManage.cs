@@ -51,6 +51,11 @@ public class ParamManage : MonoBehaviour
         return ref m_usedCharaNumber;
 	}
 
+    public void ResetSavedCharaNumber()
+	{
+        m_usedCharaNumber.Clear();
+	}
+
 	private void Update()
 	{
 		//if(SceneManager.GetActiveScene().name == "01_TitleScene")

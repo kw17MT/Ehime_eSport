@@ -15,7 +15,7 @@ public class RaceAIScript : MonoBehaviour
 
     //ステータス//
     //スピード
-    private float m_maxSpeed {get;set;} = 25.0f;                                //最高速度
+    public float m_maxSpeed {get;set;} = 25.0f;                                //最高速度
 
     //操作性
     private Vector3 m_rightSteeringVector { get; set; }

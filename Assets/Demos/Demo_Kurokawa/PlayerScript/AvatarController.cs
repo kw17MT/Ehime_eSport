@@ -40,19 +40,24 @@ public class AvatarController : MonoBehaviourPunCallbacks
     private bool m_isInvincible = false;                //自分のプレイヤーは無敵化
     private Quaternion m_prevTrasnform;                 //前回の回転の度合い
     
-    public float MOVE_POWER = 25.0f;                  　//リジッドボディにかける移動の倍率
-    public float MOVE_POWER_USING_STAR = 35.0f;         //スター使用時のリジッドボディにかける移動の倍率
-    public float MOVE_POWER_USING_JET = 50.0f;          //ジェット使用時のリジッドボディにかける移動の倍率
-    public float MOVE_POWER_USING_KILLER = 15.0f;       //キラー使用時のリジッドボディにかける移動の倍率
-    public float ROT_POWER = 50.0f;                      //ハンドリング
+   
+    private float MOVE_POWER_USING_STAR = 35.0f;         //スター使用時のリジッドボディにかける移動の倍率
+    private float MOVE_POWER_USING_JET = 50.0f;          //ジェット使用時のリジッドボディにかける移動の倍率
+    private float MOVE_POWER_USING_KILLER = 10.0f;       //キラー使用時のリジッドボディにかける移動の倍率
+    
     public float MAX_STAR_REMAIN_TIME = 10.5f;          //スターの最大継続時間
-    public float MAX_KILLER_REMAIN_TIME = 3.0f;         //キラーの最大継続時間
+    public float MAX_KILLER_REMAIN_TIME = 2.0f;         //キラーの最大継続時間
     public float MAX_DASH_TIME = 1.0f;                  //ダッシュの最大継続時間
-    public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
-    public float KILLER_HANDLING_RATE = 5.0f;           //キラーを使用した際のカメラの追従速度
+
+    private float KILLER_HANDLING_RATE = 5.0f;           //キラーを使用した際のカメラの追従速度
     public float SPIN_AMOUNT = 6.0f;                    //被弾時の回転率
     private float FIX_MOVESPEED_POWER_AFTER_KILLER = 10.0f; //キラー終了時に通常スピードに戻すための変数          
     private float UPDATE_DISTANCE_TIMING = 0.1f;        //次のウェイポイントとの距離を更新するタイミング
+
+    //キャラごとに性能差をつけるパラメータ
+    public float ROT_POWER = 50.0f;                      //ハンドリング
+    public float MOVE_POWER = 25.0f;                   //リジッドボディにかける移動の倍率
+    public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
 
     void Start()
     {
@@ -346,7 +351,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //高さはいらない
             direction.y = 0.0f;
             //TRASNFORMで位置を更新（Rigidbodyを使うと速さも出ないし、速くしたらコースアウトする
-            this.transform.position += direction /** 1.5f*/;
+            this.transform.position += direction / 2.0f /** 1.5f*/;
 
             //キラーを使用している時間をゲームタイムでインクリメント
             m_killerTime += Time.deltaTime;
