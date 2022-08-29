@@ -233,6 +233,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                             //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
                             if (otherPlayerDistance < myDistance)
                             {
+                            //Debug.Log("Other   :" + otherPlayerDistance + "my     :" + myDistance);
                                 //自分の順位を1落とす
                                 currentPlace += 1;
                             }
@@ -260,8 +261,9 @@ public class InGameScript : MonoBehaviourPunCallbacks
                             //他のプレイヤーの方が自分より次のウェイポイントへ近づいていたら
                             if (ai.GetComponent<AICommunicator>().GetDistanceToNextWayPoint()/*otherPlayerDistance*/ < myDistance)
                             {
-                                //自分の順位を1落とす
-                                currentPlace += 1;
+                            //Debug.Log("Other   :" + otherPlayerDistance + "my     :" + myDistance);
+                            //自分の順位を1落とす
+                            currentPlace += 1;
                             }
                             break;
                         }

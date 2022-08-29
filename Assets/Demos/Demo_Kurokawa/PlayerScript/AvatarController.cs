@@ -94,9 +94,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
 
 
         //1秒間に何回通信するか
-        PhotonNetwork.SendRate = 15;
+        PhotonNetwork.SendRate = 30;
         //1秒間に何回同期を行うか
-        PhotonNetwork.SerializationRate = 15;
+        PhotonNetwork.SerializationRate = 30;
 
         //プレイヤーについているスクリプトの取得
         m_aiScript = this.GetComponent<RaceAIScript>();
