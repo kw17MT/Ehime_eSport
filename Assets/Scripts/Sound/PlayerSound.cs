@@ -17,21 +17,40 @@ namespace nsSound
         //3Dサウンド用
         private Vector3 m_ssPos;
         private Vector3 m_listenerPos;
+        private Vector3 m_listenerDir;
+
+        //このゲーム画面のプレイヤーの情報
+        private Transform m_ownPlayerTransform = null;
+        private AvatarController m_ownPlayerAvatarController = null;
+
+        //このゲーム画面のプレイヤーのアイテム情報
+        private ObtainItemController m_obtainItemController = null;
+
+        //カメラの位置の情報
+        private Transform m_mainCameraTransform = null;
 
         private SoundSource m_engineSE = null;
         private SoundSource m_acceleSE = null;
         private float m_acceleSEPitch = 0.0f;
 
-        //このゲーム画面のプレイヤーの情報
-        private RaceAIScript m_ownPlayerRaceAI = null;
-
-        //このゲーム画面のプレイヤーのアイテム情報
-        private ObtainItemController m_obtainItemController = null;
-
         //アイテムスロット回転中のサウンド
         private SoundSource m_itemSlotLotterySE = null;
         //アイテムスロットのサウンドを鳴らすフラグ
         private bool m_itemSlotSoundPlayFlag = false;
+
+        //キラーのSEのソース
+        nsSound.SoundSource m_trainWhistleSS = null;
+        nsSound.SoundSource m_trainSSRun = null;
+        //スターのBGMのソース
+        private SoundSource m_starSS = null;
+
+        //アイテムを持っているかどうか
+        private bool m_isHavingItem = false;
+        //持っているアイテム
+        private int m_haveItem = -1;
+
+        //攻撃されたかどうか
+        private bool m_isAttacked = false;
 
         // Start is called before the first frame update
         void Start()
@@ -53,46 +72,71 @@ namespace nsSound
             m_acceleSE.Set3DMinMaxDistance(m_3DSoundMinDistance, m_3DSoundMaxDistance);
             m_acceleSE.PlayStart(nsSound.SENames.m_accele);
 
-            // StartCoroutine("Init");
             Init();
+
         }
 
-        //コルーチン辞めろ
         void Init()
         {
-            //yield return null;
-
             //このゲームオブジェクトがプレイヤー自信ならば
             if (this.gameObject.name == "OwnPlayer")
             {
                 m_obtainItemController = this.gameObject.GetComponent<ObtainItemController>();
-
+                m_ownPlayerTransform = this.gameObject.transform;
+                m_ownPlayerAvatarController = this.gameObject.GetComponent<AvatarController>();
             }
             //プレイヤー以外ならば
             else
             {
-                m_ownPlayerRaceAI = GameObject.Find("OwnPlayer").GetComponent<RaceAIScript>();
-            } 
+                m_ownPlayerTransform = GameObject.Find("OwnPlayer").transform;
+                m_ownPlayerAvatarController = GameObject.Find("OwnPlayer").gameObject.GetComponent<AvatarController>();
+            }
+            //メインカメラの情報
+            m_mainCameraTransform = GameObject.Find("Main Camera").transform;
         }
 
         // Update is called once per frame
         void Update()
         {
-
-            if (this.gameObject.name != "OwnPlayer")
+            //プレイヤーがゴールしていたら、終了
+            if (m_ownPlayerAvatarController.GetGoaled())
             {
-                m_ssPos = this.GetComponent<RaceAIScript>().GetRigidBody.position;
-                m_listenerPos = m_ownPlayerRaceAI.GetRigidBody.position;
-
-                m_engineSE.Set3DSourcePos(m_ssPos);
-                m_engineSE.Set3DListenerPos(m_listenerPos);
+                Destroy(this);
             }
 
+            //3Dサウンドの情報の更新
+            Update3DSoundStatus();
+
+            //アクセル音
             AcceleSound();
 
+            //プレイヤー自信のときのみ鳴らす音
             if (this.gameObject.name == "OwnPlayer")
             {
                 ItemGetSound();
+                ItemUseSound();
+                //攻撃された時
+                Attacked();
+
+            }
+        }
+
+        //3Dサウンドの情報(位置、向き等)を更新
+        private void Update3DSoundStatus()
+        {
+            //プレイヤー自信のとき
+            if (this.gameObject.name == "OwnPlayer")
+            {
+                m_ssPos = m_ownPlayerTransform.position;
+                m_listenerPos = m_mainCameraTransform.position + GameObject.Find("Main Camera").transform.forward * 4.5f;
+                m_listenerDir = m_mainCameraTransform.forward;
+            }
+            //その他のプレイヤーの時
+            else
+            {
+                m_ssPos = this.GetComponent<RaceAIScript>().GetRigidBody.position;
+                m_listenerPos = m_ownPlayerTransform.position;
+                m_listenerDir = m_mainCameraTransform.forward;
             }
         }
 
@@ -135,12 +179,41 @@ namespace nsSound
             m_acceleSEPitch = kartSpeed * m_accelePitchHeight;
             m_acceleSE.SetPitch(m_acceleSEPitch);
 
-            //自分以外の車の音は、3Dサウンドに。
-            if (this.gameObject.name != "OwnPlayer")
+            //3Dサウンドに。
+            m_acceleSE.Set3DSourcePos(m_ssPos);
+            m_acceleSE.Set3DListenerPos(m_listenerPos);
+            m_acceleSE.Set3DListenerDir(m_listenerDir);
+
+            //エンジン音も。
+            m_engineSE.Set3DSourcePos(m_ssPos);
+            m_engineSE.Set3DListenerPos(m_listenerPos);
+            m_engineSE.Set3DListenerDir(m_listenerDir);
+        }
+
+        //攻撃された時のSE
+        private void Attacked()
+        {
+            if (m_isAttacked == false)
             {
-                m_acceleSE.Set3DSourcePos(m_ssPos);
-                m_acceleSE.Set3DListenerPos(m_listenerPos);
+                if (m_ownPlayerAvatarController.GetIsAttacked())
+                {
+                    m_isAttacked = true;
+
+                    SoundSource attackedSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                    attackedSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                    attackedSS.Be3DSound();
+                    attackedSS.PlayStart(nsSound.SENames.m_attacked);
+
+                    //attackedSS.Set3DSourcePos(m_ssPos);
+                    //attackedSS.Set3DListenerPos(m_listenerPos);
+                    //attackedSS.Set3DListenerDir(m_listenerDir);                 
+                }
             }
+            else
+            {
+                m_isAttacked = m_ownPlayerAvatarController.GetIsAttacked();
+            }
+
         }
 
         private void ItemGetSound()
@@ -184,9 +257,158 @@ namespace nsSound
             }
         }
 
+        //アイテムを使うときのサウンド
+        private void ItemUseSound()
+        {
+            //何か持っていなければ
+            if (m_isHavingItem == false)
+            {
+                //今持っているアイテムの種類を取得
+                m_haveItem = m_obtainItemController.GetObtainItemType();
 
+                if (m_haveItem != -1)
+                {
+                    //アイテムを持っているに設定
+                    m_isHavingItem = true;
+                }
+            }
+            //アイテムを持っているとき、
+            else
+            {
+                //アイテムが無くなっていたら、使用したと判定
+                if (m_obtainItemController.GetObtainItemType() == -1)
+                {
+                    //使ったアイテムに合わせてサウンドを再生
+                    switch (m_haveItem)
+                    {
+                        case 0:
+                            //皮を落とす音の再生
+                            nsSound.SoundSource orangePeelSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                            orangePeelSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                            orangePeelSS.Be3DSound();
+                            orangePeelSS.PlayStart(nsSound.SENames.m_dropOrangePeel);
+                            break;
+                        case 1:
+                            //加速SEの再生
+                            nsSound.SoundSource orangeJetSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                            orangeJetSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                            orangeJetSS.Be3DSound();
+                            orangeJetSS.PlayStart(nsSound.SENames.m_dash);
+                            break;
+                        case 2:
+                            //大砲の音の再生
+                            nsSound.SoundSource snapperCannonSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                            snapperCannonSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                            snapperCannonSS.Be3DSound();
+                            snapperCannonSS.PlayStart(nsSound.SENames.m_cannon);
+                            break;
+                        case 3:
+                            break;
+                        case 4:
+                            //BGM.Instance.SetVolume(0.0f);
+                            //m_starSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                            //m_starSS.SetSoundType(nsSound.EnSoundTypes.enBGM);
+                            //m_starSS.SetLoop(true);
+                            //m_starSS.PlayStart(nsSound.BGMNames.m_star);
+                            break;
+                        default:
+                            break;
 
+                    }
 
+                    //アイテムを持っていない状態に
+                    m_isHavingItem = false;
+                    m_haveItem = -1;
+                }
+            }
 
+            //キラーの時は特殊判定。使ってもすぐにはアイテムが消えないため。
+            if (m_ownPlayerAvatarController.GetIsUsingKiller() == true)
+            {
+                if (m_trainWhistleSS == null)
+                {
+                    //列車の音の再生
+                    m_trainWhistleSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                    m_trainWhistleSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                    m_trainWhistleSS.Be3DSound();
+                    m_trainWhistleSS.PlayStart(nsSound.SENames.m_trainWhistle);
+                }
+                else if (m_trainSSRun == null)
+                {
+                    m_trainSSRun = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                    m_trainSSRun.SetSoundType(nsSound.EnSoundTypes.enSE);
+                    m_trainSSRun.Be3DSound();
+                    m_trainSSRun.PlayStart(nsSound.SENames.m_trainRun);
+                }
+            }
+
+            //if (m_ownPlayerAvatarController.GetIsUsingStar() == false)
+            //{
+            //    BGM.Instance.SetVolume(1.0f);
+            //    if (m_starSS != null)
+            //    {
+            //        m_starSS.Stop();
+            //    }
+            //}
+        }
+
+        // 物体がコリジョン接触したとき、１度だけ呼ばれる
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (this.gameObject.name != "OwnPlayer")
+            {
+                return;
+            }
+            //接触したコリジョンのタグを取得する。
+            string triggerName = collision.gameObject.tag;
+
+            //衝突点
+            Vector3 contactPoint = Vector3.zero;
+
+            //壁に衝突していない判定の状態で壁に衝突したら
+            if (/*!m_hitWall && */triggerName == "Wall")
+            {
+                //衝突点を取得する。
+                foreach (ContactPoint contact in collision.contacts)
+                {
+                    contactPoint = new Vector3(contact.point.x, contact.point.y, contact.point.z);
+                }
+
+                //自身から衝突点に向かって伸びるベクトルを計算。
+                Vector3 contactVec = contactPoint - this.gameObject.transform.position;
+
+                //y成分を削除。
+                contactVec.y = 0.0f;
+
+                //正規化。
+                contactVec.Normalize();
+
+                //外積を求める。
+                Vector3 dot = Vector3.Cross(contactVec, this.gameObject.transform.forward);
+
+                //衝突音
+                SoundSource hitWallSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                hitWallSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+                hitWallSS.Be3DSound();
+                hitWallSS.PlayStart(nsSound.SENames.m_hitWall);
+                hitWallSS.Set3DListenerPos(m_listenerPos);
+                hitWallSS.Set3DListenerDir(m_listenerDir);
+
+                Vector3 axisY = new Vector3(0.0f, 1.0f, 0.0f);
+                Vector3 rightDir = Vector3.Cross(m_mainCameraTransform.forward, axisY);
+
+                //外積から壁が右にあるのか左にあるのか判断する。
+                //右
+                if (dot.y < 0.0)
+                {
+                    hitWallSS.Set3DSourcePos(m_listenerPos + rightDir * 2.0f);
+                }
+                //左
+                else
+                {
+                    hitWallSS.Set3DSourcePos(m_listenerPos + rightDir * -2.0f);
+                }
+            }
+        }
     }
 }

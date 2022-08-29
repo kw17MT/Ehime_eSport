@@ -24,15 +24,10 @@ namespace nsSound
         public const string m_startEngine = "SE_StartEngine";
         public const string m_trainRun = "SE_TrainRun";
         public const string m_trainWhistle = "SE_TrainWhistle";
-
-
-
-
-
-
-
-
-
+        public const string m_cannon = "SE_Cannon";
+        public const string m_attacked = "SE_Attacked";
+        public const string m_hitWall = "SE_HitWall";
+        public const string m_snapper = "SE_Snapper";
     }
 
     //BGM
@@ -74,6 +69,7 @@ namespace nsSound
     public static class NarTitleNames
     {
         public const string m_GAMENNAGAOSHIDEGAMESTART = "Nar_Title_GAMENNAGAOSHIDEGAMESTART";
+        public const string m_GAMENTAPPUDEGAMESTART = "Nar_Title_GAMENTAPPUDEGAMESTART";
     }
     public static class NarModeNames
     {

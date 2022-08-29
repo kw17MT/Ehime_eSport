@@ -90,6 +90,10 @@ namespace nsSound
 			m_bgmSS.Stop();
 		}
 
+		public void SetVolume(float volume)
+		{
+			m_bgmSS.SetSourceVolume(volume);
+		}
 
 	}
 }

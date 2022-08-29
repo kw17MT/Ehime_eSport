@@ -41,6 +41,9 @@ namespace nsSound
             LongTouchSound();
 
             PlayEnterSound();
+
+            //ダブルタッチSE
+            //DoubleTouchSound();
         }
 
         //現在メニュー系の画面かどうかを設定。
@@ -48,6 +51,19 @@ namespace nsSound
         {
             m_gameIsMenu = gameIsMenu;
         }
+
+        //private void DoubleTouchSound()
+        //{
+        //    if (m_operation.GetIsDoubleTouch())
+        //    {
+        //        nsSound.SoundSource enterSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+        //        enterSS.SetSoundType(nsSound.EnSoundTypes.enSE);
+        //        enterSS.Be3DSound();
+        //        enterSS.PlayStart(nsSound.SENames.m_enter);
+        //        //ダブルタップしているかの判定がリセットされては困るので、再設定しています。
+        //        m_operation.SetIsDoubleTouch(true);
+        //    }
+        //}
 
         //長押しSEの再生
         private void LongTouchSound()

@@ -363,6 +363,27 @@ namespace nsSound
             m_atomEx3DSource.Update();
         }
 
+        //3Dサウンド用。リスナーの向きを設定する。基本的にゲームカメラの向きを設定する。
+        public void Set3DListenerDir(Vector3 dir)
+        {
+            if (Init() != true)
+            {
+                return;
+            }
+            m_atomEx3Dlistener.SetOrientation(dir.x,dir.y,dir.z,0.0f,1.0f,0.0f);
+            m_atomEx3Dlistener.Update();
+        }
+        public void Set3DListenerDir(float dirX, float dirY, float dirZ)
+        {
+            if (Init() != true)
+            {
+                return;
+            }
+            m_atomEx3Dlistener.SetOrientation(dirX, dirX, dirX, 0.0f, 1.0f, 0.0f);
+            m_atomEx3Dlistener.Update();
+        }
+
+
         //3Dサウンドが聞こえる最小距離と最大距離を設定する。
         //最小距離は、それ以上音の大きさが大きくならない距離
         //最大距離は、音が聞こえなくなる距離。

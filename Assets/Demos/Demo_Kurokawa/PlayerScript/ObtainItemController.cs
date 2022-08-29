@@ -106,25 +106,10 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
                         //オレンジの皮のポップ位置を自機の後ろにする
                         Vector3 orangePeelPos = this.gameObject.transform.position + (this.gameObject.transform.forward * SPACE_BETWEEN_PLAYER_BACK);
                         //オレンジの皮をネットワークオブジェクトとしてインスタンス化
-                        photonView.RPC(nameof(InstantiateItem), RpcTarget.All, "OrangePeel", orangePeelPos, -1, -1);
-
-                        ////////////////////////////////////////////////
-                        //皮を落とす音の再生
-                        nsSound.SoundSource dropOrangePeelSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
-                        dropOrangePeelSS.SetSoundType(nsSound.EnSoundTypes.enSE);
-                        dropOrangePeelSS.Be3DSound();
-                        dropOrangePeelSS.PlayStart(nsSound.SENames.m_dropOrangePeel);
-                        ////////////////////////////////////////////////
+                        photonView.RPC(nameof(InstantiateItem), RpcTarget.All, "OrangePeel", orangePeelPos, -1, -1);                      
                         break;
                     case EnItemType.enOrangeJet:
-                        this.GetComponent<AvatarController>().SetIsUsingJet();
-                        ////////////////////////////////////////////////
-                        //ダッシュSEの再生
-                        nsSound.SoundSource dashSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
-                        dashSS.SetSoundType(nsSound.EnSoundTypes.enSE);
-                        dashSS.Be3DSound();
-                        dashSS.PlayStart(nsSound.SENames.m_dash);
-                        ////////////////////////////////////////////////
+                        this.GetComponent<AvatarController>().SetIsUsingJet();                       
                         break;
                     case EnItemType.enTrain:
                         this.GetComponent<AvatarController>().SetIsUsingKiller();
