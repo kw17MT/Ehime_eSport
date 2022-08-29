@@ -20,7 +20,6 @@ public class ModeChange : MonoBehaviour
     {
         enOnlineMode,       //オンライン対戦モード
         enCpuMode,          //CPU対戦モード
-        enTimeAttackMode,   //タイムアタックモード
         enSettingMode,      //設定モード
         enMaxModeNum        //モード数
     }
@@ -151,11 +150,6 @@ public class ModeChange : MonoBehaviour
                 break;
             //CPU対戦モード
             case EnModeType.enCpuMode:
-                //設定モードシーンに遷移
-                SceneManager.LoadScene("04_CharaSelectScene");
-                break;
-            //タイムアタックモード
-            case EnModeType.enTimeAttackMode:
                 //設定モードシーンに遷移
                 SceneManager.LoadScene("04_CharaSelectScene");
                 break;

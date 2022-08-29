@@ -120,8 +120,13 @@ public class Operation : MonoBehaviour
         {
             return;
         }
-        //画面にタッチしている
-        m_isTouching = true;
+        //画面下部だったら、
+        if (Screen.height / 1.2 <= Input.mousePosition.y)
+        {
+            return;
+        }
+            //画面にタッチしている
+            m_isTouching = true;
         //タッチしている画面上の座標を取得
         m_touchStartPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z);
     }
@@ -263,7 +268,7 @@ public class Operation : MonoBehaviour
 
         return NowOperation();
     }
-    
+
     public InputInfo GetNowOperationAndPower()
 	{
         if (!m_canDataThrow)
@@ -311,8 +316,8 @@ public class Operation : MonoBehaviour
     /////////////////////////////////////////////////////////////////////////////////
     //長押し中かどうかを設定するプロパティ
     public void SetIsLongTouch(bool isLongTouch)
-    {       
-        m_isLongTouch = isLongTouch;  
+    {
+        m_isLongTouch = isLongTouch;
     }
     /////////////////////////////////////////////////////////////////////////////////
 
@@ -321,6 +326,8 @@ public class Operation : MonoBehaviour
     {
         //タッチしていない
         m_isTouching = false;
+        //
+        m_isDoubleTouch = false;
         //長押ししていない
         m_isLongTouch = false;
         //一定時間以上長押ししていない
@@ -401,5 +408,10 @@ public class Operation : MonoBehaviour
         m_isSingleTouch = false;
         m_isDoubleTouch = false;
         m_timeFromFirstTouch = TOUCH_ACTIVE_TIME;
+    }
+
+    public void SetIsDoubleTouch(bool isDoubleTouch)
+    {
+        m_isDoubleTouch = isDoubleTouch;
     }
 }
