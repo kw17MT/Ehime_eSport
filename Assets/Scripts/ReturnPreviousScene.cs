@@ -49,7 +49,7 @@ public class ReturnPreviousScene : MonoBehaviourPunCallbacks
             Destroy(GameObject.Find("ParamManager"));
 		}
 
-        //モード選択シーンに遷移
+        //前シーンに遷移
         SceneManager.LoadScene(m_previousSceneName);
 
         //デバック

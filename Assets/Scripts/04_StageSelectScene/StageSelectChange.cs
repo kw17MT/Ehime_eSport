@@ -26,7 +26,6 @@ public class StageSelectChange : MonoBehaviour
     {
         enStage1,       //ステージ1
         enStage2,       //ステージ2
-        enStage3,       //ステージ3
         enMaxStageNum   //最大ステージ数
     }
     //現在選択されているステージ
@@ -157,8 +156,22 @@ public class StageSelectChange : MonoBehaviour
         //選択されたステージデータを保存
         m_userSettingData.GetSetStageType = (int)m_nowSelectStage;
 
-        //CPU強さ設定選択シーンに遷移
-        SceneManager.LoadScene("06_CpuPowerSettingScene");
+        if (m_userSettingData.GetSetModeType == 0)
+        {
+            //マッチングシーンに遷移
+            SceneManager.LoadScene("07_MatchingScene");
+        }
+        else if (m_userSettingData.GetSetModeType == 1)
+        {
+            if (m_userSettingData.GetSetStageType == 0)
+            {
+                SceneManager.LoadScene("08_EasyGameScene");
+            }
+            else if (m_userSettingData.GetSetStageType == 1)
+            {
+                SceneManager.LoadScene("08_GameScene");
+            }
+        }
     }
 
     //電車の移動に合わせて選択しているデータを合わせるカウンター
