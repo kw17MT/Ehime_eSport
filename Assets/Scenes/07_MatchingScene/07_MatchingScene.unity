@@ -1202,8 +1202,8 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
+  m_ReferenceResolution: {x: 720, y: 1280}
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -1561,7 +1561,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7154196111916797054, guid: 1283fa1e6f96e3248ba46ade81c7ca16, type: 3}
       propertyPath: m_previousSceneName
-      value: 06_CpuPowerSettingScene
+      value: 05_StageSelectScene
       objectReference: {fileID: 0}
     - target: {fileID: 7770826742184020104, guid: 1283fa1e6f96e3248ba46ade81c7ca16, type: 3}
       propertyPath: m_Pivot.x
