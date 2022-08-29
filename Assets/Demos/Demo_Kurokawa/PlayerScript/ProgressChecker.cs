@@ -101,18 +101,29 @@ public class ProgressChecker : MonoBehaviour
         lapSS.SetSoundType(nsSound.EnSoundTypes.enNarration);
         lapSS.Be3DSound();
 
-        //ラップ数に対応する音源を再生。
-        switch (m_lapCount)
+        //ゴール周じゃなかったら
+        if (m_lapCount != MAX_LAP_NUM)
         {
-            case 1:
-                lapSS.PlayStart(nsSound.NarInGameLiveNames.m_1);
-                break;
-            case 2:
-                lapSS.PlayStart(nsSound.NarInGameLiveNames.m_2);
-                break;
-            case 3:
-                //ラップ３のときはゴールなので再生しない。
-                break;
+            //ラップ数に対応する音源を再生。
+            switch (m_lapCount)
+            {
+                case 1:
+                    lapSS.PlayStart(nsSound.NarInGameNames.m_RAP1);
+                    break;
+                case 2:
+                    lapSS.PlayStart(nsSound.NarInGameNames.m_RAP2);
+                    break;
+            }
+
+            //最終周なのでBGMを変更する。
+            if(m_lapCount == MAX_LAP_NUM - 1)
+            {
+                //現在のBGMをフェードアウト。
+                nsSound.BGM.Instance.FadeOutStart();
+
+                //最終周用のBGMを再生。
+                nsSound.BGM.Instance.SetPlayBGM(nsSound.BGMNames.m_lastLap);
+            }
         }
 
         if (!PhotonNetwork.OfflineMode)

@@ -15,7 +15,7 @@ public class RaceAIScript : MonoBehaviour
 
     //ステータス//
     //スピード
-    private float m_maxSpeed {get;set;} = 25.0f;                                //最高速度
+    public float m_maxSpeed {get;set;} = 25.0f;                                //最高速度
 
     //操作性
     private Vector3 m_rightSteeringVector { get; set; }
@@ -102,6 +102,9 @@ public class RaceAIScript : MonoBehaviour
 		{
             this.GetComponent<AICommunicator>().SetMoving(canMove);
         }
+
+        this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY;
+        this.gameObject.GetComponent<Rigidbody>().freezeRotation = true;
     }
 
     public int GetNextWayPoint()

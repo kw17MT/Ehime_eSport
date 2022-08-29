@@ -27,37 +27,29 @@ namespace nsSound
             m_commonNarList = new List<string>();
             m_commonNarList.Add(nsSound.NarAdvanceNames.m_SAYUUHURIKKUDE);
             m_commonNarList.Add(nsSound.NarStageSeleNames.m_STAGEWOERABERUYO);
-            m_commonNarList.Add(nsSound.NarAdvanceNames.m_ERABINAOSHITAITOKIHAGAMENHIDARISHITAWONAGAOSHISHITENE);
+            m_commonNarList.Add(nsSound.NarAdvanceNames.m_ERABINAOSHITAITOKIHAGAMENHIDARIUEWOTAPSHITENE);
 
             //3.
-            //オンラインモード選択時のナレーションのリスト
-            List<string> nanyoStageNarList = new List<string>();
-            nanyoStageNarList.Add(nsSound.NarStageSeleNames.m_NANYOSTAGE);
-            nanyoStageNarList.Add(nsSound.NarStageSeleNames.m_OCHITEIRUMIKANNICHUUISHIYOU);
+            //直線ステージ選択時のナレーションのリスト
+            List<string> straightStageNarList = new List<string>();
+            straightStageNarList.Add(nsSound.NarStageSeleNames.m_CHOKUSENNNOSTAGEDAYO);
 
-            //CPUモード選択時のナレーションのリスト
-            List<string> chuuyoStageNarList = new List<string>();
-            chuuyoStageNarList.Add(nsSound.NarStageSeleNames.m_NANYOSTAGE);
-            chuuyoStageNarList.Add(nsSound.NarStageSeleNames.m_OCHITEIRUMIKANNICHUUISHIYOU);
-
-            //タイムアタックモード選択時のナレーションのリスト
-            List<string> touyoStageModeNarList = new List<string>();
-            touyoStageModeNarList.Add(nsSound.NarStageSeleNames.m_NANYOSTAGE);
-            touyoStageModeNarList.Add(nsSound.NarStageSeleNames.m_OCHITEIRUMIKANNICHUUISHIYOU);
+            //楕円形ステージ選択時のナレーションのリスト
+            List<string> ellipseStageNarList = new List<string>();
+            ellipseStageNarList.Add(nsSound.NarStageSeleNames.m_DAENKEINOSTAGEDAYO);
 
             //4.
             //ナレーションのリストを、リストに加えていく(enumの順番と同じにすること！)
             m_narList = new List<List<string>>();
-            m_narList.Add(nanyoStageNarList);
-            m_narList.Add(chuuyoStageNarList);
-            m_narList.Add(touyoStageModeNarList);
+            m_narList.Add(straightStageNarList);
+            m_narList.Add(ellipseStageNarList);
         }
 
         //現在の選択状態を調べる。return:変わっているかどうか
         protected override bool CheckNowSelectState()
         {
             //モードの選択が変わっていたら、
-            if (m_selectStateNo != (int)m_sceneScript.GetNowSelectState())
+            if (m_selectStateNo != (int)m_sceneScript.GetNowSelectState() && m_narList.Count > (int)m_sceneScript.GetNowSelectState())
             {
                 //モードの選択を更新
                 m_selectStateNo = (int)m_sceneScript.GetNowSelectState();

@@ -162,12 +162,12 @@ public class InGameNarration : MonoBehaviour
                 //右側に当たっている。
                 if (direction == EnDirection.enRight)
                 {
-                    ss.PlayStart(nsSound.NarInGameNames.m_MIGIGAWANI);
+                    ss.PlayStart(nsSound.NarInGameNames.m_MIGINOKABENIATATTEIRUYO);
                 }
                 //左側に当たっている。
                 else if(direction == EnDirection.enLeft)
                 {
-                    ss.PlayStart(nsSound.NarInGameNames.m_HIDARIGAWANI);
+                    ss.PlayStart(nsSound.NarInGameNames.m_HIDARINOKABENIATATTEIRUYO);
                 }
                 //壁に衝突した。
                 m_hitWall = true;

@@ -27,7 +27,7 @@ namespace nsSound
             m_commonNarList = new List<string>();
             m_commonNarList.Add(nsSound.NarAdvanceNames.m_SAYUUHURIKKUDE);
             m_commonNarList.Add(nsSound.NarCPUSeleNames.m_COMPUTERNOTUYOSAWOERABERUYO);
-            m_commonNarList.Add(nsSound.NarAdvanceNames.m_ERABINAOSHITAITOKIHAGAMENHIDARISHITAWONAGAOSHISHITENE);
+            m_commonNarList.Add(nsSound.NarAdvanceNames.m_ERABINAOSHITAITOKIHAGAMENHIDARIUEWOTAPSHITENE);
 
             //3.
             //弱いを選択時のナレーションのリスト
@@ -54,7 +54,7 @@ namespace nsSound
         protected override bool CheckNowSelectState()
         {
             //モードの選択が変わっていたら、
-            if (m_selectStateNo != (int)m_sceneScript.GetNowSelectState())
+            if (m_selectStateNo != (int)m_sceneScript.GetNowSelectState() && m_narList.Count > (int)m_sceneScript.GetNowSelectState())
             {
                 //モードの選択を更新
                 m_selectStateNo = (int)m_sceneScript.GetNowSelectState();
