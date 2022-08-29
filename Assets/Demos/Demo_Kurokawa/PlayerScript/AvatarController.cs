@@ -18,6 +18,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
     float m_distanceToNextWayPoint = 0.0f;              //次のウェイポイントへの距離
     private GameObject m_paramManager = null;           //パラメータを保存するインスタンス（シーン跨ぎ）
     private GameObject m_orepation = null;              //プレイヤーの操作状態をもつインスタンス
+    private GameObject m_trainModel = null;             //プレイヤーにかぶせる坊ちゃん列車モデル（ルームオブジェクト）
     private RaceAIScript m_aiScript = null;             //プレイヤーにつけているAIScript（ゴールした時にキャラの操作をAIに移管する用）
     private AvatarController m_avaCon = null;           //操作をAIに移管した時にプレイヤーの操作をOFFにするためのインスタンス（このスクリプト）
     private AlongWall m_alongWall = null;               //壁ずり時の移動方向を更新するインスタンス
@@ -58,6 +59,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
     public float ROT_POWER = 50.0f;                      //ハンドリング
     public float MOVE_POWER = 25.0f;                   //リジッドボディにかける移動の倍率
     public float MAX_STIFFIN_TIME = 1.5f;               //攻撃が当たった時の最大硬直時間
+
+    [SerializeField] GameObject m_effect;
 
     void Start()
     {
@@ -102,6 +105,15 @@ public class AvatarController : MonoBehaviourPunCallbacks
         m_aiScript = this.GetComponent<RaceAIScript>();
         //プレイヤーについているスクリプトの取得
         m_avaCon = this.GetComponent<AvatarController>();
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        if(m_trainModel != null)
+		{
+            Destroy(m_trainModel.gameObject);
+            m_trainModel = null;
+		}
     }
 
     //ルームプロパティの何かが更新された時の関数
@@ -203,6 +215,8 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //ルームプロパティを更新
             PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
         }
+
+        m_trainModel = PhotonNetwork.InstantiateRoomObject("Train", this.gameObject.transform.position, this.gameObject.transform.rotation);
     }
 
     //スターを使用しているかを取得する
@@ -363,6 +377,9 @@ public class AvatarController : MonoBehaviourPunCallbacks
                 //キラーを使っていない状態にする
                 m_isUsingKiller = false;
                 this.gameObject.GetComponent<ObtainItemController>().SetItemNothing();
+
+                Destroy(m_trainModel.gameObject);
+                m_trainModel = null;
 
                 m_rb.velocity = Vector3.zero;
                 m_moveSpeed = direction * MOVE_POWER_USING_KILLER * FIX_MOVESPEED_POWER_AFTER_KILLER;
@@ -691,6 +708,11 @@ public class AvatarController : MonoBehaviourPunCallbacks
             Destroy(GameObject.Find("RankingImage"));
             Destroy(GameObject.Find("Item"));
         }
+
+        if(m_trainModel != null)
+		{
+            m_trainModel.gameObject.transform.position = this.transform.position;
+		}
     }
 
 
@@ -780,6 +802,18 @@ public class AvatarController : MonoBehaviourPunCallbacks
             //緩やかにして適用
             transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * KILLER_HANDLING_RATE);
             //m_rb.MoveRotation(Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * KILLER_HANDLING_RATE));
+
+            if(m_trainModel != null)
+			{
+                //モデルの関係上みぎベクトルを使用する
+                newForward = ((this.GetComponent<WayPointChecker>().GetNextWayPoint() - this.transform.position) - m_trainModel.transform.right);
+                newForward.y = 0.0f;
+                rot = Quaternion.LookRotation(newForward);
+                Quaternion Yrot = Quaternion.Euler(0.0f, -90.0f, 0.0f);
+                rot *= Yrot;
+                m_trainModel.transform.rotation = rot;// Quaternion.Slerp(m_trainModel.transform.rotation, rot, Time.deltaTime * KILLER_HANDLING_RATE);
+            }
+
             //現在の回転を保存
             m_prevTrasnform = this.transform.rotation;
             return;

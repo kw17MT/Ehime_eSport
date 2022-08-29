@@ -66,7 +66,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 			{
                 //自分の順位に応じたアイテムを抽選
                 //2位→0から2番のアイテムしか抽選されない
-                itemType = (int)Random.Range(currentPlace - 2, currentPlace);
+                itemType = (int)Random.Range(currentPlace - 2, currentPlace - 0.1f);
             }
 
             m_obtainItemType = (EnItemType)itemType;       

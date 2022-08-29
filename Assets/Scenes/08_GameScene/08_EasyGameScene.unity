@@ -6673,8 +6673,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 56c85bb44bc3d2248851f8b6173fa21e, type: 3}
   - {fileID: 21300000, guid: 6eac1605745a5b148a864b019b993cb2, type: 3}
   - {fileID: 21300000, guid: 620e5fd89b0f6b142905ce1a341c471c, type: 3}
-  - {fileID: 21300000, guid: 824013af7192d5c4798a71641ab977c9, type: 3}
-  - {fileID: 21300000, guid: bde55febcd122ef4a806bc698035e519, type: 3}
+  - {fileID: 21300000, guid: c282c276bbec80b40b8b73c36cbd6c4d, type: 3}
   itemImage: {fileID: 622354146}
   blinkingNumberOfTimes: 6
   blinkingDelayTime: 0.2
