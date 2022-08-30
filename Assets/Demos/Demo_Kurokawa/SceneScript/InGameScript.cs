@@ -489,6 +489,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
         //カウントダウンのテキストを破棄
         Destroy(m_countDownComponent.gameObject);
+
+        m_isBGMStart = true;
     }
 
     //各プレイヤーから送られてきたタイムを映し出す
@@ -598,8 +600,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                     m_shouldCountDown = false;
                     //game開始フラグを立てるように通信を送る
                     photonView.RPC(nameof(SetPlayerMovable), RpcTarget.All);
-                    //BGMを鳴らし始める
-                    m_isBGMStart = true;
+                    
                 }
                 //待機時間の秒数が変わったらそれを同期する
                 if (m_prevCountDownNum != (int)m_countDownNum)
