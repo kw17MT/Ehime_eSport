@@ -26,7 +26,7 @@ namespace nsSound
             //操作システムのゲームオブジェクトを検索しゲームコンポーネントを取得する
             m_operation = GameObject.Find("OperationSystem").GetComponent<Operation>();
 
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
 
         // Update is called once per frame
