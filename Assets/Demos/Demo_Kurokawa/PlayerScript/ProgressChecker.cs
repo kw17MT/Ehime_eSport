@@ -12,6 +12,7 @@ public class ProgressChecker : MonoBehaviour
     private bool m_isDisplayingLapLabel = false;
 
     private int m_lapCount = 0;                             //ゲーム中の周回回数
+    private bool m_isGetLapLavel = false;
     [SerializeField] int MAX_CHECKPOINT_NUM = 3;            //ステージに配置されるチェックポイントの数
     [SerializeField] int MAX_LAP_NUM = 3;                   //何周するか
     private List<bool> m_checkPoint = new List<bool>();     //通過したチェックポイントの保存配列
@@ -29,13 +30,17 @@ public class ProgressChecker : MonoBehaviour
         //現在、ゲームシーンならば
         if(SceneManager.GetActiveScene().name[0..2] == "08" && gameObject.CompareTag("OwnPlayer"))
 		{
-            //ラップ数を表示するオブジェクトを取得
-            m_lapLabel = GameObject.Find("Lap");
-            m_lapCountLabel = GameObject.Find("LapLabel");
-            m_lapCountLabel.GetComponent<LapChange>().SetLapNum(m_lapCount);
-            MAX_LAP_NUM = 3;
-            m_lapLabel.SetActive(false);
+            if(!m_isGetLapLavel)
+			{
+                //ラップ数を表示するオブジェクトを取得
+                m_lapLabel = GameObject.Find("Lap");
+                m_lapCountLabel = GameObject.Find("LapLabel");
+                m_lapCountLabel.GetComponent<LapChange>().SetLapNum(m_lapCount);
+                MAX_LAP_NUM = 3;
+                m_lapLabel.SetActive(false);
 
+                m_isGetLapLavel = true;
+            }
 
             if(SceneManager.GetActiveScene().name == "08_EasyGameScene")
 			{
@@ -181,5 +186,29 @@ public class ProgressChecker : MonoBehaviour
                 }
 			}
 		}
-	}
+
+        //ラップラベルをStartで取得できない場合があるため再確認
+        if (!m_isGetLapLavel)
+        {
+            //現在、ゲームシーンならば
+            if (SceneManager.GetActiveScene().name[0..2] == "08" && gameObject.CompareTag("OwnPlayer"))
+            {
+
+                //ラップ数を表示するオブジェクトを取得
+                m_lapLabel = GameObject.Find("Lap");
+                m_lapCountLabel = GameObject.Find("LapLabel");
+                m_lapCountLabel.GetComponent<LapChange>().SetLapNum(m_lapCount);
+                MAX_LAP_NUM = 3;
+                m_lapLabel.SetActive(false);
+
+                m_isGetLapLavel = true;
+
+
+                if (SceneManager.GetActiveScene().name == "08_EasyGameScene")
+                {
+                    MAX_LAP_NUM = 1;
+                }
+            }
+        }
+    }
 }

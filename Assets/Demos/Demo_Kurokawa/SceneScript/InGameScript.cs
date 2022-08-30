@@ -155,7 +155,17 @@ public class InGameScript : MonoBehaviourPunCallbacks
             //切断された
             m_isDisconnected = true;
 		}
-	}
+
+        //次のウェイポイントの番号をルームプロパティに保存
+        var hashtable = new ExitGames.Client.Photon.Hashtable();
+        //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
+        string name = PhotonNetwork.NickName + "WayPointNumber";
+        //ウェイポイント番号を設定
+        hashtable[name] = 999;
+        //ルームプロパティの更新
+        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+
+    }
 
     //オンラインプレイヤーが参照できるルームプロパティが更新されたら
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
