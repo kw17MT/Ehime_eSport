@@ -1608,15 +1608,18 @@ MonoBehaviour:
   - "\u307F\u304D\u3083\u3093"
   - "\u3053\u307F\u304D\u3083\u3093"
   - "\u30C0\u30FC\u30AF\u307F\u304D\u3083\u3093"
+  - "\u30C0\u30FC\u30AF\u307F\u304D\u3083\u3093"
   m_charaNameLabel: {fileID: 334463000}
   m_charaStatus:
   - SSSS
   - AAAA
   - BBBB
+  - BBBB
   m_charaStatusLabel: {fileID: 159461922}
   m_charaExplanationSentence:
   - "\u3048\u3072\u3081\u306E\u30DE\u30B9\u30B3\u30C3\u30C8\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3002\u306A\u3093\u3067\u3082\u305D\u3064\u306A\u304F\u3053\u306A\u305B\u308B\u30D0\u30E9\u30A4\u30F3\u30B9\u30BF\u30A4\u30D7\u3067\u3059\u3002"
   - "\u3053\u307F\u304D\u3083\u3093\u3002"
+  - "\u30C0\u30FC\u30AF\u307F\u304D\u3083\u3093\u3002"
   - "\u30C0\u30FC\u30AF\u307F\u304D\u3083\u3093\u3002"
   m_charaExplanationLabel: {fileID: 539976563}
 --- !u!1001 &1650717232

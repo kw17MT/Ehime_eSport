@@ -22,15 +22,8 @@ public class CharaSelectChange : MonoBehaviour
     //キャラクター説明ラベル
     [SerializeField] Text m_charaExplanationLabel = null;
 
-    enum EnCharaType
-    {
-        enMikyan,        //みきゃん
-        enKomikyan,      //子みきゃん
-        enDarkmikyan,    //ダークみきゃん
-        enMaxCharaNum    //最大キャラクター数
-    }
     //現在選択されているキャラクター
-    EnCharaType m_nowSelectChara = EnCharaType.enMikyan;
+    int m_nowSelectChara = 0;
     //操作システム
     Operation m_operation = null;
     //選択移動をしているか
@@ -99,9 +92,9 @@ public class CharaSelectChange : MonoBehaviour
         m_selectMove = true;
         //選択されているキャラクターを次のキャラクターにする
         m_nowSelectChara++;
-        if (m_nowSelectChara >= EnCharaType.enMaxCharaNum)
+        if (m_nowSelectChara >= m_charaName.Length)
         {
-            m_nowSelectChara = EnCharaType.enMikyan;
+            m_nowSelectChara = 0;
         }
     }
     //前のキャラクターに選択を移動する関数
@@ -111,9 +104,9 @@ public class CharaSelectChange : MonoBehaviour
         m_selectMove = true;
         //選択されているモードを前のモードにする
         m_nowSelectChara--;
-        if (m_nowSelectChara < EnCharaType.enMikyan)
+        if (m_nowSelectChara < 0)
         {
-            m_nowSelectChara = EnCharaType.enMaxCharaNum - 1;
+            m_nowSelectChara = m_charaName.Length - 1;
         }
     }
 
