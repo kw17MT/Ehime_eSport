@@ -11,6 +11,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
     const float SPACE_BETWEEN_PLAYER_FRONT = 5.0f;      //プレイヤーから前方向へずらす幅
     const float SPACE_BETWEEN_PLAYER_BACK = -2.0f;      //プレイヤーから後ろ方向にずらす幅
     EnItemType m_obtainItemType = EnItemType.enNothing; //現在所持しているアイテム名
+    const float ADJUST_PARAM = 0.99f;
 
     //アイテムの種類
     enum EnItemType
@@ -66,7 +67,7 @@ public class ObtainItemController : MonoBehaviourPunCallbacks
 			{
                 //自分の順位に応じたアイテムを抽選
                 //2位→0から2番のアイテムしか抽選されない
-                itemType = (int)Random.Range(currentPlace - 2, currentPlace - 0.1f);
+                itemType = (int)Random.Range(currentPlace - 2, currentPlace + ADJUST_PARAM);
             }
 
             m_obtainItemType = (EnItemType)itemType;       
