@@ -114,6 +114,11 @@ public class InGameScript : MonoBehaviourPunCallbacks
         //•b”‚Ì®”•”•ª‚Ì•Ï‰»‚ğŒ©‚é‚½‚ß‚É•Û‘¶‚·‚éB
         m_prevCountDownNum = (int)m_countDownNum;
 
+        if(m_userSetting.GetComponent<UserSettingData>().GetSetBlindMode)
+        {
+            GameObject.Find("BlinderPanel").GetComponent<Image>().enabled = true;
+		}
+
         ////////////////////////////////////////////////////////////////////////////
         //BGM‚ğ’â~
         nsSound.BGM.Instance.FadeOutStart();
