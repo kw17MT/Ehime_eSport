@@ -71,6 +71,12 @@ namespace nsSound
         public const string m_GAMENNAGAOSHIDEGAMESTART = "Nar_Title_GAMENNAGAOSHIDEGAMESTART";
         public const string m_GAMENTAPPUDEGAMESTART = "Nar_Title_GAMENTAPPUDEGAMESTART";
     }
+
+    public static class NarTutorialNames
+    {
+        public const string m_SOUSASETUMEI = "Nar_SOUSASETUMEI";
+    }
+
     public static class NarModeNames
     {
         public const string m_ASOBIKATAWOERABERUYO = "Nar_Mode_ASOBIKATAWOERABERUYO";
@@ -200,5 +206,9 @@ namespace nsSound
         public const string m_NII = "Nar_Result_NII";
         public const string m_SANNi = "Nar_Result_SANNi";
         public const string m_YONNi = "Nar_Result_YONNi";
+        public const string m_DOUBLETAPPUDEMATCHINSCENENIMODORUYO = "Nar_Result_DOUBLETAPPUDEMATCHINSCENENIMODORUYO";
+        public const string m_DOUBLETAPPUDEMOUICHIDORACEWOSURUYO = "Nar_Result_DOUBLETAPPUDEMOUICHIDORACEWOSURUYO";
+        public const string m_DOUBLETAPPUDETITLENIMODORUYO = "Nar_Result_DOUBLETAPPUDETITLENIMODORUYO";
+
     }
 }
