@@ -216,7 +216,7 @@ public class AvatarController : MonoBehaviourPunCallbacks
             PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
         }
 
-        m_trainModel = PhotonNetwork.InstantiateRoomObject("Train", this.gameObject.transform.position, this.gameObject.transform.rotation);
+        m_trainModel = PhotonNetwork.Instantiate("Train", this.gameObject.transform.position, this.gameObject.transform.rotation);
     }
 
     //スターを使用しているかを取得する
