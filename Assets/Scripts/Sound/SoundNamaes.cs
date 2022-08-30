@@ -28,6 +28,7 @@ namespace nsSound
         public const string m_attacked = "SE_Attacked";
         public const string m_hitWall = "SE_HitWall";
         public const string m_snapper = "SE_Snapper";
+        public const string m_star = "BGM_Star";
     }
 
     //BGM

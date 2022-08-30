@@ -29,6 +29,8 @@ namespace nsSound
         //カメラの位置の情報
         private Transform m_mainCameraTransform = null;
 
+        private AvatarController m_myAvatarContoroller = null;
+
         private SoundSource m_engineSE = null;
         private SoundSource m_acceleSE = null;
         private float m_acceleSEPitch = 0.0f;
@@ -84,12 +86,14 @@ namespace nsSound
                 m_obtainItemController = this.gameObject.GetComponent<ObtainItemController>();
                 m_ownPlayerTransform = this.gameObject.transform;
                 m_ownPlayerAvatarController = this.gameObject.GetComponent<AvatarController>();
+                m_myAvatarContoroller = this.gameObject.GetComponent<AvatarController>();
             }
             //プレイヤー以外ならば
             else
             {
                 m_ownPlayerTransform = GameObject.Find("OwnPlayer").transform;
                 m_ownPlayerAvatarController = GameObject.Find("OwnPlayer").gameObject.GetComponent<AvatarController>();
+                m_myAvatarContoroller = this.gameObject.GetComponent<AvatarController>();
             }
             //メインカメラの情報
             m_mainCameraTransform = GameObject.Find("Main Camera").transform;
@@ -109,6 +113,9 @@ namespace nsSound
 
             //アクセル音
             AcceleSound();
+
+            TrainSound();
+            StarSound();
 
             //プレイヤー自信のときのみ鳴らす音
             if (this.gameObject.name == "OwnPlayer")
@@ -154,6 +161,11 @@ namespace nsSound
             {
                 m_itemSlotLotterySE.Stop();
             }
+            if (m_starSS != null)
+            {
+                m_starSS.Stop();
+            }
+            BGM.Instance.SetVolume(1.0f);
         }
 
         //アクセル音の再生。移動速度に合わせて、ピッチを変える。
@@ -304,12 +316,7 @@ namespace nsSound
                             break;
                         case 3:
                             break;
-                        case 4:
-                            //BGM.Instance.SetVolume(0.0f);
-                            //m_starSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
-                            //m_starSS.SetSoundType(nsSound.EnSoundTypes.enBGM);
-                            //m_starSS.SetLoop(true);
-                            //m_starSS.PlayStart(nsSound.BGMNames.m_star);
+                        case 4:                           
                             break;
                         default:
                             break;
@@ -321,9 +328,12 @@ namespace nsSound
                     m_haveItem = -1;
                 }
             }
+        }
 
+        private void TrainSound()
+        {
             //キラーの時は特殊判定。使ってもすぐにはアイテムが消えないため。
-            if (m_ownPlayerAvatarController.GetIsUsingKiller() == true)
+            if (m_myAvatarContoroller != null && m_myAvatarContoroller.GetIsUsingKiller() == true)
             {
                 if (m_trainWhistleSS == null)
                 {
@@ -333,24 +343,68 @@ namespace nsSound
                     m_trainWhistleSS.Be3DSound();
                     m_trainWhistleSS.PlayStart(nsSound.SENames.m_trainWhistle);
                 }
-                else if (m_trainSSRun == null)
+                else
+                {
+                    m_trainWhistleSS.Set3DSourcePos(m_ssPos);
+                    m_trainWhistleSS.Set3DListenerPos(m_listenerPos);
+                    m_trainWhistleSS.Set3DListenerDir(m_listenerDir);       
+                }
+                if (m_trainSSRun == null)
                 {
                     m_trainSSRun = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
                     m_trainSSRun.SetSoundType(nsSound.EnSoundTypes.enSE);
                     m_trainSSRun.Be3DSound();
                     m_trainSSRun.PlayStart(nsSound.SENames.m_trainRun);
                 }
+                else
+                {
+                    m_trainSSRun.Set3DSourcePos(m_ssPos);
+                    m_trainSSRun.Set3DListenerPos(m_listenerPos);
+                    m_trainSSRun.Set3DListenerDir(m_listenerDir);
+                }
+            }
+        }
+        private void StarSound()
+        {
+            //スターの時は特殊判定
+            if (m_myAvatarContoroller != null && m_myAvatarContoroller.GetIsUsingStar() == true)
+            {
+                if (m_starSS == null)
+                {
+                    if (this.gameObject.name == "OwnPlayer")
+                    {
+                        BGM.Instance.SetVolume(0.0f);
+                    }
+
+                    m_starSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                    m_starSS.SetSoundType(nsSound.EnSoundTypes.enBGM);
+                    m_starSS.SetLoop(true);
+                    m_starSS.PlayStart(nsSound.BGMNames.m_star);
+                    m_starSS.Set3DSourcePos(m_ssPos);
+                    m_starSS.Set3DListenerPos(m_listenerPos);
+                    m_starSS.Set3DListenerDir(m_listenerDir);
+                }
+                else
+                {
+                    m_starSS.Set3DSourcePos(m_ssPos);
+                    m_starSS.Set3DListenerPos(m_listenerPos);
+                    m_starSS.Set3DListenerDir(m_listenerDir);
+                }
+            }
+            else
+            {        
+                if (m_starSS != null)
+                {
+                    m_starSS.Stop();
+                    if (this.gameObject.name == "OwnPlayer")
+                    {
+                        BGM.Instance.SetVolume(1.0f);
+                    }
+                }
             }
 
-            //if (m_ownPlayerAvatarController.GetIsUsingStar() == false)
-            //{
-            //    BGM.Instance.SetVolume(1.0f);
-            //    if (m_starSS != null)
-            //    {
-            //        m_starSS.Stop();
-            //    }
-            //}
-        }
+
+		}
 
         // 物体がコリジョン接触したとき、１度だけ呼ばれる
         private void OnCollisionEnter(Collision collision)
