@@ -155,7 +155,17 @@ public class InGameScript : MonoBehaviourPunCallbacks
             //切断された
             m_isDisconnected = true;
 		}
-	}
+
+        //次のウェイポイントの番号をルームプロパティに保存
+        var hashtable = new ExitGames.Client.Photon.Hashtable();
+        //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
+        string name = PhotonNetwork.NickName + "WayPointNumber";
+        //ウェイポイント番号を設定
+        hashtable[name] = 999;
+        //ルームプロパティの更新
+        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+
+    }
 
     //オンラインプレイヤーが参照できるルームプロパティが更新されたら
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
@@ -489,6 +499,8 @@ public class InGameScript : MonoBehaviourPunCallbacks
         }
         //カウントダウンのテキストを破棄
         Destroy(m_countDownComponent.gameObject);
+
+        m_isBGMStart = true;
     }
 
     //各プレイヤーから送られてきたタイムを映し出す
@@ -598,8 +610,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                     m_shouldCountDown = false;
                     //game開始フラグを立てるように通信を送る
                     photonView.RPC(nameof(SetPlayerMovable), RpcTarget.All);
-                    //BGMを鳴らし始める
-                    m_isBGMStart = true;
+                    
                 }
                 //待機時間の秒数が変わったらそれを同期する
                 if (m_prevCountDownNum != (int)m_countDownNum)
