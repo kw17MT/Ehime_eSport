@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: -5379012440428623862}
   - component: {fileID: -3608291565485695810}
   - component: {fileID: -9028076444946934821}
+  - component: {fileID: 8234967993668218076}
   m_Layer: 0
   m_Name: Snapper
   m_TagString: Untagged
@@ -296,6 +297,18 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
   m_Emitting: 1
+--- !u!114 &8234967993668218076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9015274224041216933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40cc08a2145ca394f82cac360fab12e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8073271191545453979
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -207,7 +207,7 @@ public class Operation : MonoBehaviour
             return m_isDoubleTouch;
         }
     }
-
+    
     //Œ»İ‚Ç‚ñ‚È‘€ì‚ğ‚µ‚Ä‚¢‚é‚©”»’f‚·‚éŠÖ”
     string NowOperation()
     {

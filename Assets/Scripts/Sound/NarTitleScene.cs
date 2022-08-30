@@ -38,7 +38,7 @@ namespace nsSound
                 m_narSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
                 m_narSS.SetSoundType(nsSound.EnSoundTypes.enNarration);
                 m_narSS.Be3DSound();
-                m_narSS.PlayStart(nsSound.NarTitleNames.m_GAMENNAGAOSHIDEGAMESTART);
+                m_narSS.PlayStart(nsSound.NarTitleNames.m_GAMENTAPPUDEGAMESTART);
 
                 m_narPlayCount = m_maxNarPlayCount;
 
