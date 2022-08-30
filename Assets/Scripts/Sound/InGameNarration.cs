@@ -76,6 +76,9 @@ public class InGameNarration : MonoBehaviour
     //物体がトリガーに接触したとき、１度だけ呼ばれる
     private void OnTriggerEnter(Collider collision)
     {
+        //プレイヤー自身じゃないなら早期リターン。
+        if (!m_isOwnPlayer) { return; }
+
         //接触したトリガーのタグを取得する。
         string triggerName = collision.gameObject.tag;
 
@@ -86,6 +89,9 @@ public class InGameNarration : MonoBehaviour
     // 物体がコリジョン接触したとき、１度だけ呼ばれる
     private void OnCollisionEnter(Collision collision)
     {
+        //プレイヤー自身じゃないなら早期リターン。
+        if (!m_isOwnPlayer) { return; }
+
         //接触したコリジョンのタグを取得する。
         string triggerName = collision.gameObject.tag;
 
