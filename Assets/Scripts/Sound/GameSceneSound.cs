@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 namespace nsSound
 {
@@ -108,6 +109,22 @@ namespace nsSound
                             default:
                                 BGM.Instance.SetPlayBGM(nsSound.BGMNames.m_result2);
                                 break;
+                        }
+
+                        //モードに応じて音声案内を生成。
+                        //サウンドソースを生成。
+                        nsSound.SoundSource nextSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
+                        nextSS.SetSoundType(nsSound.EnSoundTypes.enNarration);
+                        nextSS.Be3DSound();
+                        //オフライン時
+                        if (PhotonNetwork.OfflineMode)
+                        {
+                            nextSS.PlayStart(nsSound.NarResultNames.m_DOUBLETAPPUDEMOUICHIDORACEWOSURUYO);
+                        }
+                        //オンライン時
+                        else
+                        {
+                            nextSS.PlayStart(nsSound.NarResultNames.m_DOUBLETAPPUDEMATCHINSCENENIMODORUYO);
                         }
                     }
                 }
