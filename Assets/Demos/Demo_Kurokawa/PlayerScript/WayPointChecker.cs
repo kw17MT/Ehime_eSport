@@ -30,7 +30,7 @@ public class WayPointChecker : MonoBehaviour
         }
 
         //Playerタグ(AI)だったら
-        if (this.gameObject.tag == "Player")
+        if (this.gameObject.tag == "Player" && SceneManager.GetActiveScene().name[0..2] == "08")
         {
             //最初はウェイポイント1を目指す。
             GameObject nextWayPoint = GameObject.Find("WayPoint0");

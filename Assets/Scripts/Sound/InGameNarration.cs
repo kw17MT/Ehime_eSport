@@ -132,6 +132,9 @@ public class InGameNarration : MonoBehaviour
     //タグの名前から音源を再生する関数。
     private void PlayNarration(string triggerName, EnDirection direction){
 
+        //正しい音源が再生されたかどうか
+        bool play = false;
+
         nsSound.SoundSource ss = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
         ss.SetSoundType(nsSound.EnSoundTypes.enNarration);
         ss.Be3DSound();
@@ -140,18 +143,21 @@ public class InGameNarration : MonoBehaviour
         if (triggerName == SoundTriggerTagName.m_rightCurve)
         {
             ss.PlayStart(nsSound.NarInGameNames.m_MIGICURVEGAARUYO);
+            play = true;
         }
 
         //左カーブ前
         if (triggerName == SoundTriggerTagName.m_leftCurve)
         {
             ss.PlayStart(nsSound.NarInGameNames.m_HIDARICURVEGAARUYO);
+            play = true;
         }
 
         //アイテム前
         if (triggerName == SoundTriggerTagName.m_item)
         {
             ss.PlayStart(nsSound.NarInGameNames.m_ITEMGAARUYO);
+            play = true;
         }
 
         //壁
@@ -163,11 +169,13 @@ public class InGameNarration : MonoBehaviour
                 if (direction == EnDirection.enRight)
                 {
                     ss.PlayStart(nsSound.NarInGameNames.m_MIGINOKABENIATATTEIRUYO);
+                    play = true;
                 }
                 //左側に当たっている。
-                else if(direction == EnDirection.enLeft)
+                else if (direction == EnDirection.enLeft)
                 {
                     ss.PlayStart(nsSound.NarInGameNames.m_HIDARINOKABENIATATTEIRUYO);
+                    play = true;
                 }
                 //壁に衝突した。
                 m_hitWall = true;
@@ -175,11 +183,20 @@ public class InGameNarration : MonoBehaviour
                 m_hitWallTimer = m_hitWallTimerConst;
             }
         }
+
+        //何も再生されなかったら削除。
+        if (!play)
+        {
+            ss.Stop();
+        }
     }
 
     //アイテム番号から音源を再生する関数。
     private void PlayNarration(EnItemType itemType)
     {
+        //正しい音源が再生されたかどうか
+        bool play = false;
+
         //サウンドソースを生成。
         nsSound.SoundSource itemSS = new GameObject("SoundSource").AddComponent<nsSound.SoundSource>();
         itemSS.SetSoundType(nsSound.EnSoundTypes.enNarration);
@@ -191,27 +208,38 @@ public class InGameNarration : MonoBehaviour
             //オレンジの皮
             case EnItemType.enOrangePeel:
                 itemSS.PlayStart(nsSound.NarInGameItemNames.m_MIKANNNOKAWADA);
+                play = true;
                 break;
 
             //オレンジジュースジェット
             case EnItemType.enOrangeJet:
                 itemSS.PlayStart(nsSound.NarInGameItemNames.m_JUICEJETDA);
+                play = true;
                 break;
 
             //タイ砲
             case EnItemType.enSnapperCannon:
                 itemSS.PlayStart(nsSound.NarInGameItemNames.m_TAIHOUDA);
+                play = true;
                 break;
 
             //坊ちゃん列車キラー
             case EnItemType.enTrain:
                 itemSS.PlayStart(nsSound.NarInGameItemNames.m_BOCCHANRESSYADA);
+                play = true;
                 break;
 
             //スター
             case EnItemType.enStar:
                 itemSS.PlayStart(nsSound.NarInGameItemNames.m_OUGONNMIKANNDA);
+                play = true;
                 break;
+        }
+
+        //何も再生されなかったら削除。
+        if (!play)
+        {
+            itemSS.Stop();
         }
     }
 

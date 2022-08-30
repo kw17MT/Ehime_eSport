@@ -27,7 +27,7 @@ public class ProgressChecker : MonoBehaviour
 		}
 
         //現在、ゲームシーンならば
-        if(SceneManager.GetActiveScene().name[0..2] == "08")
+        if(SceneManager.GetActiveScene().name[0..2] == "08" && gameObject.CompareTag("OwnPlayer"))
 		{
             //ラップ数を表示するオブジェクトを取得
             m_lapLabel = GameObject.Find("Lap");

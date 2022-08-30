@@ -16,7 +16,6 @@ public class Operation : MonoBehaviour
     bool m_isLongTouch = false;                           //長押しかどうか
     bool m_isDecideDirWhenLongTouch = false;              //一定時間長押ししている時、その時点での方向を確認したか
     private bool m_isSingleTouch = false;
-    [SerializeField] bool m_isWorkEveryFrame = true;      //毎フレームタッチの移動方向を調べるか。ゲームシーンで切り替え可
     //長押し判定が起動する時間
     [SerializeField] float m_longTachJudgmentActivationTime = 1.2f;
     //フリック方向またはタップの情報を渡せる状態かどうか
