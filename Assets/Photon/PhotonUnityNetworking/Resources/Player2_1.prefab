@@ -163,8 +163,9 @@ MonoBehaviour:
   MAX_DASH_TIME: 1
   SPIN_AMOUNT: 5
   ROT_POWER: 25
-  MOVE_POWER: 25
-  MAX_STIFFIN_TIME: 2
+  MOVE_POWER: 23
+  MAX_STIFFIN_TIME: 1.5
+  m_effect: {fileID: 0}
 --- !u!114 &-7257786847198530558
 MonoBehaviour:
   m_ObjectHideFlags: 0
