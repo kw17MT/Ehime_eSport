@@ -41,22 +41,22 @@ namespace nsSound
             remoremonNarList.Add(nsSound.NarCharaSeleNames.m_SPEEDGATADAYO);
 
             //キウイーン選択時のナレーションのリスト
-            List<string> kiwinNarList = new List<string>();
-            kiwinNarList.Add(nsSound.NarCharaSeleNames.m_KIUIIN);
-            kiwinNarList.Add(nsSound.NarCharaSeleNames.m_POWERFULGATADAYO);
+            List<string> nyauiNarList = new List<string>();
+            nyauiNarList.Add(nsSound.NarCharaSeleNames.m_NYAUI);
+            nyauiNarList.Add(nsSound.NarCharaSeleNames.m_POWERFULGATADAYO);
 
-            //Ms.ライミリィー選択時のナレーションのリスト
-            List<string> msLimilyNarList = new List<string>();
-            msLimilyNarList.Add(nsSound.NarCharaSeleNames.m_MISURAIMIRII);
-            msLimilyNarList.Add(nsSound.NarCharaSeleNames.m_TECHNICGATADAYO);
+            //ブラックみかん丸選択時のナレーションのリスト
+            List<string> blackMikanmaruNarList = new List<string>();
+            blackMikanmaruNarList.Add(nsSound.NarCharaSeleNames.m_BLACKMIKANMARU);
+            blackMikanmaruNarList.Add(nsSound.NarCharaSeleNames.m_TECHNICGATADAYO);
 
             //4.
             //ナレーションのリストを、リストに加えていく(enumの順番と同じにすること！)
             m_narList = new List<List<string>>();
             m_narList.Add(mikanmaruNarList);
             m_narList.Add(remoremonNarList);
-            m_narList.Add(kiwinNarList);
-            m_narList.Add(msLimilyNarList);
+            m_narList.Add(nyauiNarList);
+            m_narList.Add(blackMikanmaruNarList);
         }
 
         //現在の選択状態を調べる。return:変わっているかどうか

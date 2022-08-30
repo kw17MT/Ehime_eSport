@@ -107,6 +107,9 @@ namespace nsSound
         public const string m_TECHNICGATADAYO = "Nar_CharaSele_TECHNICGATADAYO";
         public const string m_TECHNICSPEEDGATADAYO = "Nar_CharaSele_TECHNICSPEEDGATADAYO";
         public const string m_UNGAIIYO = "Nar_CharaSele_UNGAIIYO";
+
+        public const string m_BLACKMIKANMARU = "Nar_CharaSele_BLACKMIKANMARU";
+        public const string m_NYAUI = "Nar_CharaSele_NYAUI";
     }
 
     public static class NarCPUSeleNames
