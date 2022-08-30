@@ -625,7 +625,10 @@ public class AvatarController : MonoBehaviourPunCallbacks
         //攻撃されていなければ
         else
         {
-            CalcRotation();
+            if(photonView.IsMine)
+			{
+                CalcRotation();
+            }
 
             //壁ずり状態ならば
             if (m_hittedWall)
