@@ -1264,7 +1264,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 2
-  m_Text: "\uFF1A\n\uFF1A\n\uFF1A\n\uFF1A\n\uFF1A\n\uFF1A"
+  m_Text: "\uFF1A\n\uFF1A\n\uFF1A\n\uFF1A\n\uFF1A\n"
 --- !u!222 &918146597
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1743,7 +1743,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 2
-  m_Text: "BGM\nSE\n\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u30DC\u30A4\u30B9\n\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3\u30DC\u30A4\u30B9\n\u30D0\u30A4\u30D6\u30EC\u30FC\u30B7\u30E7\u30F3\n\u30D6\u30E9\u30A4\u30F3\u30C9\u30E2\u30FC\u30C9"
+  m_Text: "BGM\nSE\n\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u30DC\u30A4\u30B9\n\u30CA\u30EC\u30FC\u30B7\u30E7\u30F3\u30DC\u30A4\u30B9\n\u30D6\u30E9\u30A4\u30F3\u30C9\u30E2\u30FC\u30C9\n"
 --- !u!222 &1518022718
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1790,7 +1790,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 146.36, y: -312.7}
+  m_AnchoredPosition: {x: 146.36, y: -222}
   m_SizeDelta: {x: 200, y: 65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1559676309
@@ -2032,7 +2032,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1923452974
 RectTransform:
   m_ObjectHideFlags: 0
