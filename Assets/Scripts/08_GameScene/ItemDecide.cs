@@ -52,6 +52,11 @@ public class ItemDecide : MonoBehaviour
             //アイテムを持っていない状態
             case EnItemState.enNothingState:
                 obtainItemController = GameObject.Find("OwnPlayer").GetComponent<ObtainItemController>();
+                if(obtainItemController == null)
+				{
+                    break;
+				}
+
                 //アイテムを獲得したら、
                 if (obtainItemController.GetObtainItemType() != -1)
                 {
