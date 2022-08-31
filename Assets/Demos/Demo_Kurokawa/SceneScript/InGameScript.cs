@@ -161,14 +161,17 @@ public class InGameScript : MonoBehaviourPunCallbacks
             m_isDisconnected = true;
 		}
 
-        //次のウェイポイントの番号をルームプロパティに保存
-        var hashtable = new ExitGames.Client.Photon.Hashtable();
-        //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
-        string name = PhotonNetwork.NickName + "WayPointNumber";
-        //ウェイポイント番号を設定
-        hashtable[name] = 999;
-        //ルームプロパティの更新
-        PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        //if (!PhotonNetwork.OfflineMode)
+        //{
+        //    //次のウェイポイントの番号をルームプロパティに保存
+        //    var hashtable = new ExitGames.Client.Photon.Hashtable();
+        //    //プレイヤー名＋WayPointNumberという名前を作成 ex.)Player2WayPointNumber
+        //    string name = PhotonNetwork.NickName + "WayPointNumber";
+        //    //ウェイポイント番号を設定
+        //    hashtable[name] = 999;
+        //    //ルームプロパティの更新
+        //    PhotonNetwork.CurrentRoom.SetCustomProperties(hashtable);
+        //}
 
     }
 
@@ -780,6 +783,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
             {
                 if (m_operation.GetComponent<Operation>().GetIsLongTouch)
                 {
+                    GameObject.Find("ItemImage").GetComponent<ItemDecide>().enabled = false;
                     m_paramManager.GetComponent<ParamManage>().ResetSavedCharaNumber();
                     //ルームから出る
                     PhotonNetwork.LeaveRoom();
@@ -792,6 +796,7 @@ public class InGameScript : MonoBehaviourPunCallbacks
                 }
                 else if (m_operation.GetComponent<Operation>().GetIsDoubleTouch())
                 {
+                    GameObject.Find("ItemImage").GetComponent<ItemDecide>().enabled = false;
                     //ポーズ状態を解除
                     GameObject.Find("PauseButton").GetComponent<PauseButton>().OffPausePanel();
                     //ルームから出る
