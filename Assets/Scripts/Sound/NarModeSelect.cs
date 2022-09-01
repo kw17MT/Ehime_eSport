@@ -41,9 +41,9 @@ namespace nsSound
             cpuModeNarList.Add(nsSound.NarModeNames.m_COMPUTERTOTAISENDEKIRUYO);
 
             //タイムアタックモード選択時のナレーションのリスト
-            List<string> timeAttackModeNarList = new List<string>();
-            timeAttackModeNarList.Add(nsSound.NarModeNames.m_TIMEATTACK);
-            timeAttackModeNarList.Add(nsSound.NarModeNames.m_SHINKIROKUWOMEZASOU);
+            //List<string> timeAttackModeNarList = new List<string>();
+            //timeAttackModeNarList.Add(nsSound.NarModeNames.m_TIMEATTACK);
+            //timeAttackModeNarList.Add(nsSound.NarModeNames.m_SHINKIROKUWOMEZASOU);
 
             //設定モード選択時のナレーションのリスト
             List<string> settingModeNarList = new List<string>();
@@ -55,7 +55,7 @@ namespace nsSound
             m_narList = new List<List<string>>();
             m_narList.Add(onlineModeNarList);
             m_narList.Add(cpuModeNarList);
-            m_narList.Add(timeAttackModeNarList);
+            //m_narList.Add(timeAttackModeNarList);
             m_narList.Add(settingModeNarList);
         }
 
